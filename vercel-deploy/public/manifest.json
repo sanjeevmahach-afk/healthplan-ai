@@ -1,0 +1,15 @@
+{
+  "short_name": "HealthPlan AI",
+  "name": "HealthPlan AI - Insurance Recommender",
+  "description": "AI-powered health insurance plan recommendation engine",
+  "icons": [
+    { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any maskable" }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#1e1b4b",
+  "background_color": "#f4f6fb",
+  "categories": ["finance", "productivity"]
+}
