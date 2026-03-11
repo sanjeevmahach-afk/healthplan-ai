@@ -98,98 +98,120 @@ const PLANS_DATA = {
     specialFeatures: ["Specialized cardiac coverage"],
     bestFor: ["Heart disease patients"],
     medicals: "Yes", payoutFresh: "Good", payoutPort: "Good", color: "#e11d48"
+  },
+  "Star Cancer Care": {
+    insurer: "Star", pedWaiting: "Varies (subject to UW)", copay: "No", roomRent: "No Cap",
+    ncb: "Varies", maxBMI: 35, maxAge: 99, premiumRange: "High",
+    diseases: ["Cancer (cured)", "Cancer history"],
+    specialFeatures: ["Specialized cancer coverage", "Final issuance depends on Underwriting decision"],
+    bestFor: ["Cancer survivors", "Cancer history"],
+    medicals: "Yes (Subject to UW)", payoutFresh: "Good", payoutPort: "Good", color: "#be185d"
+  },
+  "Aditya Birla Active One Vytl": {
+    insurer: "Aditya Birla", pedWaiting: "3 years", copay: "No", roomRent: "No Cap",
+    ncb: "50% to 100%", maxBMI: 40, maxAge: 99, premiumRange: "Medium",
+    diseases: ["HbA1c ≤ 10 (Vytl)", "Chronic conditions"],
+    specialFeatures: ["Chronic Care Day 1", "Health returns", "Affordable version of Active One Max"],
+    bestFor: ["Heart conditions", "Kidney conditions", "Budget-conscious"],
+    medicals: "PPMC above 60", payoutFresh: "Good", payoutPort: "Good", color: "#f43f5e"
+  },
+  "Reliance Health Infinity": {
+    insurer: "Reliance", pedWaiting: "3 years", copay: "No", roomRent: "Any",
+    ncb: "100% to 500%", maxBMI: 37, maxAge: 65, premiumRange: "Low",
+    diseases: ["Mild PEDs", "Up to 2 co-morbidities"],
+    specialFeatures: ["Affordable for age 40-55", "Good for maternity planning"],
+    bestFor: ["Age 40-55", "Maternity", "Budget-conscious"],
+    medicals: "No PPMC", payoutFresh: "Good", payoutPort: "Good", color: "#0ea5e9"
   }
 };
 
+// ─── RECOMMENDATION TABLE (direct from Excel sheet) ───────────────────────
+// Each entry: { low: [...], value: [...], premium: [...], note: "" }
+// Plans listed in priority order within each bucket.
+const REC_TABLE = {
+  // NO PED
+  none_u40:    { low: ["TATA Medicare Select","ICICI Elevate","Niva Aspire"],          value: ["TATA Medicare Select","ICICI Elevate","Niva Aspire"],             premium: ["Niva Reassure 3.0","HDFC Optima Secure"],          note: "" },
+  none_40_55:  { low: ["Reliance Health Gain","Niva Aspire"],                          value: ["ICICI Elevate","Niva Reassure 3.0","TATA Medicare Select"],        premium: ["Niva Reassure 3.0","HDFC Optima Secure"],          note: "" },
+  none_55plus: { low: ["ICICI Elevate","Aditya Birla Active One Max","Niva Aspire"],   value: ["Aditya Birla Active One Max","Niva Reassure 3.0","ICICI Elevate"], premium: ["Niva Reassure 3.0","HDFC Optima Secure"],          note: "" },
+  // DIABETES TABLET
+  diab_low:    { low: ["TATA Medicare Select","ICICI Elevate","Niva Aspire"],          value: ["TATA Medicare Select","ICICI Elevate","Niva Aspire"],             premium: ["Niva Reassure 3.0","HDFC Optima Secure","Care Supreme"], note: "Loading may apply on some plans" },
+  diab_high:   { low: ["SBI Health Alpha"],                                            value: ["SBI Health Alpha"],                                              premium: ["Aditya Birla Active One Max"],                      note: "Individual plans only" },
+  diab_ins:    { low: ["Care Freedom"],                                                value: ["Care Freedom"],                                                  premium: ["Care Freedom"],                                    note: "Very limited options for insulin-dependent" },
+  // BP
+  bp:          { low: ["TATA Medicare Select","ICICI Elevate","Niva Aspire","Star Assure"], value: ["TATA Medicare Select","ICICI Elevate","Star Assure"],       premium: ["Niva Reassure 3.0","HDFC Optima Secure","Care Supreme"], note: "Loading may apply" },
+  bp_diab:     { low: ["TATA Medicare Select","ICICI Elevate","Star Assure"],          value: ["TATA Medicare Select","ICICI Elevate","Star Assure"],             premium: ["Niva Reassure 3.0","Care Supreme"],                note: "" },
+  // RESPIRATORY / ORGAN
+  asthma:      { low: ["Aditya Birla Active One Max"],                                 value: ["ICICI Elevate"],                                                 premium: ["Niva Reassure 3.0","HDFC Optima Secure","Care Supreme"], note: "" },
+  copd:        { low: ["Aditya Birla Active One Max"],                                 value: ["Care Supreme"],                                                  premium: ["Niva Reassure 3.0"],                               note: "" },
+  liver:       { low: ["Aditya Birla Active One Max"],                                 value: ["Care Supreme"],                                                  premium: ["Niva Reassure 3.0"],                               note: "" },
+  // SERIOUS CONDITIONS
+  heart:       { low: ["Aditya Birla Active One Max","Niva Reassure 3.0"],             value: ["Aditya Birla Active One Max"],                                   premium: ["Care Heart / Star Cardiac Care"],                  note: "Depends on severity. Underwriting decision applies." },
+  kidney:      { low: ["Aditya Birla Active One Max","Niva Reassure 3.0"],             value: ["Aditya Birla Active One Max"],                                   premium: ["Care Freedom"],                                    note: "" },
+  cancer_cured:{ low: ["Star Cancer Care","Care Freedom"],                             value: ["Star Cancer Care","Care Freedom"],                               premium: ["Star Cancer Care"],                                note: "Final issuance depends on Underwriting decision" },
+  surgery_treated:   { low: ["Star Assure","Niva Reassure 3.0","Care Supreme"],        value: ["Star Assure","Niva Reassure 3.0"],                               premium: ["Aditya Birla Active One Max","Care Freedom"],       note: "Cataract operated, kidney stone operated, rod implant etc." },
+  surgery_untreated: { low: ["SBI Health Alpha","Niva Reassure 3.0","Care Supreme"],   value: ["Care Supreme","Aditya Birla Active One Max"],                    premium: ["Care Freedom"],                                    note: "Kidney stones, gall bladder, piles, cataract etc." },
+  mental:      { low: ["SBI Health Alpha","Aditya Birla Active One Max"],              value: ["Aditya Birla Active One Max"],                                   premium: ["Care Freedom"],                                    note: "Final issuance depends on Underwriting decision" },
+  hyperthyroid:{ low: ["SBI Health Alpha"],                                            value: ["HDFC Optima Secure"],                                            premium: ["Care Freedom"],                                    note: "Final issuance depends on Underwriting decision" },
+  rheumatoid:  { low: ["SBI Health Alpha","Care Freedom"],                             value: ["Care Freedom"],                                                  premium: ["Care Freedom"],                                    note: "Final issuance depends on Underwriting decision" },
+  maternity:   { low: ["SBI Health Alpha","Star Assure","Niva Aspire"],                value: ["Niva Aspire","TATA Medicare Select"],                            premium: ["Niva Aspire","Reliance Health Gain"],               note: "" },
+};
+
+function getPedKey(ped, age) {
+  if (ped === "none") {
+    if (age < 40)  return "none_u40";
+    if (age <= 55) return "none_40_55";
+    return "none_55plus";
+  }
+  const map = {
+    diabetes_tab_low: "diab_low", diabetes_tab_high: "diab_high", diabetes_insulin: "diab_ins",
+    bp: "bp", bp_diab: "bp_diab", asthma: "asthma", copd: "copd", liver: "liver",
+    heart: "heart", kidney: "kidney", cancer_cured: "cancer_cured",
+    surgery_treated: "surgery_treated", surgery_untreated: "surgery_untreated",
+    mental: "mental", hyperthyroid: "hyperthyroid", rheumatoid: "rheumatoid", maternity: "maternity",
+  };
+  return map[ped] || "none_u40";
+}
+
 function getRecommendations(form) {
-  const { age, ped, bmi, familySize, maternity, budget, isPort, hba1c } = form;
-  const ageNum = parseInt(age);
-  const bmiNum = parseFloat(bmi);
-  const hba1cNum = parseFloat(hba1c) || 0;
-  let scores = {};
+  const { age, ped, bmi, budget, maternity } = form;
+  const ageNum = parseInt(age) || 30;
+  const bmiNum = parseFloat(bmi) || 0;
 
-  Object.entries(PLANS_DATA).forEach(([name, plan]) => {
-    let score = 50;
-    let eligible = true;
-    let reasons = [];
+  const pedKey = getPedKey(ped === "none" && maternity === "yes" ? "maternity" : ped, ageNum);
+  const row = REC_TABLE[pedKey] || REC_TABLE["none_u40"];
 
-    if (ageNum > plan.maxAge) { eligible = false; return; }
-    if (bmiNum > plan.maxBMI) { eligible = false; return; }
-    if (ageNum >= 60 && plan.copay !== "No") score -= 5;
-    if (ageNum < 40 && plan.premiumRange === "Very Low") { score += 10; reasons.push("Budget-friendly for your age"); }
-    if (ageNum >= 55 && plan.maxAge >= 75) { score += 8; reasons.push("Suitable for your age group"); }
+  // Pick bucket based on budget
+  let ordered = [];
+  if (budget === "low")         ordered = [...row.low,     ...row.value,   ...row.premium];
+  else if (budget === "high")   ordered = [...row.premium, ...row.value,   ...row.low];
+  else                          ordered = [...row.value,   ...row.low,     ...row.premium];
 
-    if (ped === "none") {
-      if (plan.pedWaiting.includes("Day 1")) score += 5;
-      if (plan.premiumRange === "Very Low") { score += 12; reasons.push("Best value with no pre-existing conditions"); }
-      if (plan.premiumRange === "Low" || plan.premiumRange === "Medium") score += 8;
-    } else if (ped === "diabetes_tab_low") {
-      if (hba1cNum > 0 && hba1cNum <= 7 && plan.diseases.some(d => d.includes("7"))) { score += 20; reasons.push("Accepts your HbA1c level"); }
-      else if (hba1cNum > 7 && hba1cNum <= 7.5 && plan.diseases.some(d => d.includes("7.5"))) { score += 18; reasons.push("Accepts your HbA1c level"); }
-      else if (plan.diseases.some(d => d.includes("7.5") || d.includes("8"))) score += 12;
-      else score -= 15;
-    } else if (ped === "diabetes_tab_high") {
-      if (plan.diseases.some(d => d.includes("9"))) { score += 15; reasons.push("Accepts high HbA1c"); }
-      else if (plan.diseases.some(d => d.includes("8"))) { score += 10; reasons.push("Accepts your HbA1c level"); }
-      else score -= 20;
-    } else if (ped === "diabetes_insulin") {
-      if (plan.diseases.some(d => d.includes("insulin"))) { score += 20; reasons.push("Covers insulin-dependent diabetes"); }
-      else if (name === "Care Freedom") score += 15;
-      else { eligible = false; return; }
-    } else if (ped === "bp") {
-      if (plan.diseases.some(d => d.toLowerCase().includes("co-morbid"))) { score += 10; reasons.push("Covers BP conditions"); }
-    } else if (ped === "heart") {
-      if (name === "Care Heart / Star Cardiac Care") { score += 30; reasons.push("Specialized cardiac plan"); }
-      else if (name === "Aditya Birla Active One Max") { score += 15; reasons.push("Suitable for heart conditions"); }
-      else if (name === "Care Freedom") score += 10;
-      else score -= 20;
-    } else if (ped === "kidney") {
-      if (name === "Care Freedom") { score += 20; reasons.push("Good for kidney conditions"); }
-      else if (name === "Aditya Birla Active One Max") score += 15;
-      else score -= 15;
-    } else if (ped === "mental") {
-      if (name === "Care Freedom") { score += 25; reasons.push("Covers mental illness"); }
-      else if (name === "Aditya Birla Active One Max") { score += 20; reasons.push("Covers mental wellness"); }
-      else score -= 20;
-    } else if (ped === "cancer_cured") {
-      if (name === "Care Freedom") { score += 20; reasons.push("Suitable for cancer survivors"); }
-      else score -= 15;
-    } else if (ped === "surgery_treated") {
-      if (name === "Star Assure") { score += 20; reasons.push("P1 for treated surgery cases"); }
-      else if (name === "Niva Reassure 3.0") { score += 18; reasons.push("Good for post-surgery"); }
-      else if (name === "Care Supreme") score += 15;
-    } else if (ped === "surgery_untreated") {
-      if (name === "Care Supreme") { score += 20; reasons.push("P1 for untreated surgery"); }
-      else if (name === "Care Freedom") score += 15;
-    } else if (ped === "rheumatoid") {
-      if (name === "Care Freedom") { score += 30; reasons.push("Specific coverage for Rheumatoid Arthritis"); }
-      else score -= 20;
-    } else if (ped === "hyperthyroid") {
-      if (name === "HDFC Optima Secure") { score += 25; reasons.push("Covers hyperthyroid (loading relaxation)"); }
-      else if (name === "SBI Health Alpha") score += 15;
-      else if (name === "Care Freedom") score += 10;
-      else score -= 10;
-    }
+  // Deduplicate while preserving order
+  const seen = new Set();
+  const candidates = ordered.filter(n => { if (seen.has(n)) return false; seen.add(n); return true; });
 
-    const premiumMap = { "Very Low": 1, "Low": 2, "Medium": 3, "High": 4, "Very High": 5 };
-    const planPrem = premiumMap[plan.premiumRange] || 3;
-    if (budget === "low" && planPrem <= 2) { score += 20; reasons.push("Within your budget"); }
-    else if (budget === "low" && planPrem >= 4) score -= 15;
-    else if (budget === "medium" && planPrem === 3) { score += 10; reasons.push("Good value for money"); }
-    else if (budget === "high" && planPrem >= 4) { score += 10; reasons.push("Premium coverage"); }
-
-    if (familySize === "2a" && plan.bestFor.some(b => b.includes("2A"))) { score += 8; reasons.push("Ideal for couples"); }
-    if (familySize === "family" && plan.bestFor.some(b => b.includes("family") || b.includes("Any"))) { score += 8; reasons.push("Great family floater"); }
-    if ((familySize === "parents" || familySize === "senior") && plan.maxAge >= 75) { score += 10; reasons.push("Covers senior family members"); }
-    if (maternity === "yes" && plan.specialFeatures.some(f => f.toLowerCase().includes("maternity"))) { score += 20; reasons.push("Maternity benefits included"); }
-
-    if (eligible) scores[name] = { score, reasons: reasons.slice(0, 3) };
+  // Filter by BMI and age eligibility, then take top 3
+  const eligible = candidates.filter(name => {
+    const plan = PLANS_DATA[name];
+    if (!plan) return false;
+    if (bmiNum > 0 && bmiNum > plan.maxBMI) return false;
+    if (ageNum > plan.maxAge) return false;
+    return true;
   });
 
-  return Object.entries(scores)
-    .sort((a, b) => b[1].score - a[1].score)
-    .slice(0, 3)
-    .map(([name, data]) => ({ name, ...PLANS_DATA[name], ...data }));
+  // Build reason tags
+  const buildReasons = (name) => {
+    const reasons = [];
+    if (row.low.includes(name))     reasons.push("Budget-friendly option");
+    if (row.value.includes(name))   reasons.push("Best value for money");
+    if (row.premium.includes(name)) reasons.push("Premium coverage");
+    if (row.note)                   reasons.push(row.note);
+    return reasons.slice(0, 3);
+  };
+
+  return eligible.slice(0, 3).map(name => ({
+    name, ...PLANS_DATA[name], reasons: buildReasons(name)
+  }));
 }
 
 /* ─── HELPERS ───────────────────────────────────────────────────────────── */
@@ -444,6 +466,9 @@ export default function App() {
                 { value: "mental",            label: "Mental Illness" },
                 { value: "rheumatoid",        label: "Rheumatoid Arthritis" },
                 { value: "hyperthyroid",      label: "Hyperthyroid" },
+                { value: "asthma",            label: "Asthma" },
+                { value: "copd",              label: "COPD" },
+                { value: "liver",             label: "Liver Related" },
               ]} />
             </Field>
             {form.ped.includes("diabetes") && (
