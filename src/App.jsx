@@ -173,9 +173,9 @@ const MUTUALLY_EXCLUSIVE = [
    DESIGN TOKENS
 ═══════════════════════════════════════════════════════════════ */
 const C = {
-  bg:"#F5F6F8", card:"#FFFFFF", border:"#E8E8E8",
+  bg:"#FDF6F6", card:"#FFFFFF", border:"#F0DEDE",
   text:"#111111", sub:"#555555", muted:"#999999",
-  accent:"#DC2626", accentLight:"#FEF2F2", accentText:"#991B1B",
+  accent:"#E53935", accentLight:"#FFF0F0", accentText:"#C62828",
   green:"#059669", radius:"14px", radiusSm:"9px",
 };
 
@@ -196,7 +196,7 @@ const Field = ({label,hint,children}) => (
   </div>
 );
 
-const baseInp = {width:"100%",padding:"12px 14px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:"#FAFAFA",fontFamily:"'Inter',sans-serif",fontSize:"15px",color:C.text,outline:"none",boxSizing:"border-box",WebkitAppearance:"none"};
+const baseInp = {width:"100%",padding:"12px 14px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:"#FAFAFA",fontFamily:"'Inter',sans-serif",fontSize:"15px",color:"#111111",fontWeight:500,outline:"none",boxSizing:"border-box",WebkitAppearance:"none"};
 
 const TInput = ({value,onChange,placeholder,type="text"}) => (
   <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} inputMode={type==="number"?"decimal":"text"} style={baseInp}/>
@@ -326,14 +326,14 @@ export default function App() {
       <div style={{background:C.card,borderBottom:`1px solid ${C.border}`,padding:"14px 18px",position:"sticky",top:0,zIndex:100,boxShadow:"0 1px 8px rgba(0,0,0,0.05)"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"14px"}}>
           <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
-            <div style={{width:"34px",height:"34px",borderRadius:"9px",background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"16px",flexShrink:0}}>🏥</div>
+            <div style={{width:"34px",height:"34px",borderRadius:"9px",background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"16px",flexShrink:0}}>👨‍⚕️</div>
             <div>
               <div style={{fontWeight:700,fontSize:"15px",color:C.text,letterSpacing:"-0.2px"}}>Health Plan Recommender</div>
               <div style={{fontSize:"10px",color:C.muted,marginTop:"1px"}}>AI-powered · For agents</div>
             </div>
           </div>
           {step===3&&(
-            <button onClick={()=>{setStep(0);setResults(null);setAiInsight("");}} style={{background:C.accentLight,border:"none",color:C.accent,borderRadius:"20px",padding:"6px 13px",fontSize:"12px",fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif",flexShrink:0}}>← New</button>
+            <button onClick={()=>{setStep(0);setResults(null);setAiInsight("");}} style={{background:C.accent,border:"none",color:"#fff",borderRadius:"20px",padding:"8px 16px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif",flexShrink:0,boxShadow:"0 2px 8px rgba(229,57,53,0.3)"}}>＋ New Search</button>
           )}
         </div>
         {/* Step indicator */}
@@ -511,10 +511,16 @@ export default function App() {
                           </div>
                         </div>
 
-                        {/* Expand toggle */}
-                        <button onClick={()=>setExpanded(isExp?null:idx)} style={{width:"100%",background:C.bg,border:"none",borderTop:`1px solid ${C.border}`,padding:"9px",fontSize:"12px",fontWeight:500,color:C.muted,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",WebkitTapHighlightColor:"transparent",fontFamily:"'Inter',sans-serif"}}>
-                          {isExp?"▲ Hide details":"▼ Show details"}
-                        </button>
+                        {/* Card action row */}
+                        <div style={{display:"flex",borderTop:`1px solid ${C.border}`}}>
+                          <button onClick={()=>setExpanded(isExp?null:idx)} style={{flex:1,background:C.bg,border:"none",borderRight:`1px solid ${C.border}`,padding:"10px",fontSize:"12px",fontWeight:500,color:C.muted,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px",WebkitTapHighlightColor:"transparent",fontFamily:"'Inter',sans-serif"}}>
+                            {isExp?"▲ Hide":"▼ Details"}
+                          </button>
+                          <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
+                            style={{flex:1,background:"#FFF0F0",border:"none",padding:"10px",fontSize:"12px",fontWeight:700,color:C.accent,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",textDecoration:"none",WebkitTapHighlightColor:"transparent"}}>
+                            🛒 Sell on POS
+                          </a>
+                        </div>
 
                         {isExp&&(
                           <div style={{padding:"13px 15px 15px"}}>
@@ -547,6 +553,16 @@ export default function App() {
                   })}
                 </div>
 
+                {/* ── POS CTA ── */}
+                <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
+                  <div style={{fontSize:"11px",fontWeight:700,color:"rgba(255,255,255,0.7)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"4px"}}>Ready to sell?</div>
+                  <div style={{fontSize:"16px",fontWeight:700,color:"#fff",marginBottom:"14px"}}>Open InsuranceDekho POS</div>
+                  <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
+                    style={{display:"inline-flex",alignItems:"center",gap:"8px",background:"#fff",color:"#C62828",borderRadius:"10px",padding:"12px 28px",fontSize:"14px",fontWeight:700,textDecoration:"none",boxShadow:"0 2px 10px rgba(0,0,0,0.15)"}}>
+                    🛒 Sell on POS →
+                  </a>
+                </div>
+
                 <div style={{marginTop:"14px",padding:"11px 13px",background:C.card,borderRadius:C.radiusSm,border:`1px solid ${C.border}`}}>
                   <p style={{color:C.muted,fontSize:"11px",margin:0,lineHeight:1.6}}>⚠️ Payout % shown for SI ≥ ₹10L (standard). Rates vary by SI slab, city, and coverage type. Final underwriting subject to insurer guidelines.</p>
                 </div>
@@ -574,7 +590,9 @@ export default function App() {
 
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
-        input:focus{border-color:${C.accent}!important;box-shadow:0 0 0 3px ${C.accent}15;}
+        input{color:#111111!important;font-weight:600!important;-webkit-text-fill-color:#111111!important;opacity:1!important;}
+        input::placeholder{color:#AAAAAA!important;font-weight:400!important;-webkit-text-fill-color:#AAAAAA!important;}
+        input:focus{border-color:${C.accent}!important;box-shadow:0 0 0 3px rgba(229,57,53,0.12);}
         *{-webkit-tap-highlight-color:transparent;}
         body{margin:0;background:${C.bg};}
       `}</style>
