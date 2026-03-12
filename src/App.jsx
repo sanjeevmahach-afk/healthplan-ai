@@ -6,21 +6,22 @@ import { useState, useEffect } from "react";
    SI assumed ≥ 10L (most common recommendation case)
 ═══════════════════════════════════════════════════════════════ */
 const PAYOUT = {
-  "Niva Reassure 3.0":           { fresh: "23%", port: "20%" },
+  // Rates from Apps Script commission grid · SI ≥ 10L · Family floater · Fresh/Port
+  "Niva Reassure 3.0":           { fresh: "23%", port: "20%" },  // ReAssure 3.0, 10L–1Cr slab
+  "Niva Aspire":                 { fresh: "23%", port: "13%" },  // Default Niva rates, ≥10L
   "HDFC Optima Secure":          { fresh: "25%", port: "15%" },  // Family, preferred city, ≥10L
-  "ICICI Elevate":               { fresh: "25%", port: "12%" },
-  "TATA Medicare Select":        { fresh: "22%", port: "12%" },
-  "Star Assure":                 { fresh: "25%", port: "15%" },
-  "Care Supreme":                { fresh: "22%", port: "15%" },
-  "Reliance Health Gain":        { fresh: "23%", port: "15%" },
-  "Niva Aspire":                 { fresh: "23%", port: "13%" },
-  "Aditya Birla Active One Max": { fresh: "30%", port: "15%" },
-  "SBI Health Alpha":            { fresh: "20%", port: "N/A" },
-  "Care Freedom":                { fresh: "22%", port: "15%" },
-  "Care Heart / Star Cardiac":   { fresh: "25%", port: "15%" },
-  "Star Cancer Care":            { fresh: "25%", port: "15%" },
-  "Aditya Birla Active One Vytl":{ fresh: "30%", port: "15%" },
-  "Reliance Health Infinity":    { fresh: "23%", port: "15%" },
+  "ICICI Elevate":               { fresh: "25%", port: "12%" },  // ICICI health fresh/port
+  "TATA Medicare Select":        { fresh: "27%", port: "12%" },  // Medicare Select ≥10L
+  "Star Assure":                 { fresh: "25%", port: "15%" },  // Star standard grid
+  "Care Supreme":                { fresh: "22%", port: "15%" },  // Supreme/Classic row
+  "Care Freedom":                { fresh: "22%", port: "15%" },  // General Care row
+  "Care Heart / Star Cardiac":   { fresh: "22%", port: "15%" },  // Care row
+  "Star Cancer Care":            { fresh: "25%", port: "15%" },  // Star standard grid
+  "Reliance Health Gain":        { fresh: "23%", port: "15%" },  // Health Gain, ≥10L, rest of India
+  "Reliance Health Infinity":    { fresh: "23%", port: "15%" },  // Health Infinity, same grid
+  "Aditya Birla Active One Max": { fresh: "30%", port: "15%" },  // AB ≥10L slab
+  "Aditya Birla Active One Vytl":{ fresh: "30%", port: "15%" },  // AB ≥10L slab
+  "SBI Health Alpha":            { fresh: "35%", port: "10%" },  // SBI Alpha, >10L, rest of India
 };
 
 /* ═══════════════════════════════════════════════════════════════
@@ -291,8 +292,17 @@ export default function App() {
   const [loading,setLoading]     = useState(false);
   const [aiInsight,setAiInsight] = useState("");
   const [expanded,setExpanded]   = useState(null);
+  const [compareList,setCompareList] = useState([]);
+  const [showCompare,setShowCompare] = useState(false);
 
   const set = k => v => setForm(f=>({...f,[k]:v}));
+  const toggleCompare = (name) => {
+    setCompareList(prev => {
+      if (prev.includes(name)) return prev.filter(x=>x!==name);
+      if (prev.length>=2) return prev; // max 2
+      return [...prev,name];
+    });
+  };
   const bmi = calcBMI(form.height,form.weight);
   const bmiInfo = bmiMeta(bmi);
   const hasDiab = (form.peds||[]).some(p=>p.startsWith("diabetes"));
@@ -300,7 +310,7 @@ export default function App() {
   useEffect(()=>{ window.scrollTo({top:0,behavior:"smooth"}); },[step]);
 
   const handleGenerate = async () => {
-    setLoading(true); setResults(null); setAiInsight(""); setExpanded(null);
+    setLoading(true); setResults(null); setAiInsight(""); setExpanded(null); setCompareList([]); setShowCompare(false);
     setStep(3);
     const recs = getRecommendations({...form,bmi});
     setResults(recs);
@@ -481,7 +491,20 @@ export default function App() {
                               <div style={{fontSize:"10px",fontWeight:700,color:C.muted,letterSpacing:"0.09em",textTransform:"uppercase",marginBottom:"2px"}}>{plan.insurer}</div>
                               <div style={{fontWeight:700,fontSize:"16px",color:C.text,letterSpacing:"-0.2px",lineHeight:1.2}}>{plan.name}</div>
                             </div>
-                            <span style={{fontSize:"20px",marginLeft:"8px",flexShrink:0}}>{medal}</span>
+                            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"4px",marginLeft:"8px",flexShrink:0}}>
+                              <span style={{fontSize:"20px"}}>{medal}</span>
+                              <button onClick={()=>toggleCompare(plan.name)} style={{
+                                display:"flex",alignItems:"center",gap:"3px",
+                                padding:"3px 8px",borderRadius:"20px",border:"none",
+                                background:compareList.includes(plan.name)?C.accent:"#F0F0F0",
+                                color:compareList.includes(plan.name)?"#fff":C.muted,
+                                fontSize:"10px",fontWeight:700,cursor:"pointer",
+                                opacity:(!compareList.includes(plan.name)&&compareList.length>=2)?0.4:1,
+                                WebkitTapHighlightColor:"transparent",fontFamily:"'Inter',sans-serif",
+                              }}>
+                                {compareList.includes(plan.name)?"✓ Added":"+ Compare"}
+                              </button>
+                            </div>
                           </div>
 
                           {/* Premium badge */}
@@ -553,7 +576,107 @@ export default function App() {
                   })}
                 </div>
 
-                {/* ── POS CTA ── */}
+                {/* ── COMPARE TRIGGER ── */}
+                {compareList.length===2&&!showCompare&&(
+                  <button onClick={()=>setShowCompare(true)} style={{
+                    width:"100%",marginTop:"16px",padding:"14px",borderRadius:C.radius,border:"none",
+                    background:"linear-gradient(135deg,#1D4ED8,#3B82F6)",color:"#fff",
+                    fontSize:"15px",fontWeight:700,cursor:"pointer",
+                    display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",
+                    fontFamily:"'Inter',sans-serif",boxShadow:"0 4px 16px rgba(29,78,216,0.3)",
+                    WebkitTapHighlightColor:"transparent",
+                  }}>
+                    ⚖️ Compare {compareList[0].split(" ")[0]} vs {compareList[1].split(" ")[0]}
+                  </button>
+                )}
+
+                {/* ── COMPARISON TABLE ── */}
+                {showCompare&&compareList.length===2&&(()=>{
+                  const pa = results.find(r=>r.name===compareList[0]);
+                  const pb2 = results.find(r=>r.name===compareList[1]);
+                  if(!pa||!pb2) return null;
+                  const payA = PAYOUT[pa.name]||{fresh:"–",port:"–"};
+                  const payB = PAYOUT[pb2.name]||{fresh:"–",port:"–"};
+                  const isPort = form.isPort==="yes";
+
+                  const parseNum = v => parseFloat(String(v).replace("%",""))||0;
+
+                  const rows = [
+                    { label:"PED Waiting",      a:pa.pedWaiting,           b:pb2.pedWaiting,       winnerFn:(a,b)=>a.includes("Day 1")?"A":b.includes("Day 1")?"B":"tie" },
+                    { label:"Co-pay",           a:pa.copay,                b:pb2.copay,            winnerFn:(a,b)=>a==="No"&&b!=="No"?"A":b==="No"&&a!=="No"?"B":"tie" },
+                    { label:"Room Rent",        a:pa.roomRent,             b:pb2.roomRent,         winnerFn:(a,b)=>a==="No Cap"&&b!=="No Cap"?"A":b==="No Cap"&&a!=="No Cap"?"B":"tie" },
+                    { label:"NCB",              a:pa.ncb,                  b:pb2.ncb,              winnerFn:()=>"tie" },
+                    { label:"Premium Range",    a:pa.premiumRange,         b:pb2.premiumRange,     winnerFn:(a,b)=>{ const o=["Very Low","Low","Medium","High","Very High"]; return o.indexOf(a)<o.indexOf(b)?"A":o.indexOf(b)<o.indexOf(a)?"B":"tie"; } },
+                    { label:"Medicals",         a:pa.medicals,             b:pb2.medicals,         winnerFn:(a,b)=>a==="No PPMC"&&b!=="No PPMC"?"A":b==="No PPMC"&&a!=="No PPMC"?"B":"tie" },
+                    { label:isPort?"Port Payout":"Fresh Payout", a:isPort?payA.port:payA.fresh, b:isPort?payB.port:payB.fresh, winnerFn:(a,b)=>parseNum(a)>parseNum(b)?"A":parseNum(b)>parseNum(a)?"B":"tie" },
+                    { label:"Max Age",          a:pa.maxAge===99?"No limit":pa.maxAge+" yrs", b:pb2.maxAge===99?"No limit":pb2.maxAge+" yrs", winnerFn:(a,b)=>pa.maxAge>pb2.maxAge?"A":pb2.maxAge>pa.maxAge?"B":"tie" },
+                  ];
+
+                  const scoreA = rows.filter(r=>r.winnerFn(r.a,r.b)==="A").length;
+                  const scoreB = rows.filter(r=>r.winnerFn(r.a,r.b)==="B").length;
+
+                  return (
+                    <div style={{marginTop:"16px",background:C.card,borderRadius:C.radius,overflow:"hidden",border:`1px solid ${C.border}`,boxShadow:"0 4px 20px rgba(0,0,0,0.08)"}}>
+                      {/* Header */}
+                      <div style={{background:"linear-gradient(135deg,#1D4ED8,#3B82F6)",padding:"14px 16px"}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
+                          <div style={{fontSize:"12px",fontWeight:700,color:"rgba(255,255,255,0.8)",letterSpacing:"0.08em",textTransform:"uppercase"}}>⚖️ Plan Comparison</div>
+                          <button onClick={()=>setShowCompare(false)} style={{background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",borderRadius:"20px",padding:"4px 10px",fontSize:"11px",fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>✕ Close</button>
+                        </div>
+                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px"}}>
+                          {[{plan:pa,score:scoreA,pay:payA},{plan:pb2,score:scoreB,pay:payB}].map(({plan:pl,score,pay},i)=>(
+                            <div key={i} style={{background:"rgba(255,255,255,0.15)",borderRadius:"10px",padding:"10px 12px"}}>
+                              <div style={{fontSize:"10px",color:"rgba(255,255,255,0.7)",fontWeight:600,marginBottom:"2px"}}>{pl.insurer}</div>
+                              <div style={{fontSize:"13px",fontWeight:700,color:"#fff",lineHeight:1.2,marginBottom:"6px"}}>{pl.name}</div>
+                              <div style={{display:"inline-block",background:score>=(scoreA===scoreB?0:Math.max(scoreA,scoreB))&&score===Math.max(scoreA,scoreB)?"#FCD34D":"rgba(255,255,255,0.2)",color:score===Math.max(scoreA,scoreB)&&scoreA!==scoreB?"#92400E":"#fff",borderRadius:"20px",padding:"2px 10px",fontSize:"11px",fontWeight:700}}>
+                                {score} wins {score===Math.max(scoreA,scoreB)&&scoreA!==scoreB?"👑":""}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Rows */}
+                      {rows.map((row,i)=>{
+                        const winner = row.winnerFn(row.a,row.b);
+                        const hlA = winner==="A";
+                        const hlB = winner==="B";
+                        return (
+                          <div key={i} style={{display:"grid",gridTemplateColumns:"1fr 80px 1fr",borderBottom:`1px solid ${C.border}`}}>
+                            <div style={{padding:"10px 10px",background:hlA?"#EFF6FF":"#fff",borderRight:`1px solid ${C.border}`}}>
+                              <div style={{fontSize:"13px",fontWeight:hlA?700:400,color:hlA?"#1D4ED8":C.text,display:"flex",alignItems:"center",gap:"5px"}}>
+                                {hlA&&<span style={{color:"#1D4ED8",fontSize:"12px"}}>✓</span>}{row.a}
+                              </div>
+                            </div>
+                            <div style={{padding:"10px 6px",background:"#FAFAFA",display:"flex",alignItems:"center",justifyContent:"center",borderRight:`1px solid ${C.border}`}}>
+                              <div style={{fontSize:"9px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",lineHeight:1.3}}>{row.label}</div>
+                            </div>
+                            <div style={{padding:"10px 10px",background:hlB?"#EFF6FF":"#fff"}}>
+                              <div style={{fontSize:"13px",fontWeight:hlB?700:400,color:hlB?"#1D4ED8":C.text,display:"flex",alignItems:"center",gap:"5px",justifyContent:"flex-end"}}>
+                                {row.b}{hlB&&<span style={{color:"#1D4ED8",fontSize:"12px"}}>✓</span>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+
+                      {/* Overall winner */}
+                      <div style={{padding:"14px 16px",background:scoreA===scoreB?"#FAFAFA":scoreA>scoreB?"#EFF6FF":"#EFF6FF",textAlign:"center"}}>
+                        {scoreA===scoreB?(
+                          <div style={{fontSize:"13px",fontWeight:600,color:C.muted}}>🤝 It's a tie! Both plans are evenly matched.</div>
+                        ):(
+                          <div>
+                            <div style={{fontSize:"11px",color:C.muted,marginBottom:"3px",textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Overall Winner</div>
+                            <div style={{fontSize:"15px",fontWeight:700,color:"#1D4ED8"}}>👑 {scoreA>scoreB?pa.name:pb2.name}</div>
+                            <div style={{fontSize:"11px",color:C.muted,marginTop:"2px"}}>{Math.max(scoreA,scoreB)} of {rows.length} categories</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* ── POS CTA ── */}}
                 <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
                   <div style={{fontSize:"11px",fontWeight:700,color:"rgba(255,255,255,0.7)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"4px"}}>Ready to sell?</div>
                   <div style={{fontSize:"16px",fontWeight:700,color:"#fff",marginBottom:"14px"}}>Open InsuranceDekho POS</div>
