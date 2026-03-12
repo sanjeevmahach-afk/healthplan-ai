@@ -329,7 +329,7 @@ export default function App() {
             <div style={{width:"34px",height:"34px",borderRadius:"9px",background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"16px",flexShrink:0}}>👨‍⚕️</div>
             <div>
               <div style={{fontWeight:700,fontSize:"15px",color:C.text,letterSpacing:"-0.2px"}}>Health Plan Recommender</div>
-              <div style={{fontSize:"10px",color:C.muted,marginTop:"1px"}}>AI-powered · For agents</div>
+              <div style={{fontSize:"10px",color:C.muted,marginTop:"1px"}}>AI-powered · Health Insurance</div>
             </div>
           </div>
           {step===3&&(
@@ -412,7 +412,7 @@ export default function App() {
 
             <Field label="Family Size">
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"7px"}}>
-                {[{value:"self",label:"Self",emoji:"🧍"},{value:"2a",label:"Self + Spouse",emoji:"👫"},{value:"family",label:"Family 2A+2C",emoji:"👨‍👩‍👧‍👦"},{value:"parents",label:"Self + Parents",emoji:"👴"},{value:"senior",label:"Senior (60+)",emoji:"🧓"}].map(o=>{
+                {[{value:"self",label:"Self",emoji:"🧍"},{value:"2a",label:"Self + Spouse",emoji:"👫"},{value:"family",label:"Family 2A+2C",emoji:"👨‍👩‍👧‍👦"},{value:"senior",label:"Senior (60+)",emoji:"🧓"}].map(o=>{
                   const a=form.familySize===o.value;
                   return <button key={o.value} onClick={()=>set("familySize")(o.value)} style={{padding:"10px 11px",borderRadius:C.radiusSm,textAlign:"left",border:a?`1.5px solid ${C.accent}`:`1.5px solid ${C.border}`,background:a?C.accentLight:"#FAFAFA",color:a?C.accent:C.text,fontFamily:"'Inter',sans-serif",fontSize:"13px",fontWeight:a?600:400,cursor:"pointer",WebkitTapHighlightColor:"transparent"}}>{o.emoji} {o.label}</button>;
                 })}
@@ -561,7 +561,7 @@ export default function App() {
                 {/* ── POS CTA ── */}}
                 <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
                   <div style={{fontSize:"11px",fontWeight:700,color:"rgba(255,255,255,0.7)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"4px"}}>Ready to sell?</div>
-                  <div style={{fontSize:"16px",fontWeight:700,color:"#fff",marginBottom:"14px"}}>Open InsuranceDekho POS</div>
+                  <div style={{fontSize:"16px",fontWeight:700,color:"#fff",marginBottom:"14px"}}>Open POS Portal</div>
                   <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
                     style={{display:"inline-flex",alignItems:"center",gap:"8px",background:"#fff",color:"#C62828",borderRadius:"10px",padding:"12px 28px",fontSize:"14px",fontWeight:700,textDecoration:"none",boxShadow:"0 2px 10px rgba(0,0,0,0.15)"}}>
                     🛒 Sell on POS →
