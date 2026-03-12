@@ -107,17 +107,16 @@ function mergePedRows(keys) {
 }
 
 function getRecommendations(form) {
-  const { age, peds, bmi, budget, maternity } = form;
+  const { age, ped, bmi, budget, maternity } = form;
   const ageNum = parseInt(age) || 30;
   const bmiNum = parseFloat(bmi) || 0;
-  const activePeds = (peds||[]).filter(p => p !== "none");
-  const effectivePeds = activePeds.length === 0 ? [maternity === "yes" ? "maternity" : "none"] : activePeds;
-  const keys = effectivePeds.map(p => getPedKey(p, ageNum));
-  const row = mergePedRows(keys);
+  const effectivePed = (!ped || ped === "none") ? (maternity === "yes" ? "maternity" : "none") : ped;
+  const key = getPedKey(effectivePed, ageNum);
+  const row = REC_TABLE[key] || REC_TABLE["none_u40"];
   let ordered = [];
-  if (budget === "low")       ordered = [...row.low,    ...row.value,  ...row.premium];
-  else if (budget === "high") ordered = [...row.premium,...row.value,  ...row.low];
-  else                        ordered = [...row.value,  ...row.low,    ...row.premium];
+  if (budget === "low")       ordered = [...row.low,   ...row.value,  ...row.premium];
+  else if (budget === "high") ordered = [...row.premium,...row.value, ...row.low];
+  else                        ordered = [...row.value,  ...row.low,   ...row.premium];
   const seen = new Set();
   const candidates = ordered.filter(n => { if (seen.has(n)) return false; seen.add(n); return true; });
   const eligible = candidates.filter(name => {
@@ -292,25 +291,16 @@ export default function App() {
   const [loading,setLoading]     = useState(false);
   const [aiInsight,setAiInsight] = useState("");
   const [expanded,setExpanded]   = useState(null);
-  const [compareList,setCompareList] = useState([]);
-  const [showCompare,setShowCompare] = useState(false);
 
   const set = k => v => setForm(f=>({...f,[k]:v}));
-  const toggleCompare = (name) => {
-    setCompareList(prev => {
-      if (prev.includes(name)) return prev.filter(x=>x!==name);
-      if (prev.length>=2) return prev; // max 2
-      return [...prev,name];
-    });
-  };
   const bmi = calcBMI(form.height,form.weight);
   const bmiInfo = bmiMeta(bmi);
-  const hasDiab = (form.peds||[]).some(p=>p.startsWith("diabetes"));
+  const hasDiab = (form.ped||"").startsWith("diabetes");
 
   useEffect(()=>{ window.scrollTo({top:0,behavior:"smooth"}); },[step]);
 
   const handleGenerate = async () => {
-    setLoading(true); setResults(null); setAiInsight(""); setExpanded(null); setCompareList([]); setShowCompare(false);
+    setLoading(true); setResults(null); setAiInsight(""); setExpanded(null);
     setStep(3);
     const recs = getRecommendations({...form,bmi});
     setResults(recs);
@@ -318,7 +308,7 @@ export default function App() {
       const res = await fetch("https://api.anthropic.com/v1/messages",{
         method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,
-          messages:[{role:"user",content:`Health insurance advisor India. Customer: Age ${form.age}, PEDs: ${(form.peds||[]).join("+")||"none"}, BMI: ${bmi||"N/A"}, Family: ${form.familySize}, Maternity: ${form.maternity}, Budget: ${form.budget}, Port: ${form.isPort}. Recommended: ${recs.map(r=>r.name).join(", ")}. Write 2 sentences explaining why these plans fit this customer. Max 55 words.`}]})
+          messages:[{role:"user",content:`Health insurance advisor India. Customer: Age ${form.age}, PED: ${form.ped||"none"}, BMI: ${bmi||"N/A"}, Family: ${form.familySize}, Maternity: ${form.maternity}, Budget: ${form.budget}, Port: ${form.isPort}. Recommended: ${recs.map(r=>r.name).join(", ")}. Write 2 sentences explaining why these plans fit this customer. Max 55 words.`}]})
       });
       const d = await res.json();
       if(d.content?.[0]?.text) setAiInsight(d.content[0].text);
@@ -403,7 +393,13 @@ export default function App() {
             <div style={{fontSize:"13px",color:C.muted,marginBottom:"22px"}}>Select up to 2 pre-existing conditions</div>
 
             <Field label="Pre-existing Disease (PED)">
-              <PedSelector value={form.peds} onChange={set("peds")}/>
+              <select value={form.ped} onChange={e=>set("ped")(e.target.value)} style={{
+                ...baseInp, paddingRight:"36px", cursor:"pointer",
+                backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23999'/%3E%3C/svg%3E")`,
+                backgroundRepeat:"no-repeat", backgroundPosition:"right 14px center",
+              }}>
+                {PED_OPTIONS.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
             </Field>
 
             {hasDiab&&(
@@ -456,7 +452,7 @@ export default function App() {
               <>
                 {/* Summary chips */}
                 <div style={{display:"flex",flexWrap:"wrap",gap:"5px",marginBottom:"16px"}}>
-                  {[`Age ${form.age}`, bmi?`BMI ${bmi}`:"", ...(form.peds||[]).filter(p=>p!=="none").map(p=>PED_OPTIONS.find(o=>o.value===p)?.label||p), form.maternity==="yes"?"Maternity":"", `${form.budget} budget`, form.isPort==="yes"?"Port":"Fresh"].filter(Boolean).map((chip,i)=>(
+                  {[`Age ${form.age}`, bmi?`BMI ${bmi}`:"", form.ped&&form.ped!=="none"?PED_OPTIONS.find(o=>o.value===form.ped)?.label||form.ped:"", form.maternity==="yes"?"Maternity":"", `${form.budget} budget`, form.isPort==="yes"?"Port":"Fresh"].filter(Boolean).map((chip,i)=>(
                     <span key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:"20px",padding:"3px 9px",fontSize:"11px",color:C.muted,fontWeight:500}}>{chip}</span>
                   ))}
                 </div>
@@ -491,20 +487,7 @@ export default function App() {
                               <div style={{fontSize:"10px",fontWeight:700,color:C.muted,letterSpacing:"0.09em",textTransform:"uppercase",marginBottom:"2px"}}>{plan.insurer}</div>
                               <div style={{fontWeight:700,fontSize:"16px",color:C.text,letterSpacing:"-0.2px",lineHeight:1.2}}>{plan.name}</div>
                             </div>
-                            <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:"4px",marginLeft:"8px",flexShrink:0}}>
-                              <span style={{fontSize:"20px"}}>{medal}</span>
-                              <button onClick={()=>toggleCompare(plan.name)} style={{
-                                display:"flex",alignItems:"center",gap:"3px",
-                                padding:"3px 8px",borderRadius:"20px",border:"none",
-                                background:compareList.includes(plan.name)?C.accent:"#F0F0F0",
-                                color:compareList.includes(plan.name)?"#fff":C.muted,
-                                fontSize:"10px",fontWeight:700,cursor:"pointer",
-                                opacity:(!compareList.includes(plan.name)&&compareList.length>=2)?0.4:1,
-                                WebkitTapHighlightColor:"transparent",fontFamily:"'Inter',sans-serif",
-                              }}>
-                                {compareList.includes(plan.name)?"✓ Added":"+ Compare"}
-                              </button>
-                            </div>
+                            <span style={{fontSize:"20px",marginLeft:"8px",flexShrink:0}}>{medal}</span>
                           </div>
 
                           {/* Premium badge */}
@@ -549,7 +532,6 @@ export default function App() {
                           <div style={{padding:"13px 15px 15px"}}>
                             <InfoRow label="Room Rent" value={plan.roomRent}/>
                             <InfoRow label="NCB" value={plan.ncb}/>
-                            <InfoRow label="Max Age" value={plan.maxAge===99?"No limit":plan.maxAge+" yrs"}/>
                             <InfoRow label="Medicals" value={plan.medicals}/>
                             {plan.reasons?.length>0&&(
                               <div style={{marginTop:"13px"}}>
@@ -575,106 +557,6 @@ export default function App() {
                     );
                   })}
                 </div>
-
-                {/* ── COMPARE TRIGGER ── */}
-                {compareList.length===2&&!showCompare&&(
-                  <button onClick={()=>setShowCompare(true)} style={{
-                    width:"100%",marginTop:"16px",padding:"14px",borderRadius:C.radius,border:"none",
-                    background:"linear-gradient(135deg,#1D4ED8,#3B82F6)",color:"#fff",
-                    fontSize:"15px",fontWeight:700,cursor:"pointer",
-                    display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",
-                    fontFamily:"'Inter',sans-serif",boxShadow:"0 4px 16px rgba(29,78,216,0.3)",
-                    WebkitTapHighlightColor:"transparent",
-                  }}>
-                    ⚖️ Compare {compareList[0].split(" ")[0]} vs {compareList[1].split(" ")[0]}
-                  </button>
-                )}
-
-                {/* ── COMPARISON TABLE ── */}
-                {showCompare&&compareList.length===2&&(()=>{
-                  const pa = results.find(r=>r.name===compareList[0]);
-                  const pb2 = results.find(r=>r.name===compareList[1]);
-                  if(!pa||!pb2) return null;
-                  const payA = PAYOUT[pa.name]||{fresh:"–",port:"–"};
-                  const payB = PAYOUT[pb2.name]||{fresh:"–",port:"–"};
-                  const isPort = form.isPort==="yes";
-
-                  const parseNum = v => parseFloat(String(v).replace("%",""))||0;
-
-                  const rows = [
-                    { label:"PED Waiting",      a:pa.pedWaiting,           b:pb2.pedWaiting,       winnerFn:(a,b)=>a.includes("Day 1")?"A":b.includes("Day 1")?"B":"tie" },
-                    { label:"Co-pay",           a:pa.copay,                b:pb2.copay,            winnerFn:(a,b)=>a==="No"&&b!=="No"?"A":b==="No"&&a!=="No"?"B":"tie" },
-                    { label:"Room Rent",        a:pa.roomRent,             b:pb2.roomRent,         winnerFn:(a,b)=>a==="No Cap"&&b!=="No Cap"?"A":b==="No Cap"&&a!=="No Cap"?"B":"tie" },
-                    { label:"NCB",              a:pa.ncb,                  b:pb2.ncb,              winnerFn:()=>"tie" },
-                    { label:"Premium Range",    a:pa.premiumRange,         b:pb2.premiumRange,     winnerFn:(a,b)=>{ const o=["Very Low","Low","Medium","High","Very High"]; return o.indexOf(a)<o.indexOf(b)?"A":o.indexOf(b)<o.indexOf(a)?"B":"tie"; } },
-                    { label:"Medicals",         a:pa.medicals,             b:pb2.medicals,         winnerFn:(a,b)=>a==="No PPMC"&&b!=="No PPMC"?"A":b==="No PPMC"&&a!=="No PPMC"?"B":"tie" },
-                    { label:isPort?"Port Payout":"Fresh Payout", a:isPort?payA.port:payA.fresh, b:isPort?payB.port:payB.fresh, winnerFn:(a,b)=>parseNum(a)>parseNum(b)?"A":parseNum(b)>parseNum(a)?"B":"tie" },
-                    { label:"Max Age",          a:pa.maxAge===99?"No limit":pa.maxAge+" yrs", b:pb2.maxAge===99?"No limit":pb2.maxAge+" yrs", winnerFn:(a,b)=>pa.maxAge>pb2.maxAge?"A":pb2.maxAge>pa.maxAge?"B":"tie" },
-                  ];
-
-                  const scoreA = rows.filter(r=>r.winnerFn(r.a,r.b)==="A").length;
-                  const scoreB = rows.filter(r=>r.winnerFn(r.a,r.b)==="B").length;
-
-                  return (
-                    <div style={{marginTop:"16px",background:C.card,borderRadius:C.radius,overflow:"hidden",border:`1px solid ${C.border}`,boxShadow:"0 4px 20px rgba(0,0,0,0.08)"}}>
-                      {/* Header */}
-                      <div style={{background:"linear-gradient(135deg,#1D4ED8,#3B82F6)",padding:"14px 16px"}}>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
-                          <div style={{fontSize:"12px",fontWeight:700,color:"rgba(255,255,255,0.8)",letterSpacing:"0.08em",textTransform:"uppercase"}}>⚖️ Plan Comparison</div>
-                          <button onClick={()=>setShowCompare(false)} style={{background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",borderRadius:"20px",padding:"4px 10px",fontSize:"11px",fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>✕ Close</button>
-                        </div>
-                        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px"}}>
-                          {[{plan:pa,score:scoreA,pay:payA},{plan:pb2,score:scoreB,pay:payB}].map(({plan:pl,score,pay},i)=>(
-                            <div key={i} style={{background:"rgba(255,255,255,0.15)",borderRadius:"10px",padding:"10px 12px"}}>
-                              <div style={{fontSize:"10px",color:"rgba(255,255,255,0.7)",fontWeight:600,marginBottom:"2px"}}>{pl.insurer}</div>
-                              <div style={{fontSize:"13px",fontWeight:700,color:"#fff",lineHeight:1.2,marginBottom:"6px"}}>{pl.name}</div>
-                              <div style={{display:"inline-block",background:score>=(scoreA===scoreB?0:Math.max(scoreA,scoreB))&&score===Math.max(scoreA,scoreB)?"#FCD34D":"rgba(255,255,255,0.2)",color:score===Math.max(scoreA,scoreB)&&scoreA!==scoreB?"#92400E":"#fff",borderRadius:"20px",padding:"2px 10px",fontSize:"11px",fontWeight:700}}>
-                                {score} wins {score===Math.max(scoreA,scoreB)&&scoreA!==scoreB?"👑":""}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Rows */}
-                      {rows.map((row,i)=>{
-                        const winner = row.winnerFn(row.a,row.b);
-                        const hlA = winner==="A";
-                        const hlB = winner==="B";
-                        return (
-                          <div key={i} style={{display:"grid",gridTemplateColumns:"1fr 80px 1fr",borderBottom:`1px solid ${C.border}`}}>
-                            <div style={{padding:"10px 10px",background:hlA?"#EFF6FF":"#fff",borderRight:`1px solid ${C.border}`}}>
-                              <div style={{fontSize:"13px",fontWeight:hlA?700:400,color:hlA?"#1D4ED8":C.text,display:"flex",alignItems:"center",gap:"5px"}}>
-                                {hlA&&<span style={{color:"#1D4ED8",fontSize:"12px"}}>✓</span>}{row.a}
-                              </div>
-                            </div>
-                            <div style={{padding:"10px 6px",background:"#FAFAFA",display:"flex",alignItems:"center",justifyContent:"center",borderRight:`1px solid ${C.border}`}}>
-                              <div style={{fontSize:"9px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.06em",textAlign:"center",lineHeight:1.3}}>{row.label}</div>
-                            </div>
-                            <div style={{padding:"10px 10px",background:hlB?"#EFF6FF":"#fff"}}>
-                              <div style={{fontSize:"13px",fontWeight:hlB?700:400,color:hlB?"#1D4ED8":C.text,display:"flex",alignItems:"center",gap:"5px",justifyContent:"flex-end"}}>
-                                {row.b}{hlB&&<span style={{color:"#1D4ED8",fontSize:"12px"}}>✓</span>}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                      {/* Overall winner */}
-                      <div style={{padding:"14px 16px",background:scoreA===scoreB?"#FAFAFA":scoreA>scoreB?"#EFF6FF":"#EFF6FF",textAlign:"center"}}>
-                        {scoreA===scoreB?(
-                          <div style={{fontSize:"13px",fontWeight:600,color:C.muted}}>🤝 It's a tie! Both plans are evenly matched.</div>
-                        ):(
-                          <div>
-                            <div style={{fontSize:"11px",color:C.muted,marginBottom:"3px",textTransform:"uppercase",letterSpacing:"0.07em",fontWeight:600}}>Overall Winner</div>
-                            <div style={{fontSize:"15px",fontWeight:700,color:"#1D4ED8"}}>👑 {scoreA>scoreB?pa.name:pb2.name}</div>
-                            <div style={{fontSize:"11px",color:C.muted,marginTop:"2px"}}>{Math.max(scoreA,scoreB)} of {rows.length} categories</div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })()}
 
                 {/* ── POS CTA ── */}}
                 <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
