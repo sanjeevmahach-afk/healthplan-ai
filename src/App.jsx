@@ -175,7 +175,7 @@ function getRecommendations(form) {
     } else if (pedKey === "kidney") {
       if (name.includes("Aditya") || name.includes("AB")) r.push("Kidney conditions covered under Chronic Care Day 1");
       else if (name.includes("Freedom"))   r.push("Accepts kidney conditions with co-pay");
-      else if (name.includes("Reassure"))  r.push("Kidney PED covered after waiting period");
+      else if (name.includes("Reassure"))  r.push("Kidney conditions covered — Day 1 PED available");
     } else if (pedKey === "cancer_cured") {
       if (name.includes("Cancer"))         r.push("Specialised cancer coverage plan");
       else if (name.includes("Freedom"))   r.push("Accepts cured cancer cases subject to underwriting");
@@ -221,9 +221,13 @@ function getRecommendations(form) {
       else if (name.includes("ICICI"))                     r.push("Covers up to age 65, unlimited restoration");
     }
 
-    // PED waiting period as a reason if short
-    if (pd?.pedWaiting?.includes("Day 1"))   r.push("Day 1 PED coverage — no waiting period");
-    else if (pd?.pedWaiting?.includes("2 y")) r.push("Shorter PED waiting period of 2 years");
+    // PED waiting period as a reason — only add if not already mentioned above
+    const alreadyMentionsDay1 = r.some(x => x.includes("Day 1"));
+    const alreadyMentionsWait = r.some(x => x.includes("waiting") || x.includes("PED"));
+    if (!alreadyMentionsDay1 && pd?.pedWaiting?.includes("Day 1"))
+      r.push("Day 1 PED coverage — no waiting period");
+    else if (!alreadyMentionsWait && pd?.pedWaiting?.includes("2 y"))
+      r.push("Shorter PED waiting period of 2 years");
 
     // Row note if present
     if (row.note && r.length < 2) r.push(row.note);
@@ -650,11 +654,17 @@ export default function App() {
                             <div style={{fontWeight:700,fontSize:"13px",color:C.text,lineHeight:1.3,marginTop:"2px"}}>{plan.name}</div>
                           </div>
 
-                          {/* Payout */}
-                          <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:"7px",padding:"6px 8px",textAlign:"center"}}>
-                            <div style={{fontSize:"9px",color:C.muted,fontWeight:600,textTransform:"uppercase"}}>💰 Payout</div>
-                            <div style={{fontSize:"20px",fontWeight:700,color:C.green,letterSpacing:"-0.5px"}}>{payoutVal}</div>
-                          </div>
+                          {/* Why Recommended — on top */}
+                          {plan.reasons?.length>0&&(
+                            <div style={{background:"#FFF7ED",borderRadius:"7px",padding:"7px 8px"}}>
+                              <div style={{fontSize:"8px",fontWeight:700,color:"#92400e",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"4px"}}>Why Recommended</div>
+                              {plan.reasons.map((r,i)=>(
+                                <div key={i} style={{display:"flex",gap:"5px",alignItems:"flex-start",fontSize:"11px",color:C.text,marginBottom:"3px",lineHeight:1.3}}>
+                                  <span style={{color:C.green,fontWeight:700,flexShrink:0,fontSize:"10px"}}>✓</span><span>{r}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
 
                           {/* Key stats */}
                           <div style={{display:"flex",flexDirection:"column",gap:"4px"}}>
@@ -666,17 +676,11 @@ export default function App() {
                             ))}
                           </div>
 
-                          {/* Why Recommended — always visible */}
-                          {plan.reasons?.length>0&&(
-                            <div style={{background:"#FFF7ED",borderRadius:"7px",padding:"7px 8px"}}>
-                              <div style={{fontSize:"8px",fontWeight:700,color:"#92400e",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"4px"}}>Why Recommended</div>
-                              {plan.reasons.map((r,i)=>(
-                                <div key={i} style={{display:"flex",gap:"5px",alignItems:"flex-start",fontSize:"11px",color:C.text,marginBottom:"3px",lineHeight:1.3}}>
-                                  <span style={{color:C.green,fontWeight:700,flexShrink:0,fontSize:"10px"}}>✓</span><span>{r}</span>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          {/* Payout — at bottom */}
+                          <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:"7px",padding:"6px 8px",textAlign:"center"}}>
+                            <div style={{fontSize:"9px",color:C.muted,fontWeight:600,textTransform:"uppercase"}}>💰 Payout</div>
+                            <div style={{fontSize:"20px",fontWeight:700,color:C.green,letterSpacing:"-0.5px"}}>{payoutVal}</div>
+                          </div>
 
                           {/* Details toggle */}
                           <button onClick={()=>setExpanded(isExp?null:idx)} style={{width:"100%",background:C.bg,border:`1px solid ${C.border}`,borderRadius:"7px",padding:"7px",fontSize:"11px",fontWeight:600,color:C.muted,cursor:"pointer",fontFamily:"'Inter',sans-serif",WebkitTapHighlightColor:"transparent"}}>
