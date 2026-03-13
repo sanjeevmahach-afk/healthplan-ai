@@ -29,16 +29,16 @@ const PAYOUT = {
 ═══════════════════════════════════════════════════════════════ */
 const PLANS_DATA = {
   "Niva Reassure 3.0":           { insurer:"Niva Bupa",      pedWaiting:"Day 1",                         copay:"No",      roomRent:"No Cap",              ncb:"Unlimited",             maxAge:99, premiumRange:"High",     medicals:"PPMC (in absence of reports)", specialFeatures:["Lock the Age","OPD covered (Optional)","Day 1 PED covered","Unlimited SI"] },
-  "HDFC Optima Secure":          { insurer:"HDFC",           pedWaiting:"3 years",                       copay:"No",      roomRent:"No Cap",              ncb:"50% to 100%",           maxAge:65, premiumRange:"Very High", medicals:"PPMC (in absence of reports)", specialFeatures:["2X Cover from Day 1","Loading relaxation on single PED"] },
+  "HDFC Optima Secure":          { insurer:"HDFC",           pedWaiting:"3 years",                       copay:"No",      roomRent:"No Cap",              ncb:"50% to 100%",           maxAge:65, premiumRange:"High", medicals:"PPMC (in absence of reports)", specialFeatures:["2X Cover from Day 1","Loading relaxation on single PED"] },
   "ICICI Elevate":               { insurer:"ICICI",          pedWaiting:"3 yrs (30-day jumpstart opt.)", copay:"No",      roomRent:"Single Pvt. AC room", ncb:"20% to 100%",           maxAge:65, premiumRange:"High",     medicals:"PPMC (in absence of reports)", specialFeatures:["Unlimited claim (Infinite Care)","Day 30 PED Jumpstart","Worldwide cover after 2 yrs","2-hour hospitalisation"] },
   "TATA Medicare Select":        { insurer:"TATA AIG",       pedWaiting:"3 years",                       copay:"No",      roomRent:"Single Pvt. AC room", ncb:"50% to 100%",           maxAge:65, premiumRange:"High",     medicals:"PPMC (in absence of reports)", specialFeatures:["Unlimited claim (Infinite Advantage)","7.5% discount for salaried","Day 30 PED Advance Cover Rider","Women & mental wellbeing rider"] },
   "Star Assure":                 { insurer:"Star",           pedWaiting:"3 yrs (2.5 yr for 3-yr tenure)",copay:"10% if age>60",roomRent:"5L:1%, >5L:Any except Suite",ncb:"25%–100% (non-reducing)", maxAge:75, premiumRange:"Medium", medicals:"No PPMC", specialFeatures:["Consumables inbuilt","No sublimits","Aggregate deductible (45% discount)","Unlimited restoration"] },
   "Care Supreme":                { insurer:"Care",           pedWaiting:"4 yrs (Rider: 1 yr)",           copay:"No",      roomRent:"No Cap",              ncb:"50% to 600%",           maxAge:99, premiumRange:"High",     medicals:"No PPMC",                      specialFeatures:["No loading","Super NCB","Instant Cover rider","PED Modification rider"] },
-  "Reliance Health Gain":        { insurer:"Reliance",       pedWaiting:"3 years",                       copay:"No",      roomRent:"Any",                 ncb:"100% to 500%",          maxAge:55, premiumRange:"Very Low", medicals:"No PPMC",                      specialFeatures:["Multi-year discounts for healthy people"] },
-  "Niva Aspire":                 { insurer:"Niva Bupa",      pedWaiting:"3 years",                       copay:"No",      roomRent:"No Cap",              ncb:"100% to 1000%",         maxAge:65, premiumRange:"Very High",medicals:"PPMC (in absence of reports)", specialFeatures:["Lock the Age","Maternity (9 months)","Global cover (Borderless)","OPD Well Consult","Future spouse Day 1 cover"] },
+  "Reliance Health Gain":        { insurer:"Reliance",       pedWaiting:"3 years",                       copay:"No",      roomRent:"Any",                 ncb:"100% to 500%",          maxAge:55, premiumRange:"Low", medicals:"No PPMC",                      specialFeatures:["Multi-year discounts for healthy people"] },
+  "Niva Aspire":                 { insurer:"Niva Bupa",      pedWaiting:"3 years",                       copay:"No",      roomRent:"No Cap",              ncb:"100% to 1000%",         maxAge:65, premiumRange:"High",medicals:"PPMC (in absence of reports)", specialFeatures:["Lock the Age","Maternity (9 months)","Global cover (Borderless)","OPD Well Consult","Future spouse Day 1 cover"] },
   "Aditya Birla Active One Max": { insurer:"Aditya Birla",   pedWaiting:"3 years",                       copay:"No",      roomRent:"No Cap",              ncb:"100% to 500%",          maxAge:99, premiumRange:"High",     medicals:"PPMC above 60",                specialFeatures:["Chronic Care Day 1 (7 listed)","100% health returns","Consumables inbuilt","Health checkup inbuilt"] },
-  "SBI Health Alpha":            { insurer:"SBI",            pedWaiting:"3 years",                       copay:"No",      roomRent:"Any",                 ncb:"100% to 500%",          maxAge:99, premiumRange:"Very Low", medicals:"No PPMC",                      specialFeatures:["Wellness discount 100%","Very affordable premium"] },
-  "Care Freedom":                { insurer:"Care",           pedWaiting:"2 years",                       copay:"20%",     roomRent:"1%, Twin, Single",    ncb:"None",                  maxAge:99, premiumRange:"High",     medicals:"Yes (Subject to UW)",          specialFeatures:["100% Restoration","Ideal for multiple co-morbidities"] },
+  "SBI Health Alpha":            { insurer:"SBI",            pedWaiting:"3 years",                       copay:"No",      roomRent:"Any",                 ncb:"100% to 500%",          maxAge:99, premiumRange:"Low", medicals:"No PPMC",                      specialFeatures:["Wellness discount 100%","Affordable premium"] },
+  "Care Freedom":                { insurer:"Care",           pedWaiting:"2 years",                       copay:"20%",     roomRent:"1%, Twin, Single",    ncb:"None",                  maxAge:99, premiumRange:"High",     medicals:"Yes (Subject to UW)",          specialFeatures:["100% Restoration","Suitable for multiple co-morbidities"] },
   "Care Heart / Star Cardiac":   { insurer:"Care / Star",    pedWaiting:"Varies",                        copay:"Varies",  roomRent:"Varies",              ncb:"Varies",                maxAge:99, premiumRange:"High",     medicals:"Yes (Subject to UW)",          specialFeatures:["Specialized cardiac coverage"] },
   "Star Cancer Care":            { insurer:"Star",           pedWaiting:"Varies (subject to UW)",        copay:"No",      roomRent:"No Cap",              ncb:"Varies",                maxAge:99, premiumRange:"High",     medicals:"Yes (Subject to UW)",          specialFeatures:["Specialized cancer coverage","Final issuance depends on UW decision"] },
   "Aditya Birla Active One Vytl":{ insurer:"Aditya Birla",   pedWaiting:"3 years",                       copay:"No",      roomRent:"No Cap",              ncb:"50% to 100%",           maxAge:99, premiumRange:"Medium",   medicals:"PPMC above 60",                specialFeatures:["Chronic Care Day 1","Affordable Active One variant"] },
@@ -119,19 +119,118 @@ function getRecommendations(form) {
   else                        ordered = [...row.value,  ...row.low,   ...row.premium];
   const seen = new Set();
   const candidates = ordered.filter(n => { if (seen.has(n)) return false; seen.add(n); return true; });
+  // Per-plan BMI limits (based on underwriting guidelines)
+  const PLAN_BMI_LIMITS = {
+    "Niva Reassure 3.0":           45,
+    "Niva Aspire":                 45,
+    "HDFC Optima Secure":          35,
+    "ICICI Elevate":               40,
+    "TATA Medicare Select":        40,
+    "Star Assure":                 40,
+    "Care Supreme":                40,
+    "Care Freedom":                50, // accepts higher BMI with co-pay
+    "Care Heart / Star Cardiac":   40,
+    "Star Cancer Care":            40,
+    "Reliance Health Gain":        35,
+    "Reliance Health Infinity":    35,
+    "Aditya Birla Active One Max": 40,
+    "Aditya Birla Active One Vytl":40,
+    "SBI Health Alpha":            50, // liberal UW
+  };
+
   const eligible = candidates.filter(name => {
     const plan = PLANS_DATA[name];
     if (!plan) return false;
-    if (bmiNum > 0 && bmiNum > 40) return false; // hard cap
+    // Age filter — hard remove if customer exceeds plan max entry age
     if (ageNum > plan.maxAge) return false;
+    // BMI filter — hard remove if customer BMI exceeds plan limit
+    const bmiLimit = PLAN_BMI_LIMITS[name] || 40;
+    if (bmiNum > 0 && bmiNum > bmiLimit) return false;
     return true;
   });
   const buildReasons = (name) => {
     const r = [];
-    if (row.low.includes(name))     r.push("Budget-friendly option");
-    if (row.value.includes(name))   r.push("Best value for money");
-    if (row.premium.includes(name)) r.push("Premium coverage");
-    if (row.note)                   r.push(row.note);
+    const pd = PLANS_DATA[name];
+    const pedKey = form.ped || "none";
+
+    // PED-specific reasons
+    if (pedKey.startsWith("diab")) {
+      if (name.includes("Freedom"))        r.push("Accepts diabetes with co-pay, including insulin cases");
+      else if (name.includes("SBI"))       r.push("Accepts diabetes cases subject to underwriting");
+      else if (name.includes("Reassure"))  r.push("Day 1 PED cover available for diabetes");
+      else if (name.includes("AB") || name.includes("Aditya")) r.push("Chronic Care Day 1 covers listed diabetic conditions");
+      else                                 r.push("Covers diabetes after standard PED waiting period");
+    } else if (pedKey === "bp" || pedKey === "bp_diab") {
+      if (name.includes("Reassure"))       r.push("Day 1 PED cover available for hypertension");
+      else if (name.includes("Star"))      r.push("Hypertension covered, no loading on standard cases");
+      else                                 r.push("Covers hypertension after standard PED waiting period");
+    } else if (pedKey === "heart") {
+      if (name.includes("Aditya") || name.includes("AB")) r.push("Covers cardiac conditions from Day 1 under Chronic Care");
+      else if (name.includes("Heart") || name.includes("Cardiac")) r.push("Specialised cardiac coverage plan");
+      else if (name.includes("Reassure")) r.push("Cardiac PED covered after waiting period with no loading");
+    } else if (pedKey === "asthma" || pedKey === "copd") {
+      if (name.includes("Aditya") || name.includes("AB")) r.push("Respiratory conditions covered under Chronic Care");
+      else if (name.includes("Reassure"))  r.push("Asthma/COPD covered after standard waiting period");
+      else                                 r.push("Covers respiratory conditions after PED waiting period");
+    } else if (pedKey === "kidney") {
+      if (name.includes("Aditya") || name.includes("AB")) r.push("Kidney conditions covered under Chronic Care Day 1");
+      else if (name.includes("Freedom"))   r.push("Accepts kidney conditions with co-pay");
+      else if (name.includes("Reassure"))  r.push("Kidney PED covered after waiting period");
+    } else if (pedKey === "cancer_cured") {
+      if (name.includes("Cancer"))         r.push("Specialised cancer coverage plan");
+      else if (name.includes("Freedom"))   r.push("Accepts cured cancer cases subject to underwriting");
+    } else if (pedKey === "surgery_treated" || pedKey === "surgery_untreated") {
+      if (name.includes("Star Assure"))    r.push("Covers post-surgical conditions without loading");
+      else if (name.includes("Freedom"))   r.push("Accepts surgical history cases with co-pay");
+      else if (name.includes("Reassure"))  r.push("Surgical history covered after waiting period");
+      else if (name.includes("SBI"))       r.push("Accepts surgical cases subject to underwriting");
+    } else if (pedKey === "mental") {
+      if (name.includes("Aditya") || name.includes("AB")) r.push("Mental health conditions covered");
+      else if (name.includes("Freedom"))   r.push("Accepts mental health history with co-pay");
+      else                                 r.push("Mental health coverage available");
+    } else if (pedKey === "rheumatoid") {
+      r.push("Accepts rheumatoid arthritis subject to underwriting");
+    } else if (pedKey === "hyperthyroid") {
+      r.push("Accepts thyroid conditions subject to underwriting");
+    } else if (pedKey === "liver") {
+      if (name.includes("Aditya") || name.includes("AB")) r.push("Liver conditions covered under Chronic Care");
+      else                                 r.push("Covers liver conditions after PED waiting period");
+    }
+
+    // BMI/Obesity reason
+    const bmiVal = parseFloat(form.bmi) || 0;
+    if (bmiVal >= 30) {
+      if (name.includes("Reassure") || name.includes("Niva")) r.push("Accepts obesity — no BMI-based rejection");
+      else if (name.includes("SBI"))   r.push("No BMI restriction for entry");
+      else                             r.push("Accepts high BMI cases subject to underwriting");
+    }
+
+    // Maternity reason
+    if (form.maternity === "yes") {
+      if (name.includes("Aspire"))       r.push("Maternity cover from 9 months waiting");
+      else if (name.includes("Star Assure")) r.push("Maternity add-on available");
+      else if (name.includes("TATA"))    r.push("Maternity rider available");
+      else if (name.includes("SBI"))     r.push("Maternity cover included");
+    }
+
+    // Age-specific reason
+    const ageVal = parseInt(form.age) || 0;
+    if (ageVal >= 55) {
+      if (name.includes("Aditya") || name.includes("AB")) r.push("No entry age restriction, suitable for seniors");
+      else if (name.includes("Care Supreme"))              r.push("No age bar, lifelong renewability");
+      else if (name.includes("ICICI"))                     r.push("Covers up to age 65, unlimited restoration");
+    }
+
+    // PED waiting period as a reason if short
+    if (pd?.pedWaiting?.includes("Day 1"))   r.push("Day 1 PED coverage — no waiting period");
+    else if (pd?.pedWaiting?.includes("2 y")) r.push("Shorter PED waiting period of 2 years");
+
+    // Row note if present
+    if (row.note && r.length < 2) r.push(row.note);
+
+    // Fallback
+    if (r.length === 0) r.push("Covers pre-existing conditions after standard waiting period");
+
     return r.slice(0, 3);
   };
   return eligible.slice(0,3).map(name => ({ name, ...PLANS_DATA[name], reasons:buildReasons(name) }));
@@ -142,7 +241,7 @@ function getRecommendations(form) {
 ═══════════════════════════════════════════════════════════════ */
 const calcBMI = (h,w) => { const hm=parseFloat(h)/100,wk=parseFloat(w); if(!hm||!wk||hm<=0) return null; return parseFloat((wk/(hm*hm)).toFixed(1)); };
 const bmiMeta = b => { if(!b) return null; if(b<18.5) return{label:"Underweight",color:"#3b82f6"}; if(b<25) return{label:"Normal",color:"#10b981"}; if(b<30) return{label:"Overweight",color:"#f59e0b"}; return{label:"Obese",color:"#ef4444"}; };
-const premBadge = r => ({"Very Low":["#f0fdf4","#15803d"],"Low":["#f0fdf4","#166534"],"Medium":["#fefce8","#92400e"],"High":["#fff7ed","#c2410c"],"Very High":["#fdf2f8","#9d174d"]}[r]||["#f9fafb","#374151"]);
+const premBadge = r => ({"Low":["#f0fdf4","#166534"],"Medium":["#fefce8","#92400e"],"High":["#fff7ed","#c2410c"]}[r]||["#f9fafb","#374151"]);
 
 const PED_OPTIONS = [
   {value:"none",              label:"No PED",                  group:""},
@@ -519,6 +618,16 @@ export default function App() {
                 )}
 
                 {/* Plan Cards — side by side */}
+                {results.length === 0 ? (
+                  <div style={{background:C.card,borderRadius:C.radius,padding:"28px 20px",textAlign:"center",border:`1px solid ${C.border}`}}>
+                    <div style={{fontSize:"36px",marginBottom:"12px"}}>🚫</div>
+                    <div style={{fontWeight:700,fontSize:"16px",color:C.text,marginBottom:"8px"}}>No Plans Available</div>
+                    <div style={{fontSize:"13px",color:C.sub,lineHeight:1.6}}>
+                      Based on the customer's age, BMI, and health conditions, no plan currently meets the eligibility criteria.<br/><br/>
+                      Consider reviewing the customer's BMI or exploring specialised plans directly with the insurer.
+                    </div>
+                  </div>
+                ) : (
                 <div style={{display:"flex",gap:"10px",alignItems:"flex-start"}}>
                   {results.map((plan,idx)=>{
                     const isExp=expanded===idx;
@@ -601,6 +710,8 @@ export default function App() {
                     );
                   })}
                 </div>
+
+                                )}
 
                 {/* ── POS CTA ── */}}
                 <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
