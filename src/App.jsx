@@ -304,6 +304,31 @@ export default function App() {
     setStep(3);
     const recs = getRecommendations({...form,bmi});
     setResults(recs);
+
+    // ── LOG TO GOOGLE SHEETS ──
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzr8ZwpGX8WY50MD6uOdMX0nkjn-x_S-BjlNe22JasTqK5hWiwHYdvThkA_STCbseHx/exec";
+    if (SHEET_URL !== "https://script.google.com/macros/s/AKfycbzr8ZwpGX8WY50MD6uOdMX0nkjn-x_S-BjlNe22JasTqK5hWiwHYdvThkA_STCbseHx/exec") {
+      fetch(SHEET_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          age:        form.age,
+          bmi:        bmi || "",
+          city:       form.city,
+          isPort:     form.isPort,
+          ped:        form.ped,
+          hba1c:      form.hba1c,
+          familySize: form.familySize,
+          maternity:  form.maternity,
+          budget:     form.budget,
+          sumInsured: form.sumInsured,
+          plan1:      recs[0]?.name || "",
+          plan2:      recs[1]?.name || "",
+          plan3:      recs[2]?.name || "",
+        }),
+      }).catch(() => {}); // silent fail — don't block the app
+    }
+
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages",{
         method:"POST",headers:{"Content-Type":"application/json"},
