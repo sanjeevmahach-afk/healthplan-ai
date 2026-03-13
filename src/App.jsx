@@ -306,7 +306,7 @@ export default function App() {
     setResults(recs);
 
     // ── LOG TO GOOGLE SHEETS ──
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzr8ZwpGX8WY50MD6uOdMX0nkjn-x_S-BjlNe22JasTqK5hWiwHYdvThkA_STCbseHx/exec";
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzChn1PRSOBEBN8TZ8U03nsUK833NvOqfqCR93g4dyD7d4CUwCPh40jOFX5HLqNbsg/exec";
     try {
       const params = new URLSearchParams({
         age:        form.age        || "",
@@ -345,7 +345,7 @@ export default function App() {
 
   // ── LOG POS CLICK ──
   const logPosClick = (planName) => {
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzr8ZwpGX8WY50MD6uOdMX0nkjn-x_S-BjlNe22JasTqK5hWiwHYdvThkA_STCbseHx/exec";
+    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzChn1PRSOBEBN8TZ8U03nsUK833NvOqfqCR93g4dyD7d4CUwCPh40jOFX5HLqNbsg/exec";
     try {
       const params = new URLSearchParams({
         action:     "pos_click",
