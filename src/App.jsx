@@ -641,10 +641,8 @@ export default function App() {
                     return (
                       <div key={plan.name} style={{flex:1,minWidth:0,background:C.card,borderRadius:C.radius,overflow:"hidden",border:`1px solid ${C.border}`,boxShadow:"0 1px 6px rgba(0,0,0,0.05)",display:"flex",flexDirection:"column"}}>
 
-                        {/* Medal header */}
-                        <div style={{background:C.bg,padding:"8px 10px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:`1px solid ${C.border}`}}>
-
-                          <span style={{display:"inline-block",background:pb,color:pt,borderRadius:"20px",padding:"2px 8px",fontSize:"10px",fontWeight:600}}>{plan.premiumRange}</span>
+                        {/* Card header */}
+                        <div style={{background:C.bg,padding:"8px 10px",borderBottom:`1px solid ${C.border}`}}>
                         </div>
 
                         <div style={{padding:"10px",flex:1,display:"flex",flexDirection:"column",gap:"8px"}}>
@@ -684,24 +682,8 @@ export default function App() {
 
                           {/* Details toggle */}
                           <button onClick={()=>setExpanded(isExp?null:idx)} style={{width:"100%",background:C.bg,border:`1px solid ${C.border}`,borderRadius:"7px",padding:"7px",fontSize:"11px",fontWeight:600,color:C.muted,cursor:"pointer",fontFamily:"'Inter',sans-serif",WebkitTapHighlightColor:"transparent"}}>
-                            {isExp?"▲ Hide Details":"▼ More Details"}
+                            ▼ More Details
                           </button>
-
-                          {isExp&&(
-                            <div style={{display:"flex",flexDirection:"column",gap:"4px"}}>
-                              <InfoRow label="Room Rent" value={plan.roomRent}/>
-                              <InfoRow label="No Claim Bonus" value={plan.ncb}/>
-                              <InfoRow label="Medicals" value={plan.medicals}/>
-                              <div style={{marginTop:"6px"}}>
-                                <div style={{fontSize:"8px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"4px"}}>Key Features</div>
-                                {plan.specialFeatures.slice(0,3).map((f,i)=>(
-                                  <div key={i} style={{display:"flex",gap:"5px",alignItems:"flex-start",fontSize:"11px",color:C.text,marginBottom:"3px",lineHeight:1.3}}>
-                                    <span style={{color:C.accent,flexShrink:0}}>→</span><span>{f}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
                         </div>
 
                         {/* Sell on POS */}
@@ -715,6 +697,76 @@ export default function App() {
                   })}
                 </div>
                 )}
+
+                {/* ── FULL SCREEN DETAILS MODAL ── */}
+                {expanded!==null && results[expanded] && (()=>{
+                  const mp = results[expanded];
+                  const mpPayout = PAYOUT[mp.name]||{fresh:"–",port:"–"};
+                  const mpPayoutVal = form.isPort==="yes"?mpPayout.port:mpPayout.fresh;
+                  return (
+                    <div style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,0,0.5)",display:"flex",flexDirection:"column",justifyContent:"flex-end"}}
+                      onClick={()=>setExpanded(null)}>
+                      <div style={{background:C.card,borderRadius:"20px 20px 0 0",maxHeight:"85vh",overflowY:"auto",padding:"0 0 32px"}}
+                        onClick={e=>e.stopPropagation()}>
+                        {/* Modal header */}
+                        <div style={{position:"sticky",top:0,background:C.card,borderBottom:`1px solid ${C.border}`,padding:"16px 20px",display:"flex",justifyContent:"space-between",alignItems:"center",zIndex:10}}>
+                          <div>
+                            <div style={{fontSize:"10px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.08em"}}>{mp.insurer}</div>
+                            <div style={{fontWeight:700,fontSize:"17px",color:C.text,marginTop:"2px"}}>{mp.name}</div>
+                          </div>
+                          <button onClick={()=>setExpanded(null)} style={{background:C.bg,border:`1px solid ${C.border}`,borderRadius:"50%",width:"32px",height:"32px",fontSize:"16px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>✕</button>
+                        </div>
+
+                        <div style={{padding:"20px 20px 0"}}>
+                          {/* Why Recommended */}
+                          {mp.reasons?.length>0&&(
+                            <div style={{background:"#FFF7ED",borderRadius:"10px",padding:"14px",marginBottom:"16px"}}>
+                              <div style={{fontSize:"10px",fontWeight:700,color:"#92400e",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"8px"}}>Why Recommended</div>
+                              {mp.reasons.map((r,i)=>(
+                                <div key={i} style={{display:"flex",gap:"8px",alignItems:"flex-start",fontSize:"13px",color:C.text,marginBottom:"6px",lineHeight:1.5}}>
+                                  <span style={{color:C.green,fontWeight:700,flexShrink:0}}>✓</span><span>{r}</span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Plan details */}
+                          <div style={{marginBottom:"16px"}}>
+                            <div style={{fontSize:"10px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"10px"}}>Plan Details</div>
+                            <InfoRow label="PED Waiting Period" value={mp.pedWaiting}/>
+                            <InfoRow label="Co-pay" value={mp.copay}/>
+                            <InfoRow label="Room Rent" value={mp.roomRent}/>
+                            <InfoRow label="No Claim Bonus" value={mp.ncb}/>
+                            <InfoRow label="Medicals" value={mp.medicals}/>
+                          </div>
+
+                          {/* Payout */}
+                          <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:"10px",padding:"14px",marginBottom:"16px",textAlign:"center"}}>
+                            <div style={{fontSize:"10px",color:C.muted,fontWeight:600,textTransform:"uppercase",marginBottom:"4px"}}>💰 Agent Payout ({form.isPort==="yes"?"Port":"Fresh"})</div>
+                            <div style={{fontSize:"32px",fontWeight:700,color:C.green,letterSpacing:"-1px"}}>{mpPayoutVal}</div>
+                          </div>
+
+                          {/* Key Features */}
+                          <div style={{marginBottom:"16px"}}>
+                            <div style={{fontSize:"10px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"10px"}}>Key Features</div>
+                            {mp.specialFeatures.map((f,i)=>(
+                              <div key={i} style={{display:"flex",gap:"10px",alignItems:"flex-start",fontSize:"13px",color:C.text,marginBottom:"8px",lineHeight:1.5}}>
+                                <span style={{color:C.accent,flexShrink:0,fontWeight:700}}>→</span><span>{f}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Sell on POS */}
+                          <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
+                            onClick={()=>logPosClick(mp.name)}
+                            style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",background:C.accent,borderRadius:"12px",padding:"14px",fontSize:"14px",fontWeight:700,color:"#fff",textDecoration:"none",boxShadow:"0 4px 16px rgba(229,57,53,0.3)"}}>
+                            🛒 Sell on POS
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 {/* ── POS CTA ── */}
                 <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
