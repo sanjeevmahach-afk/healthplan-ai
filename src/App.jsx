@@ -200,9 +200,9 @@ function getRecommendations(form) {
     // BMI/Obesity reason
     const bmiVal = parseFloat(form.bmi) || 0;
     if (bmiVal >= 30) {
-      if (name.includes("Reassure") || name.includes("Niva")) r.push("Accepts obesity — no BMI-based rejection");
-      else if (name.includes("SBI"))   r.push("No BMI restriction for entry");
-      else                             r.push("Accepts high BMI cases subject to underwriting");
+      if (name.includes("Reassure") || name.includes("Niva")) r.push("BMI accepted — obesity noted, covered subject to underwriting");
+      else if (name.includes("SBI"))   r.push("BMI accepted — no restriction for entry");
+      else                             r.push("BMI accepted — subject to underwriting");
     }
 
     // Maternity reason
@@ -710,10 +710,9 @@ export default function App() {
                     );
                   })}
                 </div>
+                )}
 
-                                )}
-
-                {/* ── POS CTA ── */}}
+                {/* ── POS CTA ── */}
                 <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
                   <div style={{fontSize:"11px",fontWeight:700,color:"rgba(255,255,255,0.7)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"4px"}}>Ready to sell?</div>
                   <div style={{fontSize:"16px",fontWeight:700,color:"#fff",marginBottom:"14px"}}>Open POS Portal</div>
