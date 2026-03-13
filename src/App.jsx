@@ -410,9 +410,14 @@ export default function App() {
               <TInput value={form.age} onChange={set("age")} placeholder="e.g. 35" type="number"/>
             </Field>
 
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"11px",marginBottom:"20px"}}>
-              <div><Label>Height (ft)</Label><TInput value={form.heightFt} onChange={set("heightFt")} placeholder="5" type="number"/></div>
-              <div><Label>Height (in)</Label><TInput value={form.heightIn} onChange={set("heightIn")} placeholder="8" type="number"/></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"11px",marginBottom:"20px"}}>
+              <div>
+                <Label>Height</Label>
+                <div style={{display:"flex",gap:"6px"}}>
+                  <TInput value={form.heightFt} onChange={set("heightFt")} placeholder="ft" type="number"/>
+                  <TInput value={form.heightIn} onChange={set("heightIn")} placeholder="in" type="number"/>
+                </div>
+              </div>
               <div><Label>Weight (kg)</Label><TInput value={form.weight} onChange={set("weight")} placeholder="72" type="number"/></div>
             </div>
             {bmi&&bmiInfo&&(
@@ -513,95 +518,85 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Plan Cards */}
-                <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
+                {/* Plan Cards — side by side */}
+                <div style={{display:"flex",gap:"10px",alignItems:"flex-start"}}>
                   {results.map((plan,idx)=>{
                     const isExp=expanded===idx;
                     const [pb,pt]=premBadge(plan.premiumRange);
                     const payout = PAYOUT[plan.name] || {fresh:"–",port:"–"};
-                    const medal=["🥇","🥈","🥉"][idx];
-                    const isTop = idx===0;
+                    const payoutVal = form.isPort==="yes" ? payout.port : payout.fresh;
                     return (
-                      <div key={plan.name} style={{background:C.card,borderRadius:C.radius,overflow:"hidden",border:isTop?`2px solid ${C.accent}`:`1px solid ${C.border}`,boxShadow:isTop?"0 4px 20px rgba(29,78,216,0.1)":"0 1px 6px rgba(0,0,0,0.05)"}}>
-                        {isTop&&(
-                          <div style={{background:C.accent,color:"#fff",textAlign:"center",padding:"5px",fontSize:"10px",fontWeight:700,letterSpacing:"0.12em",textTransform:"uppercase"}}>
-                            ★ TOP RECOMMENDATION
-                          </div>
-                        )}
-                        <div style={{padding:"15px 15px 0"}}>
-                          {/* Header */}
-                          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"10px"}}>
-                            <div style={{flex:1}}>
-                              <div style={{fontSize:"10px",fontWeight:700,color:C.muted,letterSpacing:"0.09em",textTransform:"uppercase",marginBottom:"2px"}}>{plan.insurer}</div>
-                              <div style={{fontWeight:700,fontSize:"16px",color:C.text,letterSpacing:"-0.2px",lineHeight:1.2}}>{plan.name}</div>
-                            </div>
-                            <span style={{fontSize:"20px",marginLeft:"8px",flexShrink:0}}>{medal}</span>
+                      <div key={plan.name} style={{flex:1,minWidth:0,background:C.card,borderRadius:C.radius,overflow:"hidden",border:`1px solid ${C.border}`,boxShadow:"0 1px 6px rgba(0,0,0,0.05)",display:"flex",flexDirection:"column"}}>
+
+                        {/* Medal header */}
+                        <div style={{background:C.bg,padding:"8px 10px",display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:`1px solid ${C.border}`}}>
+
+                          <span style={{display:"inline-block",background:pb,color:pt,borderRadius:"20px",padding:"2px 8px",fontSize:"10px",fontWeight:600}}>{plan.premiumRange}</span>
+                        </div>
+
+                        <div style={{padding:"10px",flex:1,display:"flex",flexDirection:"column",gap:"8px"}}>
+                          {/* Plan name */}
+                          <div>
+                            <div style={{fontSize:"9px",fontWeight:700,color:C.muted,letterSpacing:"0.08em",textTransform:"uppercase"}}>{plan.insurer}</div>
+                            <div style={{fontWeight:700,fontSize:"13px",color:C.text,lineHeight:1.3,marginTop:"2px"}}>{plan.name}</div>
                           </div>
 
-                          {/* Premium badge */}
-                          <span style={{display:"inline-block",background:pb,color:pt,borderRadius:"20px",padding:"3px 10px",fontSize:"11px",fontWeight:600,marginBottom:"11px"}}>{plan.premiumRange} Premium</span>
+                          {/* Payout */}
+                          <div style={{background:"#f0fdf4",border:"1px solid #86efac",borderRadius:"7px",padding:"6px 8px",textAlign:"center"}}>
+                            <div style={{fontSize:"9px",color:C.muted,fontWeight:600,textTransform:"uppercase"}}>💰 Payout</div>
+                            <div style={{fontSize:"20px",fontWeight:700,color:C.green,letterSpacing:"-0.5px"}}>{payoutVal}</div>
+                          </div>
 
                           {/* Key stats */}
-                          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"5px",marginBottom:"10px"}}>
+                          <div style={{display:"flex",flexDirection:"column",gap:"4px"}}>
                             {[["PED Wait",plan.pedWaiting.split(" ").slice(0,2).join(" ")],["Co-pay",plan.copay]].map(([k,v])=>(
-                              <div key={k} style={{background:C.bg,borderRadius:"7px",padding:"7px 9px"}}>
-                                <div style={{fontSize:"9px",color:C.muted,fontWeight:600,textTransform:"uppercase",marginBottom:"2px"}}>{k}</div>
-                                <div style={{fontSize:"12px",fontWeight:600,color:C.text}}>{v}</div>
+                              <div key={k} style={{background:C.bg,borderRadius:"6px",padding:"5px 7px"}}>
+                                <div style={{fontSize:"8px",color:C.muted,fontWeight:600,textTransform:"uppercase"}}>{k}</div>
+                                <div style={{fontSize:"11px",fontWeight:600,color:C.text,marginTop:"1px"}}>{v}</div>
                               </div>
                             ))}
                           </div>
 
-                          {/* Payout % — highlighted based on port/fresh */}
-                          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"5px",marginBottom:"14px"}}>
-                            {[
-                              {label:"Fresh Payout",val:payout.fresh,active:form.isPort==="no"},
-                              {label:"Port Payout", val:payout.port,  active:form.isPort==="yes"},
-                            ].map(({label,val,active})=>(
-                              <div key={label} style={{borderRadius:"7px",padding:"8px 10px",background:active?"#f0fdf4":C.bg,border:active?`1px solid #86efac`:`1px solid transparent`}}>
-                                <div style={{fontSize:"9px",color:C.muted,fontWeight:600,textTransform:"uppercase",marginBottom:"3px"}}>💰 {label}</div>
-                                <div style={{fontSize:"18px",fontWeight:700,color:active?C.green:C.sub,letterSpacing:"-0.5px"}}>{val}</div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Card action row */}
-                        <div style={{display:"flex",borderTop:`1px solid ${C.border}`}}>
-                          <button onClick={()=>setExpanded(isExp?null:idx)} style={{flex:1,background:C.bg,border:"none",borderRight:`1px solid ${C.border}`,padding:"10px",fontSize:"12px",fontWeight:500,color:C.muted,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"4px",WebkitTapHighlightColor:"transparent",fontFamily:"'Inter',sans-serif"}}>
-                            {isExp?"▲ Hide":"▼ Details"}
-                          </button>
-                          <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
-                            onClick={()=>logPosClick(plan.name)}
-                            style={{flex:1,background:"#FFF0F0",border:"none",padding:"10px",fontSize:"12px",fontWeight:700,color:C.accent,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",textDecoration:"none",WebkitTapHighlightColor:"transparent"}}>
-                            🛒 Sell on POS
-                          </a>
-                        </div>
-
-                        {isExp&&(
-                          <div style={{padding:"13px 15px 15px"}}>
-                            <InfoRow label="Room Rent" value={plan.roomRent}/>
-                            <InfoRow label="NCB" value={plan.ncb}/>
-                            <InfoRow label="Medicals" value={plan.medicals}/>
-                            {plan.reasons?.length>0&&(
-                              <div style={{marginTop:"13px"}}>
-                                <Label>Why Recommended</Label>
-                                {plan.reasons.map((r,i)=>(
-                                  <div key={i} style={{display:"flex",gap:"7px",alignItems:"flex-start",fontSize:"13px",color:C.text,marginBottom:"5px"}}>
-                                    <span style={{color:C.green,fontWeight:700,flexShrink:0}}>✓</span><span>{r}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            <div style={{marginTop:"13px"}}>
-                              <Label>Key Features</Label>
-                              {plan.specialFeatures.slice(0,4).map((f,i)=>(
-                                <div key={i} style={{display:"flex",gap:"7px",alignItems:"flex-start",fontSize:"12px",color:C.text,marginBottom:"4px"}}>
-                                  <span style={{color:C.accent,flexShrink:0}}>→</span><span>{f}</span>
+                          {/* Why Recommended — always visible */}
+                          {plan.reasons?.length>0&&(
+                            <div style={{background:"#FFF7ED",borderRadius:"7px",padding:"7px 8px"}}>
+                              <div style={{fontSize:"8px",fontWeight:700,color:"#92400e",textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"4px"}}>Why Recommended</div>
+                              {plan.reasons.map((r,i)=>(
+                                <div key={i} style={{display:"flex",gap:"5px",alignItems:"flex-start",fontSize:"11px",color:C.text,marginBottom:"3px",lineHeight:1.3}}>
+                                  <span style={{color:C.green,fontWeight:700,flexShrink:0,fontSize:"10px"}}>✓</span><span>{r}</span>
                                 </div>
                               ))}
                             </div>
-                          </div>
-                        )}
+                          )}
+
+                          {/* Details toggle */}
+                          <button onClick={()=>setExpanded(isExp?null:idx)} style={{width:"100%",background:C.bg,border:`1px solid ${C.border}`,borderRadius:"7px",padding:"7px",fontSize:"11px",fontWeight:600,color:C.muted,cursor:"pointer",fontFamily:"'Inter',sans-serif",WebkitTapHighlightColor:"transparent"}}>
+                            {isExp?"▲ Hide Details":"▼ More Details"}
+                          </button>
+
+                          {isExp&&(
+                            <div style={{display:"flex",flexDirection:"column",gap:"4px"}}>
+                              <InfoRow label="Room Rent" value={plan.roomRent}/>
+                              <InfoRow label="No Claim Bonus" value={plan.ncb}/>
+                              <InfoRow label="Medicals" value={plan.medicals}/>
+                              <div style={{marginTop:"6px"}}>
+                                <div style={{fontSize:"8px",fontWeight:700,color:C.muted,textTransform:"uppercase",letterSpacing:"0.08em",marginBottom:"4px"}}>Key Features</div>
+                                {plan.specialFeatures.slice(0,3).map((f,i)=>(
+                                  <div key={i} style={{display:"flex",gap:"5px",alignItems:"flex-start",fontSize:"11px",color:C.text,marginBottom:"3px",lineHeight:1.3}}>
+                                    <span style={{color:C.accent,flexShrink:0}}>→</span><span>{f}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Sell on POS */}
+                        <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
+                          onClick={()=>logPosClick(plan.name)}
+                          style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"4px",background:"#FFF0F0",borderTop:`1px solid ${C.border}`,padding:"10px",fontSize:"11px",fontWeight:700,color:C.accent,textDecoration:"none",WebkitTapHighlightColor:"transparent"}}>
+                          🛒 Sell on POS
+                        </a>
                       </div>
                     );
                   })}
