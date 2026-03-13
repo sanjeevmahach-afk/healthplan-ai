@@ -286,14 +286,15 @@ const STEPS = ["Basics","Health","Cover","Results"];
 ═══════════════════════════════════════════════════════════════ */
 export default function App() {
   const [step,setStep]           = useState(0);
-  const [form,setForm]           = useState({age:"",height:"",weight:"",peds:["none"],hba1c:"",familySize:"2a",maternity:"no",budget:"medium",isPort:"no",city:"tier1",sumInsured:"10"});
+  const [form,setForm]           = useState({age:"",heightFt:"",heightIn:"",weight:"",peds:["none"],hba1c:"",familySize:"2a",maternity:"no",budget:"medium",isPort:"no",city:"tier1",sumInsured:"10"});
   const [results,setResults]     = useState(null);
   const [loading,setLoading]     = useState(false);
   const [aiInsight,setAiInsight] = useState("");
   const [expanded,setExpanded]   = useState(null);
 
   const set = k => v => setForm(f=>({...f,[k]:v}));
-  const bmi = calcBMI(form.height,form.weight);
+  const heightCm = form.heightFt ? (parseFloat(form.heightFt||0)*30.48 + parseFloat(form.heightIn||0)*2.54).toFixed(1) : "";
+  const bmi = calcBMI(heightCm,form.weight);
   const bmiInfo = bmiMeta(bmi);
   const hasDiab = (form.ped||"").startsWith("diabetes");
 
@@ -376,7 +377,10 @@ export default function App() {
             </div>
           </div>
           {step===3&&(
-            <button onClick={()=>{setStep(0);setResults(null);setAiInsight("");}} style={{background:C.accent,border:"none",color:"#fff",borderRadius:"20px",padding:"8px 16px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif",flexShrink:0,boxShadow:"0 2px 8px rgba(229,57,53,0.3)"}}>＋ New Search</button>
+            <div style={{display:"flex",gap:"8px",flexShrink:0}}>
+              <button onClick={()=>{setStep(2);setResults(null);setAiInsight("");}} style={{background:C.card,border:`1.5px solid ${C.border}`,color:C.text,borderRadius:"20px",padding:"8px 14px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>← Edit</button>
+              <button onClick={()=>{setStep(0);setResults(null);setAiInsight("");}} style={{background:C.accent,border:"none",color:"#fff",borderRadius:"20px",padding:"8px 16px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif",boxShadow:"0 2px 8px rgba(229,57,53,0.3)"}}>＋ New</button>
+            </div>
           )}
         </div>
         {/* Step indicator */}
@@ -406,9 +410,10 @@ export default function App() {
               <TInput value={form.age} onChange={set("age")} placeholder="e.g. 35" type="number"/>
             </Field>
 
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"11px",marginBottom:"20px"}}>
-              <div><Label>Height (cm)</Label><TInput value={form.height} onChange={set("height")} placeholder="e.g. 168" type="number"/></div>
-              <div><Label>Weight (kg)</Label><TInput value={form.weight} onChange={set("weight")} placeholder="e.g. 72" type="number"/></div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"11px",marginBottom:"20px"}}>
+              <div><Label>Height (ft)</Label><TInput value={form.heightFt} onChange={set("heightFt")} placeholder="5" type="number"/></div>
+              <div><Label>Height (in)</Label><TInput value={form.heightIn} onChange={set("heightIn")} placeholder="8" type="number"/></div>
+              <div><Label>Weight (kg)</Label><TInput value={form.weight} onChange={set("weight")} placeholder="72" type="number"/></div>
             </div>
             {bmi&&bmiInfo&&(
               <div style={{display:"flex",alignItems:"center",gap:"10px",padding:"9px 13px",background:bmiInfo.color+"12",borderRadius:C.radiusSm,border:`1px solid ${bmiInfo.color}22`,marginTop:"-10px",marginBottom:"20px"}}>
