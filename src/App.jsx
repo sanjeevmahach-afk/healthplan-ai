@@ -307,7 +307,7 @@ export default function App() {
 
     // ── LOG TO GOOGLE SHEETS ──
     const SHEET_URL = "https://script.google.com/macros/s/AKfycbzr8ZwpGX8WY50MD6uOdMX0nkjn-x_S-BjlNe22JasTqK5hWiwHYdvThkA_STCbseHx/exec";
-    if (SHEET_URL !== "https://script.google.com/macros/s/AKfycbzr8ZwpGX8WY50MD6uOdMX0nkjn-x_S-BjlNe22JasTqK5hWiwHYdvThkA_STCbseHx/exec") {
+    if (SHEET_URL !== "PASTE_YOUR_WEB_APP_URL_HERE") {
       fetch(SHEET_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
