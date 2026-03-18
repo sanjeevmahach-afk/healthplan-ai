@@ -24,6 +24,7 @@ const PAYOUT = {
   "SBI Health Alpha":            { fresh: "35%", port: "10%" },  // SBI Alpha, >10L, rest of India
 };
 
+
 /* ═══════════════════════════════════════════════════════════════
    PLANS DATA
 ═══════════════════════════════════════════════════════════════ */
@@ -249,6 +250,7 @@ const premBadge = r => ({"Low":["#f0fdf4","#166534"],"Medium":["#fefce8","#92400
 
 const PED_OPTIONS = [
   {value:"none",              label:"No PED",                  group:""},
+  {value:"maternity",         label:"Maternity",                group:"Other"},
   {value:"diabetes_tab_low",  label:"Diabetes (Tab, HbA1c ≤ 8)",group:"Diabetes"},
   {value:"diabetes_tab_high", label:"Diabetes (Tab, HbA1c > 8)",group:"Diabetes"},
   {value:"diabetes_insulin",  label:"Diabetes (Insulin)",       group:"Diabetes"},
@@ -738,6 +740,7 @@ export default function App() {
                             <InfoRow label="Room Rent" value={mp.roomRent}/>
                             <InfoRow label="No Claim Bonus" value={mp.ncb}/>
                             <InfoRow label="Medicals" value={mp.medicals}/>
+
                           </div>
 
                           {/* Payout */}
