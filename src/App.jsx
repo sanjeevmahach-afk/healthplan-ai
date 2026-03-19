@@ -394,7 +394,6 @@ export default function App() {
   const [form,setForm]           = useState({age:"",heightFt:"",heightIn:"",weight:"",peds:["none"],hba1c:"",familySize:"2a",maternity:"no",budget:"medium",isPort:"no",city:"tier1",sumInsured:"10"});
   const [results,setResults]     = useState(null);
   const [loading,setLoading]     = useState(false);
-  const [aiInsight,setAiInsight] = useState("");
   const [expanded,setExpanded]   = useState(null);
 
   const set = k => v => setForm(f=>({...f,[k]:v}));
@@ -406,44 +405,13 @@ export default function App() {
   useEffect(()=>{ window.scrollTo({top:0,behavior:"smooth"}); },[step]);
 
   const handleGenerate = async () => {
-    setLoading(true); setResults(null); setAiInsight(""); setExpanded(null);
+    setLoading(true); setResults(null);  setExpanded(null);
     setStep(3);
     const recs = getRecommendations({...form,bmi});
     setResults(recs);
 
     // ── LOG TO GOOGLE SHEETS ──
     const SHEET_URL = "https://script.google.com/macros/s/AKfycbzChn1PRSOBEBN8TZ8U03nsUK833NvOqfqCR93g4dyD7d4CUwCPh40jOFX5HLqNbsg/exec";
-    try {
-      const params = new URLSearchParams({
-        age:        form.age        || "",
-        bmi:        bmi             || "",
-        city:       form.city       || "",
-        isPort:     form.isPort     || "",
-        ped:        form.ped        || "",
-        hba1c:      form.hba1c      || "",
-        familySize: form.familySize || "",
-        maternity:  form.maternity  || "",
-        budget:     form.budget     || "",
-        sumInsured: form.sumInsured || "",
-        plan1:      recs[0]?.name   || "",
-        plan2:      recs[1]?.name   || "",
-        plan3:      recs[2]?.name   || "",
-      });
-      fetch(`${SHEET_URL}?${params.toString()}`, {
-        method: "GET",
-        mode: "no-cors",
-      }).catch(()=>{});
-    } catch(e) {}
-
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages",{
-        method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,
-          messages:[{role:"user",content:`Health insurance advisor India. Customer: Age ${form.age}, PED: ${form.ped||"none"}, BMI: ${bmi||"N/A"}, Family: ${form.familySize}, Maternity: ${form.maternity}, Budget: ${form.budget}, Port: ${form.isPort}. Recommended: ${recs.map(r=>r.name).join(", ")}. Write 2 sentences explaining why these plans fit this customer. Max 55 words.`}]})
-      });
-      const d = await res.json();
-      if(d.content?.[0]?.text) setAiInsight(d.content[0].text);
-    } catch(e){}
     setLoading(false);
   };
 
@@ -483,8 +451,8 @@ export default function App() {
           </div>
           {step===3&&(
             <div style={{display:"flex",gap:"8px",flexShrink:0}}>
-              <button onClick={()=>{setStep(2);setResults(null);setAiInsight("");}} style={{background:C.card,border:`1.5px solid ${C.border}`,color:C.text,borderRadius:"20px",padding:"8px 14px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>← Edit</button>
-              <button onClick={()=>{setStep(0);setResults(null);setAiInsight("");}} style={{background:C.accent,border:"none",color:"#fff",borderRadius:"20px",padding:"8px 16px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif",boxShadow:"0 2px 8px rgba(229,57,53,0.3)"}}>＋ New</button>
+              <button onClick={()=>{setStep(2);setResults(null);}} style={{background:C.card,border:`1.5px solid ${C.border}`,color:C.text,borderRadius:"20px",padding:"8px 14px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif"}}>← Edit</button>
+              <button onClick={()=>{setStep(0);setResults(null);}} style={{background:C.accent,border:"none",color:"#fff",borderRadius:"20px",padding:"8px 16px",fontSize:"13px",fontWeight:700,cursor:"pointer",fontFamily:"'Inter',sans-serif",boxShadow:"0 2px 8px rgba(229,57,53,0.3)"}}>＋ New</button>
             </div>
           )}
         </div>
@@ -616,12 +584,6 @@ export default function App() {
                 </div>
 
                 {/* AI Advisory */}
-                {aiInsight&&(
-                  <div style={{background:C.accentLight,border:`1px solid ${C.accent}18`,borderRadius:C.radius,padding:"14px 16px",marginBottom:"16px"}}>
-                    <div style={{fontSize:"10px",fontWeight:700,letterSpacing:"0.09em",textTransform:"uppercase",color:C.accent,marginBottom:"5px"}}>🤖 AI Advisory</div>
-                    <p style={{color:C.accentText,fontSize:"13px",lineHeight:1.65,margin:0}}>{aiInsight}</p>
-                  </div>
-                )}
 
                 {/* Plan Cards — side by side */}
                 {results.length === 0 ? (
