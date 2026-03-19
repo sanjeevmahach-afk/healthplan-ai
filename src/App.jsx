@@ -475,10 +475,10 @@ export default function App() {
       <div style={{background:C.card,borderBottom:`1px solid ${C.border}`,padding:"14px 18px",position:"sticky",top:0,zIndex:100,boxShadow:"0 1px 8px rgba(0,0,0,0.05)"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:"14px"}}>
           <div style={{display:"flex",alignItems:"center",gap:"10px"}}>
-            <div style={{width:"34px",height:"34px",borderRadius:"9px",background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"16px",flexShrink:0}}>👨‍⚕️</div>
-            <div>
-              <div style={{fontWeight:700,fontSize:"15px",color:C.text,letterSpacing:"-0.2px"}}>Health Plan Recommender</div>
-              <div style={{fontSize:"10px",color:C.muted,marginTop:"1px"}}>AI-powered · Health Insurance</div>
+            <img src="https://www.google.com/s2/favicons?domain=insurancedekho.com&sz=128" alt="InsuranceDekho" style={{height:"32px",width:"32px",borderRadius:"8px",objectFit:"cover",flexShrink:0}}/>
+            <div style={{borderLeft:`1px solid ${C.border}`,paddingLeft:"10px",marginLeft:"2px"}}>
+              <div style={{fontWeight:700,fontSize:"13px",color:C.text,letterSpacing:"-0.2px"}}>Health Plan Recommender</div>
+              <div style={{fontSize:"10px",color:C.muted,marginTop:"1px"}}>AI-powered · Agent Tool</div>
             </div>
           </div>
           {step===3&&(
@@ -511,7 +511,7 @@ export default function App() {
             <div style={{fontWeight:700,fontSize:"19px",color:C.text,marginBottom:"4px",letterSpacing:"-0.3px"}}>Basic Info</div>
             <div style={{fontSize:"13px",color:C.muted,marginBottom:"22px"}}>Enter customer details</div>
 
-            <Field label="Age (years)">
+            <Field label="Age of Eldest Member (years)">
               <TInput value={form.age} onChange={set("age")} placeholder="e.g. 35" type="number"/>
             </Field>
 
