@@ -537,8 +537,8 @@ export default function App() {
             <div style={{height:"1px",background:C.border,margin:"4px 0 20px"}}/>
 
             <Field label="Family Size">
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"7px"}}>
-                {[{value:"self",label:"Self",emoji:"🧍"},{value:"2a",label:"Self + Spouse",emoji:"👫"},{value:"family",label:"Family 2A+2C",emoji:"👨‍👩‍👧‍👦"},{value:"senior",label:"Senior (60+)",emoji:"🧓"}].map(o=>{
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"7px"}}>
+                {[{value:"self",label:"Self",emoji:"🧍"},{value:"2a",label:"Self + Spouse",emoji:"👫"},{value:"2a1c",label:"Family 2A+1C",emoji:"👨‍👩‍👦"},{value:"family",label:"Family 2A+2C",emoji:"👨‍👩‍👧‍👦"},{value:"senior",label:"Senior (60+)",emoji:"🧓"}].map(o=>{
                   const a=form.familySize===o.value;
                   return <button key={o.value} onClick={()=>set("familySize")(o.value)} style={{padding:"10px 11px",borderRadius:C.radiusSm,textAlign:"left",border:a?`1.5px solid ${C.accent}`:`1.5px solid ${C.border}`,background:a?C.accentLight:"#FAFAFA",color:a?C.accent:C.text,fontFamily:"'Inter',sans-serif",fontSize:"13px",fontWeight:a?600:400,cursor:"pointer",WebkitTapHighlightColor:"transparent"}}>{o.emoji} {o.label}</button>;
                 })}
