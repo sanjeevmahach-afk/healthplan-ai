@@ -1,6 +1,7 @@
 import { useState } from "react";
 import HealthRecommender from "./HealthRecommender";
 import ContestDashboard  from "./ContestDashboard";
+import VLIDashboard      from "./VLIDashboard";
 
 /* ── THEME ───────────────────────────────────────────────────── */
 const C = {
@@ -17,9 +18,6 @@ const C = {
   radiusSm:    "9px",
 };
 
-/* ── SCREENS ─────────────────────────────────────────────────── */
-// "home" | "recommender" | "contests" | "thailand"
-
 export default function App() {
   const [screen, setScreen] = useState("home");
 
@@ -28,7 +26,6 @@ export default function App() {
     <div style={{ minHeight:"100vh", maxWidth:"480px", margin:"0 auto", background:C.bg, fontFamily:"'Inter',sans-serif" }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
-      {/* Header */}
       <div style={{ background:C.accent, padding:"28px 20px 32px", textAlign:"center" }}>
         <div style={{ display:"flex", alignItems:"center", justifyContent:"center", gap:"10px", marginBottom:"16px" }}>
           <div style={{ width:"36px", height:"36px", borderRadius:"8px", background:"#fff", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"18px" }}>🏥</div>
@@ -41,11 +38,8 @@ export default function App() {
         <div style={{ fontSize:"13px", color:"rgba(255,255,255,0.75)" }}>What would you like to do today?</div>
       </div>
 
-      {/* Options */}
       <div style={{ padding:"20px 16px" }}>
-        <div style={{ fontSize:"10px", fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"12px" }}>
-          Choose an option
-        </div>
+        <div style={{ fontSize:"10px", fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"12px" }}>Choose an option</div>
         {[
           { icon:"🩺", iconBg:"#FFF0F0", title:"Plan Recommender",    desc:"AI-powered health plan recommendations based on age, health & budget", onClick:() => setScreen("recommender") },
           { icon:"🏆", iconBg:"#FFF8E1", title:"Contest Achievement", desc:"Track your progress and rewards across active sales contests",          onClick:() => setScreen("contests")    },
@@ -62,7 +56,6 @@ export default function App() {
           </div>
         ))}
       </div>
-
       <style>{`*{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}body{margin:0;background:${C.bg};}`}</style>
     </div>
   );
@@ -89,6 +82,32 @@ export default function App() {
 
         <div style={{ fontSize:"10px", fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:C.muted, marginBottom:"10px" }}>Live now</div>
 
+        {/* VLI */}
+        <div onClick={() => setScreen("vli")} style={{ background:C.card, border:`1.5px solid ${C.border}`, borderRadius:C.radius, padding:"16px 18px", marginBottom:"10px", cursor:"pointer" }}>
+          <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"8px" }}>
+            <div>
+              <div style={{ display:"inline-flex", alignItems:"center", gap:"4px", background:"#F0FDF4", border:"1px solid #86efac", borderRadius:"20px", padding:"2px 8px", fontSize:"10px", fontWeight:700, color:C.green, marginBottom:"6px" }}>
+                <div style={{ width:"6px", height:"6px", borderRadius:"50%", background:C.green }} />
+                Live
+              </div>
+              <div style={{ fontSize:"16px", fontWeight:700, color:C.text }}>Health Payout Incentive 💰</div>
+            </div>
+            <div style={{ fontSize:"16px", color:C.accent }}>→</div>
+          </div>
+          <div style={{ fontSize:"12px", color:C.muted, lineHeight:1.4, marginBottom:"10px" }}>
+            Earn extra payout over the base grid — up to 15% on your April health premium!
+          </div>
+          <div style={{ display:"flex", gap:"8px" }}>
+            {[{ label:"Booking period", value:"1 Apr – 30 Apr 2026" }, { label:"Max payout", value:"15%" }].map((d,i) => (
+              <div key={i} style={{ background:C.bg, border:`1px solid ${C.border}`, borderRadius:"6px", padding:"5px 8px", fontSize:"10px", color:"#555" }}>
+                <div style={{ fontSize:"9px", color:C.muted, marginBottom:"1px" }}>{d.label}</div>
+                {d.value}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Thailand Chalo */}
         <div onClick={() => setScreen("thailand")} style={{ background:C.card, border:`1.5px solid ${C.border}`, borderRadius:C.radius, padding:"16px 18px", marginBottom:"10px", cursor:"pointer" }}>
           <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:"8px" }}>
             <div>
@@ -113,6 +132,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* Coming soon */}
         <div style={{ fontSize:"10px", fontWeight:700, letterSpacing:"2px", textTransform:"uppercase", color:C.muted, margin:"16px 0 10px" }}>Coming soon</div>
         <div style={{ background:C.card, border:`1.5px solid ${C.border}`, borderRadius:C.radius, padding:"16px 18px", opacity:0.5 }}>
           <div style={{ display:"inline-flex", alignItems:"center", gap:"4px", background:"#F5F5F5", border:"1px solid #E0E0E0", borderRadius:"20px", padding:"2px 8px", fontSize:"10px", fontWeight:700, color:C.muted, marginBottom:"6px" }}>
@@ -122,9 +142,13 @@ export default function App() {
           <div style={{ fontSize:"12px", color:C.muted, marginTop:"4px" }}>Stay tuned for the next exciting contest!</div>
         </div>
       </div>
-
       <style>{`*{-webkit-tap-highlight-color:transparent;box-sizing:border-box;}body{margin:0;background:${C.bg};}`}</style>
     </div>
+  );
+
+  /* ── VLI ── */
+  if (screen === "vli") return (
+    <VLIDashboard onBack={() => setScreen("contests")} />
   );
 
   /* ── THAILAND CHALO ── */
