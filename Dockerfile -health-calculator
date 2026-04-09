@@ -1,0 +1,15 @@
+FROM 845742683201.dkr.ecr.ap-south-1.amazonaws.com/node:20.10-alpine3.17 as health-calculator
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM 845742683201.dkr.ecr.ap-south-1.amazonaws.com/node:20.10-alpine3.17
+
+WORKDIR /usr/src/app
+COPY --from=health-calculator /usr/src/app/build/ ./build
+COPY --from=health-calculator /usr/src/app/node_modules ./node_modules
+COPY --from=health-calculator /usr/src/app/server.js ./server.js
+
+CMD ["node", "server.js"]
