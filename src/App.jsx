@@ -166,96 +166,24 @@ function HomeScreen({ onNavigate }) {
 
         {/* BOOSTER NOTIFICATION BANNER */}
         {showBanner && (
-          <div style={{ background: "linear-gradient(135deg, #1a3a6b 0%, #0f2447 100%)",
-            borderRadius: C.radius, padding: "14px 16px", marginBottom: "14px",
-            position: "relative", overflow: "hidden" }}>
-
+          <div style={{ position: "relative", marginBottom: "14px", borderRadius: C.radius, overflow: "hidden", boxShadow: C.shadow }}>
             {/* Close button */}
             <button onClick={() => setShowBanner(false)}
-              style={{ position: "absolute", top: "10px", right: "10px",
-                background: "rgba(255,255,255,0.15)", border: "none", borderRadius: "50%",
-                width: "24px", height: "24px", cursor: "pointer", display: "flex",
+              style={{ position: "absolute", top: "10px", right: "10px", zIndex: 10,
+                background: "rgba(0,0,0,0.45)", border: "none", borderRadius: "50%",
+                width: "28px", height: "28px", cursor: "pointer", display: "flex",
                 alignItems: "center", justifyContent: "center", padding: 0,
                 WebkitTapHighlightColor: "transparent" }}>
               <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M1 1L11 11M11 1L1 11" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/>
+                <path d="M1 1L11 11M11 1L1 11" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </button>
-
-            {/* Header */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
-              <div style={{ background: C.red, borderRadius: "6px", padding: "4px 10px",
-                fontSize: "12px", fontWeight: 700, color: "#fff" }}>Thailand Chalo</div>
-              <div style={{ background: "rgba(255,255,255,0.15)", borderRadius: "6px",
-                padding: "4px 10px", fontSize: "11px", fontWeight: 600, color: "#fff" }}>
-                Booster Alert
-              </div>
-            </div>
-
-            {/* Booster dates highlight */}
-            <div style={{ fontSize: "14px", fontWeight: 700, color: "#FFD700", marginBottom: "6px" }}>
-              11th – 14th Apr 2026 Only
-            </div>
-            <div style={{ fontSize: "12px", color: "rgba(255,255,255,0.85)", marginBottom: "12px", lineHeight: 1.5 }}>
-              Additional weightage on single-year policies during the payment window
-            </div>
-
-            {/* Weightage table */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px", marginBottom: "12px" }}>
-              {[
-                { label: "1 NoP",         value: "+50% Weightage",  highlight: false },
-                { label: "2 or More NoPs", value: "+100% Weightage", highlight: true  },
-              ].map((r, i) => (
-                <div key={i} style={{ background: i === 1 ? C.red : "rgba(255,255,255,0.12)",
-                  borderRadius: C.radiusSm, padding: "10px 12px", textAlign: "center" }}>
-                  <div style={{ fontSize: "11px", color: i === 1 ? "#FFD700" : "rgba(255,255,255,0.7)",
-                    fontWeight: 600, marginBottom: "4px" }}>{r.label}</div>
-                  <div style={{ fontSize: "14px", fontWeight: 700,
-                    color: "#fff" }}>{r.value}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Streak reward */}
-            <div style={{ background: "rgba(255,215,0,0.15)", border: "1px solid rgba(255,215,0,0.4)",
-              borderRadius: C.radiusSm, padding: "10px 12px", marginBottom: "10px" }}>
-              <div style={{ fontSize: "11px", fontWeight: 700, color: "#FFD700", marginBottom: "4px" }}>
-                Streak Reward
-              </div>
-              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.85)", lineHeight: 1.5 }}>
-                Active 2 months: +1% on New + Port business{"\n"}
-                Active all 3 months: +3% on New + Port business
-              </div>
-            </div>
-
-            {/* Highlights */}
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
-              {["Multi-Year Policies Considered", "PSU Considered", "PA Considered"].map((h, i) => (
-                <div key={i} style={{ background: "rgba(255,255,255,0.12)", borderRadius: "99px",
-                  padding: "4px 10px", fontSize: "10px", fontWeight: 500, color: "rgba(255,255,255,0.85)" }}>
-                  {h}
-                </div>
-              ))}
-            </div>
-
-            {/* Payment window */}
-            <div style={{ marginTop: "10px", borderTop: "1px solid rgba(255,255,255,0.15)",
-              paddingTop: "10px", display: "flex", gap: "16px" }}>
-              <div>
-                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.5)", fontWeight: 600,
-                  textTransform: "uppercase", letterSpacing: "0.05em" }}>Payment Window</div>
-                <div style={{ fontSize: "11px", color: "#fff", fontWeight: 600, marginTop: "2px" }}>
-                  1 Apr – 30 Jun 2026
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: "9px", color: "rgba(255,255,255,0.5)", fontWeight: 600,
-                  textTransform: "uppercase", letterSpacing: "0.05em" }}>Booking Till</div>
-                <div style={{ fontSize: "11px", color: "#fff", fontWeight: 600, marginTop: "2px" }}>
-                  10 Jul 2026
-                </div>
-              </div>
-            </div>
+            {/* Actual image */}
+            <img
+              src="https://raw.githubusercontent.com/sanjeevmahach-afk/healthplan-ai/main/public/Thailand_Chalo_11-14_booster.png"
+              alt="Thailand Chalo Booster"
+              style={{ width: "100%", display: "block", borderRadius: C.radius }}
+            />
           </div>
         )}
 
