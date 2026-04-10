@@ -6,22 +6,22 @@ import { useState, useEffect } from "react";
    SI assumed ≥ 10L (most common recommendation case)
 ═══════════════════════════════════════════════════════════════ */
 const PAYOUT = {
-  // Rates from Apps Script commission grid · SI ≥ 10L · Family floater · Fresh/Port · Updated Apr 10 2026
-  "Niva Reassure 3.0":            { fresh: "23%", port: "13%" },  // Niva > AllExcGoldBronze > >=10L
-  "Niva Aspire":                  { fresh: "23%", port: "13%" },  // Niva > AllExcGoldBronze > >=10L
-  "HDFC Optima Secure":           { fresh: "25%", port: "15%" },  // HDFC > >=10L > Family > preferred
-  "ICICI Elevate":                { fresh: "23%", port: "10%" },  // ICICI > AllExcMaxProtect
-  "TATA Medicare Select":         { fresh: "27%", port: "12%" },  // TataAIG > MedSel > >=10L
-  "Star Assure":                  { fresh: "25%", port: "15%" },  // Star > AllPlans
-  "Care Supreme":                 { fresh: "22%", port: "15%" },  // Care > Classic/Supreme
-  "Care Freedom":                 { fresh: "22%", port: "15%" },  // Care > AllOther
-  "Care Heart / Star Cardiac":    { fresh: "22%", port: "15%" },  // Care > AllOther
-  "Star Cancer Care":             { fresh: "25%", port: "15%" },  // Star > AllPlans
-  "Reliance Health Gain":         { fresh: "30%", port: "15%" },  // IndusInd > Core > >=15L > rest
-  "Reliance Health Infinity":     { fresh: "30%", port: "15%" },  // IndusInd > Core > >=15L > rest
-  "Aditya Birla Active One Max":  { fresh: "25%", port: "15%" },  // AB > >=10L > MaxPlus/Vytl
-  "Aditya Birla Active One Vytl": { fresh: "25%", port: "15%" },  // AB > >=10L > MaxPlus/Vytl
-  "SBI Health Alpha":             { fresh: "35%", port: "10%" },  // SBI > Alpha > ROI > >10L
+  // Rates from runCalculator v7 · SI >= 10L · Family · Fresh · Updated Apr 10 2026
+  "Niva Reassure 3.0":            { fresh: "23%", port: "13%" },
+  "Niva Aspire":                  { fresh: "23%", port: "13%" },
+  "HDFC Optima Secure":           { fresh: "25%", port: "15%" },
+  "ICICI Elevate":                { fresh: "23%", port: "10%" },
+  "TATA Medicare Select":         { fresh: "27%", port: "12%" },
+  "Star Assure":                  { fresh: "25%", port: "15%" },
+  "Care Supreme":                 { fresh: "22%", port: "15%" },
+  "Care Freedom":                 { fresh: "22%", port: "15%" },
+  "Care Heart / Star Cardiac":    { fresh: "22%", port: "15%" },
+  "Star Cancer Care":             { fresh: "25%", port: "15%" },
+  "Reliance Health Gain":         { fresh: "30%", port: "15%" },
+  "Reliance Health Infinity":     { fresh: "30%", port: "15%" },
+  "Aditya Birla Active One Max":  { fresh: "25%", port: "15%" },
+  "Aditya Birla Active One Vytl": { fresh: "25%", port: "15%" },
+  "SBI Health Alpha":             { fresh: "35%", port: "10%" },
 };
 
 
