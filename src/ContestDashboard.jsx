@@ -114,6 +114,9 @@ export default function ContestDashboard() {
   const vliPctDisplay = vliPctRaw > 0 ? (vliPctRaw * 100).toFixed(0) + "%" : "0%";
   const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremium, VLI_SLABS);
 
+  const secondNop  = data ? Math.round(parseRaw(data["second nop"] || 0)) : 0;
+  const showSecond = data !== null;
+
   const showThailand = booked > 0 || sourced > 0;
   const showVLI      = vliPremium > 0;
 
@@ -333,6 +336,118 @@ export default function ContestDashboard() {
                       ? <>Book <strong>{fmtL(vNxt.min - vliPremium)} more</strong> to unlock {vNxt.pct} extra payout</>
                       : <strong>Top VLI slab — earning 15% extra payout!</strong>
                     }
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── SECOND POLICY CONTEST ── */}
+            {showSecond && (
+              <>
+                <SectionHeader title="Second Policy Contest" subtitle="9 Apr – 30 Apr 2026  |  Rs.800 on 2nd Policy" />
+                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+                  boxShadow: C.shadow }}>
+
+                  {/* Policy count display */}
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+                    marginBottom: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600,
+                        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
+                        Policies Done
+                      </div>
+                      <div style={{ fontSize: "32px", fontWeight: 700,
+                        color: secondNop >= 2 ? C.green : C.red }}>
+                        {secondNop}
+                        <span style={{ fontSize: "14px", color: C.muted, fontWeight: 400,
+                          marginLeft: "4px" }}>/ 2</span>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600,
+                        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>
+                        Reward
+                      </div>
+                      <div style={{ fontSize: "24px", fontWeight: 700,
+                        color: secondNop >= 2 ? C.green : C.muted }}>
+                        {secondNop >= 2 ? "Rs.800" : "Rs.0"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Milestone tracker — 0, 1, 2 policies */}
+                  <div style={{ position: "relative", marginBottom: "20px" }}>
+                    {/* Track line */}
+                    <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px",
+                      height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
+                      <div style={{ height: "100%", borderRadius: "99px", background: C.red,
+                        width: secondNop >= 2 ? "100%" : secondNop === 1 ? "50%" : "0%",
+                        transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                    </div>
+
+                    {/* Milestone dots */}
+                    <div style={{ display: "flex", justifyContent: "space-between",
+                      position: "relative", zIndex: 1 }}>
+                      {[
+                        { count: 0, label: "Start",    reward: null       },
+                        { count: 1, label: "1 Policy", reward: null       },
+                        { count: 2, label: "2 Policies",reward: "Rs.800"  },
+                      ].map((m, i) => {
+                        const achieved = secondNop >= m.count && m.count > 0;
+                        const isCurrent = secondNop === m.count;
+                        return (
+                          <div key={i} style={{ display: "flex", flexDirection: "column",
+                            alignItems: "center", gap: "6px" }}>
+                            {/* Reward label above */}
+                            <div style={{ fontSize: "10px", fontWeight: 700, height: "16px",
+                              color: achieved ? C.green : C.hint }}>
+                              {m.reward || ""}
+                            </div>
+                            {/* Dot */}
+                            <div style={{ width: "32px", height: "32px", borderRadius: "50%",
+                              background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border,
+                              border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`,
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              transition: "all 0.3s" }}>
+                              {achieved ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                                  <path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5"
+                                    strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              ) : (
+                                <div style={{ width: "8px", height: "8px", borderRadius: "50%",
+                                  background: isCurrent ? C.red : C.border }} />
+                              )}
+                            </div>
+                            {/* Label below */}
+                            <div style={{ fontSize: "10px", fontWeight: 600,
+                              color: achieved ? C.green : isCurrent ? C.red : C.muted,
+                              textAlign: "center" }}>
+                              {m.label}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Status message */}
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
+                    background: secondNop >= 2 ? C.greenLight : C.redLight,
+                    border: `1px solid ${secondNop >= 2 ? "#86EFAC" : "#FECACA"}`,
+                    fontSize: "12px", color: secondNop >= 2 ? C.green : C.red }}>
+                    {secondNop >= 2
+                      ? <strong>Reward unlocked — Rs.800 earned!</strong>
+                      : secondNop === 1
+                      ? <>1 more policy needed to unlock <strong>Rs.800 reward</strong></>
+                      : <>Do <strong>2 New/PA policies</strong> (min Rs.15,000 each) to earn Rs.800</>
+                    }
+                  </div>
+
+                  {/* T&C note */}
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
+                    Only New and PA policies counted. Min premium Rs.15,000 per policy.
+                    Port, Renewal and Cancelled cases excluded.
                   </div>
                 </div>
               </>
