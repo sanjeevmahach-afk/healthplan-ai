@@ -90,7 +90,7 @@ export default function App() {
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
       {/* SCREEN CONTENT */}
-      {screen === "home"        && <HomeScreen />}
+      {screen === "home"        && <HomeScreen onNavigate={setScreen} />}
       {screen === "contests"    && <ContestDashboard />}
       {screen === "calculator"  && <CommissionCalculator />}
       {screen === "recommender" && <HealthRecommender onBack={() => setScreen("home")} />}
@@ -108,7 +108,7 @@ export default function App() {
 }
 
 /* ── HOME SCREEN ─────────────────────────────────────────────── */
-function HomeScreen() {
+function HomeScreen({ onNavigate }) {
   const tools = [
     {
       title: "Plan Recommender",
@@ -169,7 +169,8 @@ function HomeScreen() {
 
         {/* TOOL CARDS */}
         {tools.map((t, i) => (
-          <div key={i} style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+          <div key={i} onClick={() => onNavigate(t.tab)}
+            style={{ background: C.card, borderRadius: C.radius, padding: "16px",
             marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px",
             boxShadow: C.shadow, cursor: "pointer" }}>
             <div style={{ width: "44px", height: "44px", borderRadius: "10px", background: C.redLight,
