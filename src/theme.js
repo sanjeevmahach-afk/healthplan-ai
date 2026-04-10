@@ -1,0 +1,21 @@
+/* ── DESIGN TOKENS (matching InsuranceDekho app) ─────────────── */
+export const C = {
+  bg:         "#F2F4F7",
+  card:       "#FFFFFF",
+  border:     "#E8ECF4",
+  text:       "#1A1A1A",
+  muted:      "#6B7280",
+  hint:       "#9CA3AF",
+  red:        "#E8272A",
+  redLight:   "#FEF2F2",
+  redDark:    "#C02023",
+  blue:       "#1B6FE8",
+  blueLight:  "#EBF0FA",
+  green:      "#16A34A",
+  greenLight: "#F0FDF4",
+  shadow:     "0 1px 4px rgba(0,0,0,0.08)",
+  radius:     "12px",
+  radiusSm:   "8px",
+  radiusXs:   "6px",
+  font:       "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif",
+};
