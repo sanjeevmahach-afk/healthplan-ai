@@ -10,7 +10,7 @@ const INSURER_PLANS = {
   "Bajaj General Insurance Co. Ltd":                 ["Health Guard","Extra Care Plus","Personal Accident"],
   "Niva Bupa Health Insurance Co Ltd":               ["ReAssure 3.0","ReAssure 2.0","Gold","Gold Plus","Bronze","Bronze Plus","Aspire","Senior First"],
   "HDFC ERGO General Insurance Company":             ["Optima Secure","Optima Restore","my:health Suraksha","Personal Accident"],
-  "ICICI Lombard":                                   ["Complete Health Insurance","Health Advantage","Max Protect","Personal Accident"],
+  "ICICI Lombard":                                   ["Elevate","Complete Health Insurance","Health Advantage","Max Protect","Personal Accident"],
   "Star Health":                                     ["Star Comprehensive","Star Assure","Star Family Health Optima","Star Senior Citizens Red Carpet","Star Cancer Care","Star Cardiac Care","Personal Accident"],
   "Tata AIG General Insurance Company Limited":      ["Medicare Select","Medicare Premier","Medicare Plus","Medicare","Medicare Lite","Elder Care","CritiMedicare","Supercharge","Accident Guard (PA)"],
   "SBI General Insurance Company Limited":           ["Health Alpha","Super Health","Arogya Supreme","Arogya Top Up","Personal Accident"],
