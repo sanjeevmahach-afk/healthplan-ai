@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { C } from "./theme";
 
 /* ═══════════════════════════════════════════════════════════════
    PAYOUT RATES (from Apps Script commission grid)
@@ -277,18 +278,11 @@ const MUTUALLY_EXCLUSIVE = [
 /* ═══════════════════════════════════════════════════════════════
    DESIGN TOKENS
 ═══════════════════════════════════════════════════════════════ */
-const C = {
-  bg:"#FDF6F6", card:"#FFFFFF", border:"#F0DEDE",
-  text:"#111111", sub:"#555555", muted:"#999999",
-  accent:"#E53935", accentLight:"#FFF0F0", accentText:"#C62828",
-  green:"#059669", radius:"14px", radiusSm:"9px",
-};
-
 /* ═══════════════════════════════════════════════════════════════
    UI COMPONENTS
 ═══════════════════════════════════════════════════════════════ */
 const Label = ({children}) => (
-  <div style={{fontSize:"11px",fontWeight:700,letterSpacing:"0.09em",textTransform:"uppercase",color:C.muted,marginBottom:"8px"}}>
+  <div style={{fontSize:"12px",fontWeight:600,color:C.muted,marginBottom:"8px",letterSpacing:"0.05em",textTransform:"uppercase"}}>
     {children}
   </div>
 );
@@ -301,18 +295,18 @@ const Field = ({label,hint,children}) => (
   </div>
 );
 
-const baseInp = {width:"100%",padding:"12px 14px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:"#FAFAFA",fontFamily:"'Inter',sans-serif",fontSize:"15px",color:"#111111",fontWeight:500,outline:"none",boxSizing:"border-box",WebkitAppearance:"none"};
+const baseInp = {width:"100%",padding:"12px 14px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:"#fff",fontFamily:C.font,fontSize:"14px",color:C.text,fontWeight:500,outline:"none",boxSizing:"border-box",WebkitAppearance:"none"};
 
 const TInput = ({value,onChange,placeholder,type="text"}) => (
   <input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} inputMode={type==="number"?"decimal":"text"} style={baseInp}/>
 );
 
-/* Segmented control */
+/* Segmented control — ID blue style */
 const Seg = ({options,value,onChange}) => (
-  <div style={{display:"flex",background:"#EFEFEF",borderRadius:"9px",padding:"3px",gap:"2px"}}>
+  <div style={{display:"flex",background:C.blueLight,borderRadius:"99px",padding:"3px",gap:"2px"}}>
     {options.map(o=>{
       const a=value===o.value;
-      return <button key={o.value} onClick={()=>onChange(o.value)} style={{flex:1,padding:"9px 4px",borderRadius:"7px",border:"none",background:a?"#fff":"transparent",color:a?C.text:C.muted,fontFamily:"'Inter',sans-serif",fontSize:"13px",fontWeight:a?600:400,cursor:"pointer",transition:"all 0.12s",boxShadow:a?"0 1px 3px rgba(0,0,0,0.1)":"none",WebkitTapHighlightColor:"transparent"}}>{o.emoji&&<span style={{marginRight:"4px"}}>{o.emoji}</span>}{o.label}</button>;
+      return <button key={o.value} onClick={()=>onChange(o.value)} style={{flex:1,padding:"8px 4px",borderRadius:"99px",border:"none",background:a?C.blue:"transparent",color:a?"#fff":C.blue,fontFamily:C.font,fontSize:"13px",fontWeight:a?600:500,cursor:"pointer",transition:"all 0.15s",WebkitTapHighlightColor:"transparent"}}>{o.label}</button>;
     })}
   </div>
 );
@@ -322,7 +316,7 @@ const PillRow = ({options,value,onChange}) => (
   <div style={{display:"flex",flexWrap:"wrap",gap:"7px"}}>
     {options.map(o=>{
       const a=value===o.value;
-      return <button key={o.value} onClick={()=>onChange(o.value)} style={{padding:"8px 15px",borderRadius:"30px",border:a?`1.5px solid ${C.accent}`:`1.5px solid ${C.border}`,background:a?C.accentLight:"#FAFAFA",color:a?C.accent:C.text,fontFamily:"'Inter',sans-serif",fontSize:"13px",fontWeight:a?600:400,cursor:"pointer",WebkitTapHighlightColor:"transparent"}}>{o.emoji&&<span style={{marginRight:"5px"}}>{o.emoji}</span>}{o.label}</button>;
+      return <button key={o.value} onClick={()=>onChange(o.value)} style={{padding:"8px 15px",borderRadius:"99px",border:a?`1.5px solid ${C.blue}`:`1.5px solid ${C.border}`,background:a?C.blueLight:"#fff",color:a?C.blue:C.text,fontFamily:C.font,fontSize:"13px",fontWeight:a?600:400,cursor:"pointer",WebkitTapHighlightColor:"transparent"}}>{o.label}</button>;
     })}
   </div>
 );
@@ -436,7 +430,7 @@ export default function HealthRecommender({ onBack }) {
   };
 
   return (
-    <div style={{minHeight:"100vh",maxWidth:"480px",margin:"0 auto",background:C.bg,fontFamily:"'Inter',sans-serif"}}>
+    <div style={{minHeight:"100vh",maxWidth:"480px",margin:"0 auto",background:C.bg,fontFamily:C.font}}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
       {/* ── HEADER ── */}
@@ -472,7 +466,7 @@ export default function HealthRecommender({ onBack }) {
       </div>
 
       {/* ── CONTENT ── */}
-      <div style={{padding:"22px 18px 120px"}}>
+      <div style={{padding:"22px 18px 160px"}}>
 
         {/* STEP 0 */}
         {step===0&&(
@@ -756,15 +750,15 @@ export default function HealthRecommender({ onBack }) {
 
       {/* ── BOTTOM NAV ── */}
       {step<3&&(
-        <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:"480px",background:C.card,borderTop:`1px solid ${C.border}`,padding:"12px 18px",display:"flex",gap:"9px",boxSizing:"border-box",zIndex:200,boxShadow:"0 -4px 16px rgba(0,0,0,0.05)"}}>
+        <div style={{position:"fixed",bottom:"72px",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:"480px",background:C.card,borderTop:`1px solid ${C.border}`,padding:"12px 18px",display:"flex",gap:"9px",boxSizing:"border-box",zIndex:200,boxShadow:"0 -4px 16px rgba(0,0,0,0.05)"}}>
           {step>0&&(
-            <button onClick={()=>setStep(s=>s-1)} style={{flex:1,padding:"13px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:C.card,color:C.text,fontSize:"14px",fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif",WebkitTapHighlightColor:"transparent"}}>← Back</button>
+            <button onClick={()=>setStep(s=>s-1)} style={{flex:1,padding:"13px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:C.card,color:C.text,fontSize:"14px",fontWeight:600,cursor:"pointer",fontFamily:C.font,WebkitTapHighlightColor:"transparent"}}>Back</button>
           )}
           {step<2?(
-            <button onClick={()=>canNext[step]&&setStep(s=>s+1)} disabled={!canNext[step]} style={{flex:3,padding:"13px",borderRadius:C.radiusSm,border:"none",background:canNext[step]?C.accent:"#EBEBEB",color:canNext[step]?"#fff":C.muted,fontSize:"14px",fontWeight:600,cursor:canNext[step]?"pointer":"not-allowed",fontFamily:"'Inter',sans-serif",WebkitTapHighlightColor:"transparent"}}>Continue →</button>
+            <button onClick={()=>canNext[step]&&setStep(s=>s+1)} disabled={!canNext[step]} style={{flex:3,padding:"13px",borderRadius:C.radiusSm,border:"none",background:canNext[step]?C.red:"#EBEBEB",color:canNext[step]?"#fff":C.muted,fontSize:"14px",fontWeight:600,cursor:canNext[step]?"pointer":"not-allowed",fontFamily:C.font,WebkitTapHighlightColor:"transparent"}}>Continue</button>
           ):(
-            <button onClick={handleGenerate} style={{flex:3,padding:"13px",borderRadius:C.radiusSm,border:"none",background:C.accent,color:"#fff",fontSize:"14px",fontWeight:600,cursor:"pointer",fontFamily:"'Inter',sans-serif",WebkitTapHighlightColor:"transparent",display:"flex",alignItems:"center",justifyContent:"center",gap:"7px"}}>
-              ✦ Get Recommendations
+            <button onClick={handleGenerate} style={{flex:3,padding:"13px",borderRadius:C.radiusSm,border:"none",background:C.red,color:"#fff",fontSize:"14px",fontWeight:600,cursor:"pointer",fontFamily:C.font,WebkitTapHighlightColor:"transparent",display:"flex",alignItems:"center",justifyContent:"center",gap:"7px"}}>
+              Get Recommendations
             </button>
           )}
         </div>
