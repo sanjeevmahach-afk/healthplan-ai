@@ -112,17 +112,19 @@ function HomeScreen({ onNavigate }) {
   const [showBanner, setShowBanner] = useState(true);
   const [visits, setVisits] = useState({ today: 0, total: 0 });
 
-  /* ── VISIT COUNTER ── */
+  /* ── VISIT COUNTER — cross-device via Apps Script ── */
   useEffect(() => {
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const stored = JSON.parse(localStorage.getItem("hpt_visits") || "{}");
-      const total  = (stored.total  || 0) + 1;
-      const todayCount = stored.date === today ? (stored.today || 0) + 1 : 1;
-      const updated = { total, today: todayCount, date: today };
-      localStorage.setItem("hpt_visits", JSON.stringify(updated));
-      setVisits({ today: todayCount, total });
-    } catch (e) {}
+    const VISIT_URL = "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec?action=visit";
+    fetch(VISIT_URL)
+      .then(r => r.json())
+      .then(d => { if (d.visits) setVisits({ total: d.visits }); })
+      .catch(() => {
+        // Fallback to localStorage if network fails
+        try {
+          const stored = JSON.parse(localStorage.getItem("hpt_visits") || "{}");
+          setVisits({ total: stored.total || 0 });
+        } catch (e) {}
+      });
   }, []);
 
   const tools = [
@@ -228,55 +230,34 @@ function HomeScreen({ onNavigate }) {
         ))}
 
         {/* VISIT STATS */}
-        <div style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
-          {[
-            {
-              label: "Visits today",
-              value: visits.today,
-              icon: (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="3" fill={C.red}/>
-                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z"
-                    stroke={C.red} strokeWidth="1.8" fill="none"/>
-                </svg>
-              ),
-            },
-            {
-              label: "Total visits",
-              value: visits.total,
-              icon: (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21"
-                    stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/>
-                  <circle cx="12" cy="10" r="3" stroke={C.red} strokeWidth="1.8"/>
-                  <path d="M23 21V19C23 18.1 22.4 17.4 21.6 17.1M16 3.1C16.8 3.4 17.4 4.2 17.4 5.1C17.4 6 16.8 6.8 16 7.1"
-                    stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/>
-                </svg>
-              ),
-            },
-          ].map((s, i) => (
-            <div key={i} style={{ flex: 1, background: C.card, borderRadius: C.radiusSm,
-              padding: "12px 14px", boxShadow: C.shadow,
-              display: "flex", alignItems: "center", gap: "10px" }}>
-              <div style={{ width: "30px", height: "30px", borderRadius: "8px",
-                background: C.redLight, display: "flex", alignItems: "center",
-                justifyContent: "center", flexShrink: 0 }}>
-                {s.icon}
-              </div>
-              <div>
-                <div style={{ fontSize: "18px", fontWeight: 700, color: C.text, lineHeight: 1 }}>
-                  {s.value.toLocaleString("en-IN")}
-                </div>
-                <div style={{ fontSize: "11px", color: C.muted, marginTop: "3px" }}>{s.label}</div>
+        <div style={{ marginTop: "6px" }}>
+          <div style={{ background: C.card, borderRadius: C.radiusSm,
+            padding: "12px 16px", boxShadow: C.shadow,
+            display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{ width: "34px", height: "34px", borderRadius: "8px",
+              background: C.redLight, display: "flex", alignItems: "center",
+              justifyContent: "center", flexShrink: 0 }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21"
+                  stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/>
+                <circle cx="12" cy="10" r="3" stroke={C.red} strokeWidth="1.8"/>
+                <path d="M23 21V19C23 18.1 22.4 17.4 21.6 17.1M16 3.1C16.8 3.4 17.4 4.2 17.4 5.1C17.4 6 16.8 6.8 16 7.1"
+                  stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: "11px", color: C.muted }}>Total visits (all devices)</div>
+              <div style={{ fontSize: "22px", fontWeight: 700, color: C.text, lineHeight: 1.2, marginTop: "2px" }}>
+                {(visits.total || 0).toLocaleString("en-IN")}
               </div>
             </div>
-          ))}
+          </div>
         </div>
 
         {/* FOOTER NOTE */}
         <div style={{ textAlign: "center", fontSize: "10px", color: C.hint,
-          marginTop: "16px", paddingBottom: "4px" }}>
-          Visits tracked on this device only
+          marginTop: "14px", paddingBottom: "4px" }}>
+          Visits tracked across all devices
         </div>
 
       </div>
