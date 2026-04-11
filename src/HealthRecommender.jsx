@@ -607,120 +607,165 @@ export default function HealthRecommender({ onBack }) {
 
                 {/* AI Advisory */}
 
-                {/* Plan Cards — stacked vertically with rank badge */}
+                {/* Plan Cards — horizontal scroll, no ranking */}
                 {results.length === 0 ? (
-                  <div style={{background:C.card,borderRadius:C.radius,padding:"28px 20px",textAlign:"center",border:`1px solid ${C.border}`}}>
+                  <div style={{background:C.card,borderRadius:C.radius,padding:"28px 20px",
+                    textAlign:"center",border:`1px solid ${C.border}`}}>
                     <div style={{fontWeight:700,fontSize:"16px",color:C.text,marginBottom:"8px"}}>No Plans Available</div>
                     <div style={{fontSize:"13px",color:C.muted,lineHeight:1.6}}>
-                      Based on the customer's age, BMI, and health conditions, no plan currently meets the eligibility criteria.
-                      Consider reviewing the customer's BMI or exploring specialised plans directly with the insurer.
+                      Based on the customer's age, BMI, and health conditions, no plan currently meets eligibility criteria.
+                      Consider reviewing the customer's BMI or exploring plans directly with the insurer.
                     </div>
                   </div>
                 ) : (
-                <div style={{display:"flex",flexDirection:"column",gap:"12px"}}>
-                  {results.map((plan,idx)=>{
-                    const isExp=expanded===idx;
-                    const [pb,pt]=premBadge(plan.premiumRange);
-                    const payout = PAYOUT[plan.name] || {fresh:"–",port:"–"};
-                    const payoutVal = form.isPort==="yes" ? payout.port : payout.fresh;
-                    const rankColors = ["#E8272A","#1B6FE8","#16A34A"];
-                    const rankLabels = ["Top Pick","2nd Choice","3rd Choice"];
-                    return (
-                      <div key={plan.name} style={{background:C.card,borderRadius:C.radius,overflow:"hidden",
-                        border:`1px solid ${idx===0 ? C.red : C.border}`,
-                        boxShadow:idx===0?"0 2px 12px rgba(232,39,42,0.1)":C.shadow}}>
+                  <div>
+                    {/* Swipe hint */}
+                    <div style={{display:"flex",alignItems:"center",gap:"5px",marginBottom:"8px"}}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M5 12H19M15 8L19 12L15 16" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      <span style={{fontSize:"11px",color:C.muted}}>Swipe to see all matching plans</span>
+                    </div>
 
-                        {/* Rank bar */}
-                        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",
-                          padding:"8px 14px",
-                          background:idx===0?C.redLight:C.bg,
-                          borderBottom:`1px solid ${C.border}`}}>
-                          <div style={{display:"flex",alignItems:"center",gap:"7px"}}>
-                            <div style={{width:"20px",height:"20px",borderRadius:"50%",
-                              background:rankColors[idx]||C.muted,
-                              display:"flex",alignItems:"center",justifyContent:"center",
-                              fontSize:"10px",fontWeight:700,color:"#fff",flexShrink:0}}>
-                              {idx+1}
-                            </div>
-                            <span style={{fontSize:"11px",fontWeight:700,
-                              color:rankColors[idx]||C.muted}}>
-                              {rankLabels[idx]||"Option"}
-                            </span>
-                          </div>
-                          <div style={{display:"flex",gap:"5px",alignItems:"center"}}>
-                            <span style={{fontSize:"10px",fontWeight:600,padding:"2px 7px",
-                              borderRadius:"99px",background:pb,color:pt}}>
-                              {plan.premiumRange} premium
-                            </span>
-                          </div>
-                        </div>
-
-                        <div style={{padding:"12px 14px",display:"flex",flexDirection:"column",gap:"10px"}}>
-                          {/* Plan name row */}
-                          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:"8px"}}>
-                            <div>
-                              <div style={{fontSize:"10px",fontWeight:600,color:C.muted,letterSpacing:"0.07em",textTransform:"uppercase"}}>{plan.insurer}</div>
-                              <div style={{fontWeight:700,fontSize:"15px",color:C.text,lineHeight:1.3,marginTop:"2px"}}>{plan.name}</div>
-                            </div>
-                            <div style={{background:C.greenLight,border:"1px solid #86efac",borderRadius:C.radiusSm,padding:"6px 10px",textAlign:"center",flexShrink:0}}>
-                              <div style={{fontSize:"9px",color:C.green,fontWeight:600,textTransform:"uppercase"}}>Payout</div>
-                              <div style={{fontSize:"18px",fontWeight:700,color:C.green,lineHeight:1}}>{payoutVal}</div>
-                            </div>
-                          </div>
-
-                          {/* Why recommended */}
-                          {plan.reasons?.length>0&&(
-                            <div style={{background:"#FFF7ED",borderRadius:C.radiusSm,padding:"8px 10px"}}>
-                              <div style={{fontSize:"9px",fontWeight:700,color:"#92400e",textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:"5px"}}>Why recommended</div>
-                              {plan.reasons.slice(0,2).map((r,i)=>(
-                                <div key={i} style={{display:"flex",gap:"6px",alignItems:"flex-start",fontSize:"12px",color:C.text,marginBottom:"3px",lineHeight:1.4}}>
-                                  <span style={{color:C.green,fontWeight:700,flexShrink:0,fontSize:"11px"}}>✓</span><span>{r}</span>
+                    {/* Scroll container — negative margin to bleed past padding */}
+                    <div style={{
+                      display:"flex", gap:"10px", overflowX:"auto",
+                      scrollSnapType:"x mandatory", WebkitOverflowScrolling:"touch",
+                      scrollbarWidth:"none", msOverflowStyle:"none",
+                      marginLeft:"-18px", marginRight:"-18px",
+                      paddingLeft:"18px", paddingRight:"18px",
+                      paddingBottom:"4px",
+                    }}
+                      id="planScroll"
+                      onScroll={e=>{
+                        const idx = Math.round(e.target.scrollLeft / (e.target.offsetWidth * 0.82));
+                        setExpanded(idx < results.length ? null : null);
+                        const dots = document.querySelectorAll(".plan-dot");
+                        dots.forEach((d,i)=>d.style.background = i===idx ? C.red : C.border);
+                      }}
+                    >
+                      {results.map((plan,idx)=>{
+                        const isExp = expanded===idx;
+                        const [pb,pt] = premBadge(plan.premiumRange);
+                        const payout = PAYOUT[plan.name] || {fresh:"–",port:"–"};
+                        const payoutVal = form.isPort==="yes" ? payout.port : payout.fresh;
+                        return (
+                          <div key={plan.name} style={{
+                            flexShrink:0, width:"82%", maxWidth:"300px",
+                            background:C.card, borderRadius:C.radius,
+                            border:`1px solid ${C.border}`, boxShadow:C.shadow,
+                            scrollSnapAlign:"start", overflow:"hidden",
+                            display:"flex", flexDirection:"column",
+                          }}>
+                            {/* Card header */}
+                            <div style={{padding:"11px 13px 10px",borderBottom:`1px solid ${C.border}`,background:C.bg}}>
+                              <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:"8px"}}>
+                                <div>
+                                  <div style={{fontSize:"10px",fontWeight:600,color:C.muted,
+                                    letterSpacing:"0.07em",textTransform:"uppercase"}}>{plan.insurer}</div>
+                                  <div style={{fontWeight:700,fontSize:"14px",color:C.text,
+                                    lineHeight:1.3,marginTop:"3px"}}>{plan.name}</div>
                                 </div>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Key stats row */}
-                          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px"}}>
-                            {[["PED Wait",plan.pedWaiting.split(" ").slice(0,3).join(" ")],["Co-pay",plan.copay],["Room Rent",plan.roomRent.length>15?plan.roomRent.split("(")[0].trim():plan.roomRent],["NCB",plan.ncb.split(" ").slice(0,2).join(" ")]].map(([k,v])=>(
-                              <div key={k} style={{background:C.bg,borderRadius:C.radiusXs,padding:"6px 8px"}}>
-                                <div style={{fontSize:"9px",color:C.muted,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em"}}>{k}</div>
-                                <div style={{fontSize:"11px",fontWeight:600,color:C.text,marginTop:"2px",lineHeight:1.3}}>{v}</div>
+                                <div style={{background:C.greenLight,border:"1px solid #86efac",
+                                  borderRadius:C.radiusSm,padding:"5px 9px",textAlign:"center",flexShrink:0}}>
+                                  <div style={{fontSize:"8px",color:C.green,fontWeight:600,textTransform:"uppercase"}}>Payout</div>
+                                  <div style={{fontSize:"20px",fontWeight:700,color:C.green,lineHeight:1}}>{payoutVal}</div>
+                                </div>
                               </div>
-                            ))}
-                          </div>
-
-                          {/* Expand toggle */}
-                          <button onClick={()=>setExpanded(isExp?null:idx)}
-                            style={{background:"none",border:`1px solid ${C.border}`,borderRadius:C.radiusSm,
-                              padding:"7px",fontSize:"11px",color:C.muted,cursor:"pointer",
-                              fontFamily:C.font,width:"100%",textAlign:"center"}}>
-                            {isExp ? "Show less" : "See full details"}
-                          </button>
-
-                          {/* Expanded content */}
-                          {isExp&&(
-                            <div style={{display:"flex",flexDirection:"column",gap:"6px"}}>
-                              {plan.specialFeatures?.map((f,i)=>(
-                                <div key={i} style={{display:"flex",gap:"8px",alignItems:"flex-start",fontSize:"12px",color:C.text,lineHeight:1.4}}>
-                                  <span style={{color:C.red,flexShrink:0,fontWeight:700}}>→</span><span>{f}</span>
-                                </div>
-                              ))}
-                              <div style={{fontSize:"11px",color:C.muted,marginTop:"4px"}}>Medicals: {plan.medicals}</div>
-                              <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
-                                onClick={()=>logPosClick(plan.name)}
-                                style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",
-                                  background:C.red,borderRadius:C.radiusSm,padding:"12px",fontSize:"13px",
-                                  fontWeight:700,color:"#fff",textDecoration:"none",marginTop:"4px"}}>
-                                Sell on POS
-                              </a>
                             </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+
+                            <div style={{padding:"10px 13px",display:"flex",flexDirection:"column",gap:"8px",flex:1}}>
+                              {/* Why recommended */}
+                              {plan.reasons?.length>0&&(
+                                <div style={{background:"#FFF7ED",borderRadius:C.radiusSm,padding:"7px 9px"}}>
+                                  <div style={{fontSize:"8px",fontWeight:700,color:"#92400e",
+                                    textTransform:"uppercase",letterSpacing:"0.07em",marginBottom:"4px"}}>Why this plan</div>
+                                  {plan.reasons.slice(0,2).map((r,i)=>(
+                                    <div key={i} style={{display:"flex",gap:"5px",alignItems:"flex-start",
+                                      fontSize:"11px",color:C.text,marginBottom:"2px",lineHeight:1.4}}>
+                                      <span style={{color:C.green,fontWeight:700,flexShrink:0}}>✓</span>
+                                      <span>{r}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* 4 stat grid */}
+                              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"5px"}}>
+                                {[
+                                  ["PED wait", plan.pedWaiting.split(" ").slice(0,3).join(" ")],
+                                  ["Co-pay",   plan.copay],
+                                  ["Room rent", plan.roomRent.length>14 ? plan.roomRent.split("(")[0].trim() : plan.roomRent],
+                                  ["NCB",       plan.ncb.split(" ").slice(0,2).join(" ")],
+                                ].map(([k,v])=>(
+                                  <div key={k} style={{background:C.bg,borderRadius:C.radiusXs,padding:"5px 7px"}}>
+                                    <div style={{fontSize:"8px",color:C.muted,fontWeight:600,
+                                      textTransform:"uppercase",letterSpacing:"0.05em"}}>{k}</div>
+                                    <div style={{fontSize:"11px",fontWeight:600,color:C.text,
+                                      marginTop:"2px",lineHeight:1.3}}>{v}</div>
+                                  </div>
+                                ))}
+                              </div>
+
+                              {/* Premium badge */}
+                              <div style={{display:"flex",justifyContent:"flex-end"}}>
+                                <span style={{fontSize:"10px",fontWeight:600,padding:"2px 8px",
+                                  borderRadius:"99px",background:pb,color:pt}}>
+                                  {plan.premiumRange} premium
+                                </span>
+                              </div>
+
+                              {/* Expand toggle */}
+                              <button onClick={()=>setExpanded(isExp?null:idx)}
+                                style={{background:"none",border:`1px solid ${C.border}`,
+                                  borderRadius:C.radiusSm,padding:"7px",fontSize:"11px",
+                                  color:C.muted,cursor:"pointer",fontFamily:C.font,width:"100%"}}>
+                                {isExp ? "Show less" : "See full details"}
+                              </button>
+
+                              {/* Expanded */}
+                              {isExp&&(
+                                <div style={{display:"flex",flexDirection:"column",gap:"5px"}}>
+                                  {plan.specialFeatures?.map((f,i)=>(
+                                    <div key={i} style={{display:"flex",gap:"7px",alignItems:"flex-start",
+                                      fontSize:"11px",color:C.text,lineHeight:1.4}}>
+                                      <span style={{color:C.red,fontWeight:700,flexShrink:0}}>→</span>
+                                      <span>{f}</span>
+                                    </div>
+                                  ))}
+                                  <div style={{fontSize:"10px",color:C.muted,marginTop:"2px"}}>
+                                    Medicals: {plan.medicals}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* POS button pinned to card bottom */}
+                            <a href="https://pos.insurancedekho.com/core/sell/health"
+                              target="_blank" rel="noopener noreferrer"
+                              onClick={()=>logPosClick(plan.name)}
+                              style={{display:"block",background:C.red,color:"#fff",
+                                textAlign:"center",fontSize:"12px",fontWeight:700,
+                                padding:"10px",textDecoration:"none",
+                                borderTop:`1px solid ${C.border}`}}>
+                              Sell on POS
+                            </a>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Dot indicators */}
+                    <div style={{display:"flex",justifyContent:"center",gap:"6px",marginTop:"10px"}}>
+                      {results.map((_,i)=>(
+                        <div key={i} className="plan-dot" style={{
+                          width:"6px",height:"6px",borderRadius:"50%",
+                          background: i===0 ? C.red : C.border,
+                          transition:"background 0.2s",
+                        }}/>
+                      ))}
+                    </div>
+                  </div>
                 )}
 
                 {/* ── FULL SCREEN DETAILS MODAL ── */}
@@ -785,8 +830,8 @@ export default function HealthRecommender({ onBack }) {
                           {/* Sell on POS */}
                           <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
                             onClick={()=>logPosClick(mp.name)}
-                            style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",background:C.red,borderRadius:"12px",padding:"14px",fontSize:"14px",fontWeight:700,color:"#fff",textDecoration:"none",boxShadow:"0 4px 16px rgba(229,57,53,0.3)"}}>
-                            🛒 Sell on POS
+                            style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"8px",background:C.red,borderRadius:C.radiusSm,padding:"14px",fontSize:"14px",fontWeight:700,color:"#fff",textDecoration:"none"}}>
+                            Sell on POS
                           </a>
                         </div>
                       </div>
@@ -795,13 +840,13 @@ export default function HealthRecommender({ onBack }) {
                 })()}
 
                 {/* ── POS CTA ── */}
-                <div style={{marginTop:"18px",background:"linear-gradient(135deg,#E53935,#C62828)",borderRadius:C.radius,padding:"18px 20px",textAlign:"center",boxShadow:"0 4px 20px rgba(229,57,53,0.25)"}}>
-                  <div style={{fontSize:"11px",fontWeight:700,color:"rgba(255,255,255,0.7)",letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:"4px"}}>Ready to sell?</div>
+                <div style={{marginTop:"18px",background:C.red,borderRadius:C.radius,padding:"18px 20px",textAlign:"center"}}>
+                  <div style={{fontSize:"11px",fontWeight:600,color:"rgba(255,255,255,0.7)",letterSpacing:"0.08em",textTransform:"uppercase",marginBottom:"4px"}}>Ready to sell?</div>
                   <div style={{fontSize:"16px",fontWeight:700,color:"#fff",marginBottom:"14px"}}>Open POS Portal</div>
                   <a href="https://pos.insurancedekho.com/core/sell/health" target="_blank" rel="noopener noreferrer"
                     onClick={()=>logPosClick("CTA Banner")}
-                    style={{display:"inline-flex",alignItems:"center",gap:"8px",background:"#fff",color:"#C62828",borderRadius:"10px",padding:"12px 28px",fontSize:"14px",fontWeight:700,textDecoration:"none",boxShadow:"0 2px 10px rgba(0,0,0,0.15)"}}>
-                    🛒 Sell on POS →
+                    style={{display:"inline-flex",alignItems:"center",gap:"8px",background:"#fff",color:C.red,borderRadius:C.radiusSm,padding:"11px 28px",fontSize:"14px",fontWeight:700,textDecoration:"none"}}>
+                    Sell on POS
                   </a>
                 </div>
 
@@ -834,9 +879,10 @@ export default function HealthRecommender({ onBack }) {
         @keyframes spin{to{transform:rotate(360deg)}}
         input{color:#111111!important;font-weight:600!important;-webkit-text-fill-color:#111111!important;opacity:1!important;}
         input::placeholder{color:#AAAAAA!important;font-weight:400!important;-webkit-text-fill-color:#AAAAAA!important;}
-        input:focus{border-color:${C.red}!important;box-shadow:0 0 0 3px rgba(229,57,53,0.12);}
+        input:focus{border-color:${C.red}!important;box-shadow:0 0 0 3px rgba(232,39,42,0.12);}
         *{-webkit-tap-highlight-color:transparent;}
         body{margin:0;background:${C.bg};}
+        #planScroll::-webkit-scrollbar{display:none;}
       `}</style>
     </div>
   );
