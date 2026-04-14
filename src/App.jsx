@@ -110,6 +110,7 @@ export default function App() {
 /* ── HOME SCREEN ─────────────────────────────────────────────── */
 function HomeScreen({ onNavigate }) {
   const [showBanner, setShowBanner] = useState(true);
+  const [carouselIdx, setCarouselIdx] = useState(0);
   const [visits, setVisits] = useState({ today: 0, total: 0 });
 
   /* ── VISIT COUNTER ── */
@@ -129,6 +130,17 @@ function HomeScreen({ onNavigate }) {
       .then(r => r.json())
       .then(d => { if (d.visits) setVisits(v => ({ ...v, total: d.visits })); })
       .catch(() => {});
+  }, []);
+
+  /* ── CAROUSEL AUTO-SCROLL ── */
+  const BANNERS = [
+    { src: "/App_banner_Thailand_Chalo.png",       alt: "Thailand Chalo Contest"   },
+    { src: "/App_Banner_VLI.png",                  alt: "VLI Health Payout"        },
+    { src: "/Second_Policy_Contest_2_App_Banner.png", alt: "Second Policy Contest" },
+  ];
+  useEffect(() => {
+    const t = setInterval(() => setCarouselIdx(i => (i + 1) % BANNERS.length), 3500);
+    return () => clearInterval(t);
   }, []);
 
   const tools = [
@@ -184,26 +196,60 @@ function HomeScreen({ onNavigate }) {
 
       <div style={{ padding: "16px" }}>
 
-        {/* BOOSTER NOTIFICATION BANNER */}
+        {/* ── BANNER CAROUSEL ── */}
+        <div style={{ position: "relative", marginBottom: "14px",
+          borderRadius: C.radius, overflow: "hidden", boxShadow: C.shadow }}>
+          {BANNERS.map((b, i) => (
+            <img key={i} src={b.src} alt={b.alt}
+              style={{ width: "100%", display: i === carouselIdx ? "block" : "none",
+                borderRadius: C.radius }} />
+          ))}
+          {/* Dot indicators */}
+          <div style={{ position: "absolute", bottom: "8px", left: "50%",
+            transform: "translateX(-50%)", display: "flex", gap: "5px" }}>
+            {BANNERS.map((_, i) => (
+              <div key={i} onClick={() => setCarouselIdx(i)}
+                style={{ width: i === carouselIdx ? "16px" : "6px", height: "6px",
+                  borderRadius: "99px", cursor: "pointer",
+                  background: i === carouselIdx ? "#fff" : "rgba(255,255,255,0.5)",
+                  transition: "all 0.3s" }} />
+            ))}
+          </div>
+        </div>
+
+        {/* ── ACTIVE CONTEST NOTIFICATION — Second Policy ── */}
         {showBanner && (
-          <div style={{ position: "relative", marginBottom: "14px", borderRadius: C.radius, overflow: "hidden", boxShadow: C.shadow }}>
-            {/* Close button */}
+          <div style={{ background: "#1a1a2e", borderRadius: C.radius,
+            padding: "12px 14px", marginBottom: "14px", boxShadow: C.shadow,
+            display: "flex", alignItems: "flex-start", gap: "10px", position: "relative" }}>
+            {/* Close */}
             <button onClick={() => setShowBanner(false)}
-              style={{ position: "absolute", top: "10px", right: "10px", zIndex: 10,
-                background: "rgba(0,0,0,0.45)", border: "none", borderRadius: "50%",
-                width: "28px", height: "28px", cursor: "pointer", display: "flex",
+              style={{ position: "absolute", top: "8px", right: "8px",
+                background: "rgba(255,255,255,0.12)", border: "none", borderRadius: "50%",
+                width: "22px", height: "22px", cursor: "pointer", display: "flex",
                 alignItems: "center", justifyContent: "center", padding: 0,
                 WebkitTapHighlightColor: "transparent" }}>
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                <path d="M1 1L11 11M11 1L1 11" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+                <path d="M1 1L11 11M11 1L1 11" stroke="#fff" strokeWidth="1.8" strokeLinecap="round"/>
               </svg>
             </button>
-            {/* Actual image */}
-            <img
-              src="/Thailand_Chalo_11-14_booster.png"
-              alt="Thailand Chalo Booster"
-              style={{ width: "100%", display: "block", borderRadius: C.radius }}
-            />
+            {/* Pulse dot */}
+            <div style={{ width: "8px", height: "8px", borderRadius: "50%",
+              background: "#22c55e", flexShrink: 0, marginTop: "4px",
+              boxShadow: "0 0 0 3px rgba(34,197,94,0.25)" }} />
+            <div style={{ flex: 1, paddingRight: "18px" }}>
+              <div style={{ fontSize: "10px", fontWeight: 700, color: "#22c55e",
+                textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "2px" }}>
+                Active Now
+              </div>
+              <div style={{ fontSize: "13px", fontWeight: 700, color: "#fff", marginBottom: "3px" }}>
+                Second Policy Contest
+              </div>
+              <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.65)", lineHeight: 1.5 }}>
+                Earn <strong style={{ color: "#FFD700" }}>Rs.800</strong> on your 2nd New/PA policy
+                (min Rs.15K). Sourcing till 30 Apr · Booking till 10 May.
+              </div>
+            </div>
           </div>
         )}
 
