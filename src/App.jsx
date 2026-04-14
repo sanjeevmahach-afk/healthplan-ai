@@ -113,9 +113,9 @@ function HomeScreen({ onNavigate }) {
   const [visits, setVisits] = useState({ today: 0, total: 0 });
 
   const BANNERS = [
-    { src: "/App_banner_Thailand_Chalo.png",          alt: "Thailand Chalo Contest"   },
-    { src: "/App_Banner_VLI.png",                     alt: "VLI Health Payout"        },
-    { src: "/Second_Policy_Contest_2_App_Banner.png", alt: "Second Policy Contest"    },
+    { src: "/App banner Thailand Chalo.png",       alt: "Thailand Chalo Contest" },
+    { src: "/App Banner VLI.png",                  alt: "VLI Health Payout"      },
+    { src: "/Second Policy Contest 2_App Banner.png", alt: "Second Policy Contest" },
   ];
 
   /* ── VISIT COUNTER ── */
