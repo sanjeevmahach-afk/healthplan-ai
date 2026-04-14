@@ -80,18 +80,132 @@ function StatTile({ label, value, valueColor = C.text }) {
   );
 }
 
+/* ── LEADERBOARD OVERLAY ─────────────────────────────────────── */
+function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
+  valueKey="booked", valueLabel="Net Booked", formatValue }) {
+  const top = entries[0]?.[valueKey] || 1;
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 300, background: C.bg,
+      fontFamily: C.font, display: "flex", flexDirection: "column",
+      maxWidth: "480px", margin: "0 auto" }}>
+
+      {/* Header */}
+      <div style={{ background: C.card, padding: "16px 16px 14px",
+        borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button onClick={onClose}
+            style={{ background: C.bg, border: `1px solid ${C.border}`, borderRadius: "50%",
+              width: "32px", height: "32px", cursor: "pointer", display: "flex",
+              alignItems: "center", justifyContent: "center", flexShrink: 0,
+              WebkitTapHighlightColor: "transparent" }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M19 12H5M11 6L5 12L11 18" stroke={C.text} strokeWidth="2"
+                strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div>
+            <div style={{ fontSize: "16px", fontWeight: 700, color: C.text }}>{title}</div>
+            <div style={{ fontSize: "11px", color: C.muted, marginTop: "1px" }}>{subtitle}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+
+        {loading && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+            {[...Array(10)].map((_, i) => (
+              <div key={i} style={{ height: "52px", background: C.card, borderRadius: C.radiusSm,
+                animation: "pulse 1.2s ease infinite" }} />
+            ))}
+          </div>
+        )}
+
+        {!loading && entries.length === 0 && (
+          <div style={{ textAlign: "center", padding: "48px 20px",
+            fontSize: "13px", color: C.muted }}>
+            No data available yet
+          </div>
+        )}
+
+        {!loading && entries.length > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            {entries.map((entry, i) => {
+              const isMe = myGid && entry.gid === myGid.toUpperCase().trim();
+              const val  = entry[valueKey] || 0;
+              const barPct = Math.min(100, (val / top) * 100);
+              const medals = ["🥇", "🥈", "🥉"];
+              return (
+                <div key={entry.gid} style={{
+                  background: isMe ? C.redLight : C.card,
+                  border: `1px solid ${isMe ? "#FECACA" : C.border}`,
+                  borderRadius: C.radiusSm, padding: "12px 14px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}>
+                    {/* Rank */}
+                    <div style={{ width: "26px", textAlign: "center", flexShrink: 0 }}>
+                      {i < 3
+                        ? <span style={{ fontSize: "18px" }}>{medals[i]}</span>
+                        : <span style={{ fontSize: "12px", fontWeight: 700,
+                            color: isMe ? C.red : C.muted }}>#{i + 1}</span>
+                      }
+                    </div>
+                    {/* GID */}
+                    <div style={{ flex: 1, fontSize: "13px", fontWeight: isMe ? 700 : 600,
+                      color: isMe ? C.red : C.text }}>
+                      {entry.gid}
+                    </div>
+                    {/* Value */}
+                    <div style={{ fontSize: "13px", fontWeight: 700,
+                      color: isMe ? C.red : C.text }}>
+                      {formatValue(val)}
+                    </div>
+                    {isMe && (
+                      <span style={{ fontSize: "9px", fontWeight: 700, background: C.red,
+                        color: "#fff", borderRadius: "4px", padding: "2px 6px", flexShrink: 0 }}>
+                        You
+                      </span>
+                    )}
+                  </div>
+                  {/* Bar */}
+                  <div style={{ height: "4px", background: C.border, borderRadius: "99px",
+                    overflow: "hidden", marginLeft: "36px" }}>
+                    <div style={{ height: "100%", background: isMe ? C.red : C.blue,
+                      borderRadius: "99px", width: barPct + "%",
+                      transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <div style={{ textAlign: "center", fontSize: "10px", color: C.hint,
+          marginTop: "16px", paddingBottom: "8px" }}>
+          Updates daily · {valueLabel}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── MAIN ────────────────────────────────────────────────────── */
 export default function ContestDashboard() {
-  const [gid,         setGid]         = useState("");
-  const [loading,     setLoading]     = useState(false);
-  const [error,       setError]       = useState("");
-  const [data,        setData]        = useState(null);
-  const [cachedGid,   setCachedGid]   = useState("");
-  const [leaderboard, setLeaderboard] = useState([]);
-  const [lbLoading,   setLbLoading]   = useState(false);
+  const [gid,            setGid]            = useState("");
+  const [loading,        setLoading]        = useState(false);
+  const [error,          setError]          = useState("");
+  const [data,           setData]           = useState(null);
+  const [cachedGid,      setCachedGid]      = useState("");
+  const [leaderboard,    setLeaderboard]    = useState([]);
+  const [lbLoading,      setLbLoading]      = useState(false);
+  const [vliLeaderboard, setVliLeaderboard] = useState([]);
+  const [vliLbLoading,   setVliLbLoading]   = useState(false);
+  const [showLb,         setShowLb]         = useState(false);   // Thailand LB overlay
+  const [showVliLb,      setShowVliLb]      = useState(false);   // VLI LB overlay
   const inputRef = useRef(null);
 
-  /* ── LOAD CACHED GID ON MOUNT ── */
+  /* ── LOAD CACHED GID ── */
   useEffect(() => {
     try {
       const saved = localStorage.getItem("hpt_last_gid");
@@ -99,7 +213,7 @@ export default function ContestDashboard() {
     } catch (e) {}
   }, []);
 
-  /* ── FETCH LEADERBOARD ON MOUNT ── */
+  /* ── FETCH LEADERBOARDS ── */
   useEffect(() => {
     setLbLoading(true);
     fetch(`${APPS_SCRIPT_URL}?action=leaderboard`)
@@ -107,6 +221,13 @@ export default function ContestDashboard() {
       .then(d => { if (d.leaderboard) setLeaderboard(d.leaderboard); })
       .catch(() => {})
       .finally(() => setLbLoading(false));
+
+    setVliLbLoading(true);
+    fetch(`${APPS_SCRIPT_URL}?action=vli_leaderboard`)
+      .then(r => r.json())
+      .then(d => { if (d.leaderboard) setVliLeaderboard(d.leaderboard); })
+      .catch(() => {})
+      .finally(() => setVliLbLoading(false));
   }, []);
 
   async function lookup() {
@@ -155,6 +276,36 @@ export default function ContestDashboard() {
 
   return (
     <div style={{ fontFamily: C.font }}>
+
+      {/* ── THAILAND LEADERBOARD OVERLAY ── */}
+      {showLb && (
+        <LeaderboardOverlay
+          title="Thailand Chalo"
+          subtitle="Top 10 · Net Booked Premium"
+          entries={leaderboard}
+          loading={lbLoading}
+          myGid={gidCode || gid}
+          valueKey="booked"
+          valueLabel="Net Booked Premium"
+          formatValue={v => fmtL(v * 100000)}
+          onClose={() => setShowLb(false)}
+        />
+      )}
+
+      {/* ── VLI LEADERBOARD OVERLAY ── */}
+      {showVliLb && (
+        <LeaderboardOverlay
+          title="Health Payout Incentive (VLI)"
+          subtitle="Top 10 · VLI Premium"
+          entries={vliLeaderboard}
+          loading={vliLbLoading}
+          myGid={gidCode || gid}
+          valueKey="vliPremium"
+          valueLabel="VLI Premium"
+          formatValue={v => fmtL(v)}
+          onClose={() => setShowVliLb(false)}
+        />
+      )}
 
       {/* PAGE HEADER */}
       <div style={{ background: C.card, padding: "20px 16px 16px", borderBottom: `1px solid ${C.border}` }}>
@@ -356,95 +507,28 @@ export default function ContestDashboard() {
                     }
                   </div>
 
-                  {/* ── LEADERBOARD ── */}
-                  <div style={{ marginTop: "16px" }}>
-                    <div style={{ display: "flex", alignItems: "center",
-                      justifyContent: "space-between", marginBottom: "10px" }}>
-                      <div style={{ fontSize: "12px", fontWeight: 700, color: C.text }}>
-                        Leaderboard
-                      </div>
-                      <div style={{ fontSize: "10px", color: C.muted }}>
-                        Top 15 · Net Booked
-                      </div>
+                  {/* Leaderboard tile */}
+                  <div onClick={() => setShowLb(true)}
+                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
+                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
+                      cursor: "pointer", border: `1px solid ${C.border}`,
+                      WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ width: "34px", height: "34px", background: C.redLight,
+                      borderRadius: "8px", display: "flex", alignItems: "center",
+                      justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.red} strokeWidth="2"
+                          strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </div>
-
-                    {lbLoading && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                        {[...Array(5)].map((_, i) => (
-                          <div key={i} style={{ height: "36px", background: C.bg,
-                            borderRadius: C.radiusXs, animation: "pulse 1.2s ease infinite" }} />
-                        ))}
-                      </div>
-                    )}
-
-                    {!lbLoading && leaderboard.length === 0 && (
-                      <div style={{ fontSize: "12px", color: C.muted, textAlign: "center",
-                        padding: "16px 0" }}>
-                        No data yet
-                      </div>
-                    )}
-
-                    {!lbLoading && leaderboard.length > 0 && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-                        {leaderboard.map((entry, i) => {
-                          const isMe = gidCode && entry.gid === gidCode.toUpperCase().trim();
-                          const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
-                          const bookedAmt = entry.booked * 100000;
-                          return (
-                            <div key={entry.gid} style={{
-                              display: "flex", alignItems: "center", gap: "10px",
-                              padding: "8px 10px", borderRadius: C.radiusXs,
-                              background: isMe ? C.redLight : i % 2 === 0 ? C.bg : C.card,
-                              border: isMe ? `1.5px solid #FECACA` : `1px solid transparent`,
-                              transition: "background 0.2s",
-                            }}>
-                              {/* Rank */}
-                              <div style={{ width: "22px", textAlign: "center", flexShrink: 0 }}>
-                                {medal
-                                  ? <span style={{ fontSize: "14px" }}>{medal}</span>
-                                  : <span style={{ fontSize: "11px", fontWeight: 700,
-                                      color: isMe ? C.red : C.muted }}>#{i + 1}</span>
-                                }
-                              </div>
-
-                              {/* GID */}
-                              <div style={{ flex: 1, fontSize: "12px", fontWeight: isMe ? 700 : 500,
-                                color: isMe ? C.red : C.text }}>
-                                {entry.gid}
-                                {isMe && (
-                                  <span style={{ marginLeft: "6px", fontSize: "9px", fontWeight: 600,
-                                    background: C.red, color: "#fff", borderRadius: "4px",
-                                    padding: "1px 5px" }}>You</span>
-                                )}
-                              </div>
-
-                              {/* Bar + Amount */}
-                              <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
-                                <div style={{ width: "60px", height: "4px", background: C.border,
-                                  borderRadius: "99px", overflow: "hidden" }}>
-                                  <div style={{
-                                    height: "100%", borderRadius: "99px",
-                                    background: isMe ? C.red : C.blue,
-                                    width: Math.min(100, (bookedAmt / (leaderboard[0].booked * 100000)) * 100) + "%",
-                                    transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)",
-                                  }} />
-                                </div>
-                                <div style={{ fontSize: "11px", fontWeight: 700,
-                                  color: isMe ? C.red : C.text, minWidth: "42px",
-                                  textAlign: "right" }}>
-                                  {fmtL(bookedAmt)}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    <div style={{ fontSize: "10px", color: C.hint, marginTop: "8px",
-                      textAlign: "center" }}>
-                      Updates daily · Based on Net Booked Premium
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Thailand Chalo Leaderboard</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners by Net Booked</div>
                     </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2"
+                        strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                 </div>
 
@@ -512,6 +596,30 @@ export default function ContestDashboard() {
                       ? <>Book <strong>{fmtL(vNxt.min - vliPremium)} more</strong> to unlock {vNxt.pct} extra payout</>
                       : <strong>Top VLI slab — earning 15% extra payout!</strong>
                     }
+                  </div>
+
+                  {/* VLI Leaderboard tile */}
+                  <div onClick={() => setShowVliLb(true)}
+                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
+                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
+                      cursor: "pointer", border: `1px solid ${C.border}`,
+                      WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ width: "34px", height: "34px", background: C.greenLight,
+                      borderRadius: "8px", display: "flex", alignItems: "center",
+                      justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2"
+                          strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>VLI Leaderboard</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners by VLI Premium</div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2"
+                        strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
                   </div>
                 </div>
               </>
