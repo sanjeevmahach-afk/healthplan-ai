@@ -82,7 +82,7 @@ function StatTile({ label, value, valueColor = C.text }) {
 
 /* ── LEADERBOARD OVERLAY ─────────────────────────────────────── */
 function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
-  valueKey="booked", valueLabel="Net Booked", formatValue }) {
+  valueKey="booked", valueLabel="Net Booked", formatValue, extraKey, extraLabel, formatExtra }) {
   const top = entries[0]?.[valueKey] || 1;
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 300, background: C.bg,
@@ -110,8 +110,27 @@ function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
         </div>
       </div>
 
+      {/* Column headers */}
+      {!loading && entries.length > 0 && (
+        <div style={{ display: "flex", alignItems: "center", gap: "10px",
+          padding: "8px 16px", background: C.card,
+          borderBottom: `1px solid ${C.border}`, flexShrink: 0 }}>
+          <div style={{ width: "26px", flexShrink: 0 }} />
+          <div style={{ flex: 1, fontSize: "10px", fontWeight: 600, color: C.muted,
+            textTransform: "uppercase", letterSpacing: "0.05em" }}>GID</div>
+          {extraKey && (
+            <div style={{ fontSize: "10px", fontWeight: 600, color: C.muted,
+              textTransform: "uppercase", letterSpacing: "0.05em", minWidth: "60px",
+              textAlign: "right" }}>{extraLabel}</div>
+          )}
+          <div style={{ fontSize: "10px", fontWeight: 600, color: C.muted,
+            textTransform: "uppercase", letterSpacing: "0.05em", minWidth: "60px",
+            textAlign: "right" }}>{valueLabel}</div>
+        </div>
+      )}
+
       {/* Content */}
-      <div style={{ flex: 1, overflowY: "auto", padding: "16px" }}>
+      <div style={{ flex: 1, overflowY: "auto", padding: "12px 16px" }}>
 
         {loading && (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -140,9 +159,9 @@ function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
                 <div key={entry.gid} style={{
                   background: isMe ? C.redLight : C.card,
                   border: `1px solid ${isMe ? "#FECACA" : C.border}`,
-                  borderRadius: C.radiusSm, padding: "12px 14px",
+                  borderRadius: C.radiusSm, padding: "10px 12px",
                 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "7px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
                     {/* Rank */}
                     <div style={{ width: "26px", textAlign: "center", flexShrink: 0 }}>
                       {i < 3
@@ -155,18 +174,24 @@ function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
                     <div style={{ flex: 1, fontSize: "13px", fontWeight: isMe ? 700 : 600,
                       color: isMe ? C.red : C.text }}>
                       {entry.gid}
+                      {isMe && (
+                        <span style={{ marginLeft: "6px", fontSize: "9px", fontWeight: 700,
+                          background: C.red, color: "#fff", borderRadius: "4px",
+                          padding: "2px 5px" }}>You</span>
+                      )}
                     </div>
-                    {/* Value */}
+                    {/* Extra column (e.g. VLI Amount) */}
+                    {extraKey && (
+                      <div style={{ fontSize: "12px", fontWeight: 600, color: C.muted,
+                        minWidth: "60px", textAlign: "right" }}>
+                        {formatExtra(entry[extraKey] || 0)}
+                      </div>
+                    )}
+                    {/* Primary value */}
                     <div style={{ fontSize: "13px", fontWeight: 700,
-                      color: isMe ? C.red : C.text }}>
+                      color: isMe ? C.red : C.text, minWidth: "60px", textAlign: "right" }}>
                       {formatValue(val)}
                     </div>
-                    {isMe && (
-                      <span style={{ fontSize: "9px", fontWeight: 700, background: C.red,
-                        color: "#fff", borderRadius: "4px", padding: "2px 6px", flexShrink: 0 }}>
-                        You
-                      </span>
-                    )}
                   </div>
                   {/* Bar */}
                   <div style={{ height: "4px", background: C.border, borderRadius: "99px",
@@ -296,13 +321,16 @@ export default function ContestDashboard() {
       {showVliLb && (
         <LeaderboardOverlay
           title="Health Payout Incentive (VLI)"
-          subtitle="Top 10 · VLI Premium"
+          subtitle="Top 10 · VLI Premium · Apr 2026"
           entries={vliLeaderboard}
           loading={vliLbLoading}
           myGid={gidCode || gid}
           valueKey="vliPremium"
           valueLabel="VLI Premium"
           formatValue={v => fmtL(v)}
+          extraKey="vliAmount"
+          extraLabel="VLI Amount"
+          formatExtra={v => "Rs." + Math.round(v).toLocaleString("en-IN")}
           onClose={() => setShowVliLb(false)}
         />
       )}
