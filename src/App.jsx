@@ -118,20 +118,22 @@ function HomeScreen({ onNavigate }) {
     { src: "/Second Policy Contest 2_App Banner.png", alt: "Second Policy Contest" },
   ];
 
-  /* ── VISIT COUNTER ── */
+  /* ── VISIT COUNTER — both cross-device via Apps Script ── */
   useEffect(() => {
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const stored = JSON.parse(localStorage.getItem("hpt_visits_today") || "{}");
-      const todayCount = stored.date === today ? (stored.count || 0) + 1 : 1;
-      localStorage.setItem("hpt_visits_today", JSON.stringify({ date: today, count: todayCount }));
-      setVisits(v => ({ ...v, today: todayCount }));
-    } catch (e) {}
     const VISIT_URL = "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec?action=visit";
     fetch(VISIT_URL)
       .then(r => r.json())
-      .then(d => { setVisits(v => ({ today: v.today, total: d.visits || v.total })); })
-      .catch(() => {});
+      .then(d => setVisits({ today: d.today || 0, total: d.visits || 0 }))
+      .catch(() => {
+        // Fallback to localStorage if network fails
+        try {
+          const date = new Date().toISOString().slice(0, 10);
+          const stored = JSON.parse(localStorage.getItem("hpt_visits_today") || "{}");
+          const todayCount = stored.date === date ? (stored.count || 0) + 1 : 1;
+          localStorage.setItem("hpt_visits_today", JSON.stringify({ date, count: todayCount }));
+          setVisits(v => ({ ...v, today: todayCount }));
+        } catch (e) {}
+      });
   }, []);
 
   /* ── CAROUSEL AUTO-SCROLL ── */
