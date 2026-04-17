@@ -69,6 +69,7 @@ const REC_TABLE = {
   surgery_untreated:{ low:["SBI Health Alpha","Aditya Birla Active One Max","Care Supreme"],value:["Care Supreme","Aditya Birla Active One Max"],                    premium:["Niva Reassure 3.0","Care Freedom"],                           note:"Kidney stones, gall bladder, piles, cataract etc." },
   mental:           { low:["SBI Health Alpha","Aditya Birla Active One Max"],              value:["SBI Health Alpha","Aditya Birla Active One Max"],                premium:["Care Freedom"],                                               note:"Final issuance depends on UW decision" },
   hyperthyroid:     { low:["SBI Health Alpha"],                                            value:["HDFC Optima Secure"],                                            premium:["Care Freedom"],                                               note:"Final issuance depends on UW decision" },
+  hypothyroid:      { low:["TATA Medicare Select","ICICI Elevate","Star Assure"],          value:["TATA Medicare Select","ICICI Elevate","Star Assure"],             premium:["Niva Reassure 3.0","HDFC Optima Secure","Care Supreme"],       note:"Loading may apply" },
   rheumatoid:       { low:["SBI Health Alpha","Care Freedom"],                             value:["Care Freedom"],                                                  premium:["Care Freedom"],                                               note:"Final issuance depends on UW decision" },
   maternity:        { low:["SBI Health Alpha","Star Assure","Niva Aspire"],                value:["Niva Aspire","TATA Medicare Select"],                            premium:["Niva Aspire","Reliance Health Gain"],                         note:"" },
 };
@@ -78,7 +79,7 @@ const PED_KEY_MAP = {
   bp:"bp", bp_diab:"bp_diab", asthma:"asthma", copd:"copd", liver:"liver",
   heart:"heart", kidney:"kidney", cancer_cured:"cancer_cured",
   surgery_treated:"surgery_treated", surgery_untreated:"surgery_untreated",
-  mental:"mental", hyperthyroid:"hyperthyroid", rheumatoid:"rheumatoid", maternity:"maternity",
+  mental:"mental", hyperthyroid:"hyperthyroid", hypothyroid:"hypothyroid", rheumatoid:"rheumatoid", maternity:"maternity",
 };
 
 function getPedKey(ped, age) {
@@ -265,6 +266,7 @@ const PED_OPTIONS = [
   {value:"surgery_untreated", label:"Surgery (Untreated)",      group:"Serious"},
   {value:"mental",            label:"Mental Illness",           group:"Other"},
   {value:"rheumatoid",        label:"Rheumatoid Arthritis",     group:"Other"},
+  {value:"hypothyroid",       label:"Hypothyroidism",           group:"Other"},
   {value:"hyperthyroid",      label:"Hyperthyroid",             group:"Other"},
   {value:"asthma",            label:"Asthma",                   group:"Other"},
   {value:"copd",              label:"COPD",                     group:"Other"},
@@ -546,6 +548,7 @@ export default function HealthRecommender({ onBack }) {
                 {form.ped === "kidney" && "Kidney condition selected — plans with liberal underwriting shown first"}
                 {(form.ped === "asthma" || form.ped === "copd") && "Respiratory condition — Chronic Care Day 1 and no-loading plans shown first"}
                 {form.ped === "cancer" && "Cancer history — specialist plans and plans accepting cancer history shown first"}
+                {form.ped === "hypothyroid" && "Hypothyroidism selected — treated with medication, most plans accept with standard waiting period. Same recommendations as Blood Pressure."}
                 {form.ped === "maternity" && "Maternity selected — plans with shortest maternity wait period shown first"}
               </div>
             )}
