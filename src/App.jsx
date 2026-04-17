@@ -130,7 +130,7 @@ function HomeScreen({ onNavigate }) {
     const VISIT_URL = "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec?action=visit";
     fetch(VISIT_URL)
       .then(r => r.json())
-      .then(d => { if (d.visits) setVisits(v => ({ ...v, total: d.visits })); })
+      .then(d => { setVisits(v => ({ today: v.today, total: d.visits || v.total })); })
       .catch(() => {});
   }, []);
 
@@ -245,7 +245,7 @@ function HomeScreen({ onNavigate }) {
         <div style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
           {[
             {
-              label: "Visits today",
+              label: "Visits today (this device)",
               value: visits.today || 0,
               icon: (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -256,7 +256,7 @@ function HomeScreen({ onNavigate }) {
               ),
             },
             {
-              label: "Total visits",
+              label: "Visits today (all devices)",
               value: visits.total || 0,
               icon: (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -285,12 +285,6 @@ function HomeScreen({ onNavigate }) {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* FOOTER NOTE */}
-        <div style={{ textAlign: "center", fontSize: "10px", color: C.hint,
-          marginTop: "14px", paddingBottom: "4px" }}>
-          Today: this device · Total: all devices
         </div>
 
       </div>
