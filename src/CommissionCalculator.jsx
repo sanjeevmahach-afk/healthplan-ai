@@ -15,6 +15,10 @@ const INSURER_PLANS = {
   "Tata AIG General Insurance Company Limited":      ["Medicare Select","Medicare Premier","Medicare Plus","Medicare","Medicare Lite","Elder Care","CritiMedicare","Supercharge","Accident Guard (PA)"],
   "SBI General Insurance Company Limited":           ["Health Alpha","Super Health","Arogya Supreme","Arogya Top Up","Personal Accident"],
   "Digit Insurance Company Limited":                 ["Health Care","Arogya Sanjeevani","Personal Accident"],
+  "Bajaj General Insurance Co. Ltd":                 ["Health Guard","Extra Care Plus","Personal Accident"],
+  "New India Assurance Company Ltd":                 ["Premier Mediclaim","Overseas Mediclaim","Yuva Bharat","Floater Mediclaim"],
+  "Oriental Insurance Company Ltd":                  ["Happy Family Floater","Individual Mediclaim","Senior Citizen"],
+  "National Insurance Company Ltd":                  ["National Mediclaim","Sanjeevani","Super Top Up","Young Mediclaim","Parivar Mediclaim","Mediclaim Plus","New Parivar Plus"],
   "Magma HDI General Insurance Company Ltd":         ["OneHealth","One Protect","One Secure","One Support","Double Suraksha"],
   "Cholamandalam MS General Insurance Company Ltd":  ["Flexi Health Supreme Plus","Flexi Health Floater","Flexi Health Individual","Super Top Up"],
   "Royal Sundaram General Insurance Company Limited":["Lifeline Supreme","Lifeline Elite","Lifeline Classic","Family Plus","Multiplier","Saral Suraksha Bima","Safety Net","Hospital Cash","Advance Top Up","Arogya Sanjeevani"],
@@ -392,6 +396,19 @@ export default function CommissionCalculator() {
               borderRadius: C.radiusXs, fontSize: "11px", color: C.muted, lineHeight: 1.6 }}>
               Base payout on Net Premium. Final payout subject to insurer guidelines and policy issuance.
             </div>
+
+            {/* First-year premium note — all insurers except Star */}
+            {!form.insurer.toLowerCase().includes("star") && (
+              <div style={{ marginTop: "8px", padding: "10px 12px", background: C.blueLight,
+                borderRadius: C.radiusXs, fontSize: "11px", color: C.blue, lineHeight: 1.6,
+                display: "flex", gap: "8px", alignItems: "flex-start" }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: "1px" }}>
+                  <circle cx="12" cy="12" r="10" stroke={C.blue} strokeWidth="1.8"/>
+                  <path d="M12 8V12M12 16H12.01" stroke={C.blue} strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <span>Payout applies to <strong>first year premium only.</strong> Renewal premiums attract a different (lower) payout rate.</span>
+              </div>
+            )}
           </div>
         )}
       </div>
