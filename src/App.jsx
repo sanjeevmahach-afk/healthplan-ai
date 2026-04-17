@@ -245,7 +245,7 @@ function HomeScreen({ onNavigate }) {
         <div style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
           {[
             {
-              label: "Visits today (this device)",
+              label: "Visits today",
               value: visits.today || 0,
               icon: (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -256,7 +256,7 @@ function HomeScreen({ onNavigate }) {
               ),
             },
             {
-              label: "Visits today (all devices)",
+              label: "Total visits",
               value: visits.total || 0,
               icon: (
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
