@@ -1,5 +1,5 @@
 import { C } from './theme';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import HealthRecommender    from "./HealthRecommender";
 import ContestDashboard     from "./ContestDashboard";
 import CommissionCalculator from "./CommissionCalculator";
@@ -107,10 +107,38 @@ export default function App() {
   );
 }
 
+/* ── COUNT-UP HOOK ───────────────────────────────────────────── */
+function useCountUp(target, duration = 1200) {
+  const [display, setDisplay] = useState(0);
+  const prev = useRef(0);
+  useEffect(() => {
+    if (target === 0) return;
+    const start  = prev.current;
+    const end    = target;
+    const range  = end - start;
+    if (range === 0) return;
+    const startTime = performance.now();
+    const step = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplay(Math.round(start + range * eased));
+      if (progress < 1) requestAnimationFrame(step);
+      else prev.current = end;
+    };
+    requestAnimationFrame(step);
+  }, [target, duration]);
+  return display;
+}
+
 /* ── HOME SCREEN ─────────────────────────────────────────────── */
 function HomeScreen({ onNavigate }) {
   const [carouselIdx, setCarouselIdx] = useState(0);
   const [visits, setVisits] = useState({ today: 0, total: 0 });
+
+  const todayDisplay = useCountUp(visits.today, 1000);
+  const totalDisplay = useCountUp(visits.total, 1400);
 
   const BANNERS = [
     { src: "/App banner Thailand Chalo.png",       alt: "Thailand Chalo Contest" },
@@ -118,22 +146,24 @@ function HomeScreen({ onNavigate }) {
     { src: "/Second Policy Contest 2_App Banner.png", alt: "Second Policy Contest" },
   ];
 
-  /* ── VISIT COUNTER — both cross-device via Apps Script ── */
+  /* ── VISIT COUNTER — instant local + cross-device sync ── */
   useEffect(() => {
+    try {
+      const cached = JSON.parse(localStorage.getItem("hpt_visits_cache") || "{}");
+      if (cached.today || cached.total) {
+        setVisits({ today: cached.today || 0, total: cached.total || 0 });
+      }
+    } catch (e) {}
+
     const VISIT_URL = "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec?action=visit";
     fetch(VISIT_URL)
       .then(r => r.json())
-      .then(d => setVisits({ today: d.today || 0, total: d.visits || 0 }))
-      .catch(() => {
-        // Fallback to localStorage if network fails
-        try {
-          const date = new Date().toISOString().slice(0, 10);
-          const stored = JSON.parse(localStorage.getItem("hpt_visits_today") || "{}");
-          const todayCount = stored.date === date ? (stored.count || 0) + 1 : 1;
-          localStorage.setItem("hpt_visits_today", JSON.stringify({ date, count: todayCount }));
-          setVisits(v => ({ ...v, today: todayCount }));
-        } catch (e) {}
-      });
+      .then(d => {
+        const updated = { today: d.today || 0, total: d.visits || 0 };
+        setVisits(updated);
+        try { localStorage.setItem("hpt_visits_cache", JSON.stringify(updated)); } catch (e) {}
+      })
+      .catch(() => {});
   }, []);
 
   /* ── CAROUSEL AUTO-SCROLL ── */
@@ -246,30 +276,10 @@ function HomeScreen({ onNavigate }) {
         {/* VISIT STATS */}
         <div style={{ display: "flex", gap: "8px", marginTop: "6px" }}>
           {[
-            {
-              label: "Visits today",
-              value: visits.today || 0,
-              icon: (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="3" fill={C.red}/>
-                  <path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z"
-                    stroke={C.red} strokeWidth="1.8" fill="none"/>
-                </svg>
-              ),
-            },
-            {
-              label: "Total visits",
-              value: visits.total || 0,
-              icon: (
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21"
-                    stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/>
-                  <circle cx="12" cy="10" r="3" stroke={C.red} strokeWidth="1.8"/>
-                  <path d="M23 21V19C23 18.1 22.4 17.4 21.6 17.1M16 3.1C16.8 3.4 17.4 4.2 17.4 5.1C17.4 6 16.8 6.8 16 7.1"
-                    stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/>
-                </svg>
-              ),
-            },
+            { label: "Visits today", value: todayDisplay,
+              icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" fill={C.red}/><path d="M2 12C2 12 5 5 12 5C19 5 22 12 22 12C22 12 19 19 12 19C5 19 2 12 2 12Z" stroke={C.red} strokeWidth="1.8" fill="none"/></svg> },
+            { label: "Total visits",  value: totalDisplay,
+              icon: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M17 21V19C17 17.9 16.1 17 15 17H9C7.9 17 7 17.9 7 19V21" stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/><circle cx="12" cy="10" r="3" stroke={C.red} strokeWidth="1.8"/><path d="M23 21V19C23 18.1 22.4 17.4 21.6 17.1M16 3.1C16.8 3.4 17.4 4.2 17.4 5.1C17.4 6 16.8 6.8 16 7.1" stroke={C.red} strokeWidth="1.8" strokeLinecap="round"/></svg> },
           ].map((s, i) => (
             <div key={i} style={{ flex: 1, background: C.card, borderRadius: C.radiusSm,
               padding: "12px 14px", boxShadow: C.shadow,
