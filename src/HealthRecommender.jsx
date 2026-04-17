@@ -7,7 +7,7 @@ import { C } from "./theme";
    SI assumed ≥ 10L (most common recommendation case)
 ═══════════════════════════════════════════════════════════════ */
 const PAYOUT = {
-  // Rates from runCalculator v7 · SI >= 10L · Family · Fresh · Updated Apr 10 2026
+  // Rates from runCalculator v8 · SI >= 10L · Family · Fresh · Updated Apr 2026
   "Niva Reassure 3.0":            { fresh: "23%", port: "13%" },
   "Niva Aspire":                  { fresh: "23%", port: "13%" },
   "HDFC Optima Secure":           { fresh: "25%", port: "15%" },
