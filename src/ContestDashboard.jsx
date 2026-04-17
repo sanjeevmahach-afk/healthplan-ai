@@ -39,6 +39,19 @@ function fmtL(n) {
   if (n >= 1000)   return "Rs." + (n / 1000).toFixed(1).replace(/\.?0+$/, "") + "K";
   return "Rs." + Math.round(n);
 }
+// Always show in lakhs with exactly 2 decimal places — for leaderboard
+function fmtLakhFixed(n) {
+  return (n / 100000).toFixed(2) + "L";
+}
+function getSlabReward(bookedLakhs) {
+  const n = bookedLakhs * 100000;
+  if (n >= 700000) return "Thailand 2 Pax";
+  if (n >= 400000) return "Thailand 1 Pax";
+  if (n >= 300000) return "10K Cash";
+  if (n >= 200000) return "5K Cash";
+  if (n >= 100000) return "2K Cash";
+  return null;
+}
 function getSlabInfo(premium, slabs) {
   let cur = null, nxt = null;
   for (let i = slabs.length - 1; i >= 0; i--) {
@@ -180,6 +193,21 @@ function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
                           padding: "2px 5px" }}>You</span>
                       )}
                     </div>
+                    {/* Reward slab badge — Thailand only */}
+                    {valueKey === "booked" && (() => {
+                      const reward = getSlabReward(val);
+                      if (!reward) return null;
+                      const isTrip = reward.includes("Thailand");
+                      return (
+                        <span style={{ fontSize: "9px", fontWeight: 700,
+                          background: isTrip ? "#FEF3C7" : C.greenLight,
+                          color: isTrip ? "#92400E" : C.green,
+                          border: `1px solid ${isTrip ? "#FCD34D" : "#86EFAC"}`,
+                          borderRadius: "99px", padding: "2px 7px", flexShrink: 0 }}>
+                          {reward}
+                        </span>
+                      );
+                    })()}
                     {/* Extra column (e.g. VLI Amount) */}
                     {extraKey && (
                       <div style={{ fontSize: "12px", fontWeight: 600, color: C.muted,
@@ -187,10 +215,12 @@ function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
                         {formatExtra(entry[extraKey] || 0)}
                       </div>
                     )}
-                    {/* Primary value */}
+                    {/* Primary value — use lakh format */}
                     <div style={{ fontSize: "13px", fontWeight: 700,
-                      color: isMe ? C.red : C.text, minWidth: "60px", textAlign: "right" }}>
-                      {formatValue(val)}
+                      color: isMe ? C.red : C.text, minWidth: "52px", textAlign: "right" }}>
+                      {valueKey === "booked"
+                        ? fmtLakhFixed(val * 100000)
+                        : formatValue(val)}
                     </div>
                   </div>
                   {/* Bar */}
@@ -225,9 +255,8 @@ export default function ContestDashboard() {
   const [leaderboard,    setLeaderboard]    = useState([]);
   const [lbLoading,      setLbLoading]      = useState(false);
   const [vliLeaderboard, setVliLeaderboard] = useState([]);
-  const [vliLbLoading,   setVliLbLoading]   = useState(false);
-  const [showLb,         setShowLb]         = useState(false);   // Thailand LB overlay
-  const [showVliLb,      setShowVliLb]      = useState(false);   // VLI LB overlay
+  const [showLb,         setShowLb]         = useState(false);
+  const [showVliLb,      setShowVliLb]      = useState(false);
   const inputRef = useRef(null);
 
   /* ── LOAD CACHED GID ── */
@@ -238,21 +267,27 @@ export default function ContestDashboard() {
     } catch (e) {}
   }, []);
 
-  /* ── FETCH LEADERBOARDS ── */
+  /* ── FETCH LEADERBOARDS — single combined call + localStorage cache ── */
   useEffect(() => {
+    // Load cached leaderboards instantly
+    try {
+      const cached = JSON.parse(localStorage.getItem("hpt_lb_cache") || "{}");
+      if (cached.leaderboard)    setLeaderboard(cached.leaderboard);
+      if (cached.vliLeaderboard) setVliLeaderboard(cached.vliLeaderboard);
+    } catch (e) {}
+
+    // Fetch both in one Apps Script call
     setLbLoading(true);
-    fetch(`${APPS_SCRIPT_URL}?action=leaderboard`)
+    fetch(`${APPS_SCRIPT_URL}?action=init`)
       .then(r => r.json())
-      .then(d => { if (d.leaderboard) setLeaderboard(d.leaderboard); })
+      .then(d => {
+        if (d.leaderboard)    { setLeaderboard(d.leaderboard);    }
+        if (d.vliLeaderboard) { setVliLeaderboard(d.vliLeaderboard); }
+        // Cache for next load
+        try { localStorage.setItem("hpt_lb_cache", JSON.stringify({ leaderboard: d.leaderboard || [], vliLeaderboard: d.vliLeaderboard || [] })); } catch (e) {}
+      })
       .catch(() => {})
       .finally(() => setLbLoading(false));
-
-    setVliLbLoading(true);
-    fetch(`${APPS_SCRIPT_URL}?action=vli_leaderboard`)
-      .then(r => r.json())
-      .then(d => { if (d.leaderboard) setVliLeaderboard(d.leaderboard); })
-      .catch(() => {})
-      .finally(() => setVliLbLoading(false));
   }, []);
 
   async function lookup() {
@@ -323,7 +358,7 @@ export default function ContestDashboard() {
           title="Health Payout Incentive (VLI)"
           subtitle="Top 10 · VLI Premium · Apr 2026"
           entries={vliLeaderboard}
-          loading={vliLbLoading}
+          loading={lbLoading}
           myGid={gidCode || gid}
           valueKey="vliPremium"
           valueLabel="VLI Premium"
@@ -460,8 +495,8 @@ export default function ContestDashboard() {
 
                   {/* Numbers */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                    <StatTile label="Net Booked" value={fmtL(booked)} valueColor={C.red} />
-                    <StatTile label="Net Sourced" value={fmtL(sourced)} valueColor={C.muted} />
+                    <StatTile label="Wtd. Premium - Booked"  value={fmtL(booked)}  valueColor={C.red} />
+                    <StatTile label="Wtd. Premium - Sourced" value={fmtL(sourced)} valueColor={C.muted} />
                   </div>
 
                   {/* Bar */}
