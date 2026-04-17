@@ -159,7 +159,6 @@ export default function CommissionCalculator() {
     if (!form.plan)    { setError("Please select a plan for " + form.insurer + "."); return; }
     if (!form.si)      { setError("Sum insured is required — tap a value above."); return; }
     if (!form.age)     { setError("Please enter the eldest member's age."); return; }
-    if (!form.premium) { setError("Net premium is required to calculate payout."); return; }
     if (needsLocation && !form.state) { setError("State is required for " + form.insurer.split(" ")[0] + " — it affects the payout rate."); return; }
     if (needsLocation && !form.city)  { setError("Please select a city to determine the correct rate."); return; }
     setError(""); setResult(null); setLoading(true);
@@ -302,7 +301,7 @@ export default function CommissionCalculator() {
                 <input value={form.premium} onChange={e => set("premium")(e.target.value)}
                   placeholder="e.g. 33290" type="number"
                   style={{ ...baseSelect, cursor: "text",
-                    borderColor: error && !form.premium ? C.red : C.border }}/>
+                    borderColor: C.border }}/>
                 <div style={{ marginTop: "5px", fontSize: "11px", color: C.hint }}>
                   Enter the net premium after all discounts
                 </div>
@@ -345,7 +344,9 @@ export default function CommissionCalculator() {
               <div style={{ fontSize: "12px", fontWeight: 600, color: C.muted,
                 textTransform: "uppercase", letterSpacing: "0.05em" }}>Payout Estimate</div>
               <button onClick={() => {
-                const txt = `Payout: ${result.outRate}% — Rs.${result.payoutAmt.toLocaleString("en-IN")} | ${form.insurer} | ${form.plan} | Rs.${Number(form.premium).toLocaleString("en-IN")} premium`;
+                const txt = form.premium
+                  ? `Payout: ${result.outRate}% — Rs.${result.payoutAmt.toLocaleString("en-IN")} | ${form.insurer} | ${form.plan} | Rs.${Number(form.premium).toLocaleString("en-IN")} premium`
+                  : `Payout: ${result.outRate}% | ${form.insurer} | ${form.plan}`;
                 navigator.clipboard?.writeText(txt).catch(() => {});
               }} style={{ display: "flex", alignItems: "center", gap: "5px", background: C.blueLight,
                 border: "none", borderRadius: C.radiusXs, padding: "6px 10px", cursor: "pointer",
@@ -359,19 +360,21 @@ export default function CommissionCalculator() {
               </button>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", marginBottom: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: form.premium ? "1fr 1fr" : "1fr", gap: "10px", marginBottom: "16px" }}>
               <div style={{ background: C.redLight, borderRadius: C.radiusSm, padding: "16px", textAlign: "center" }}>
                 <div style={{ fontSize: "10px", color: C.red, fontWeight: 600, letterSpacing: "0.05em",
                   textTransform: "uppercase", marginBottom: "6px" }}>Payout %</div>
                 <div style={{ fontSize: "34px", fontWeight: 700, color: C.red, lineHeight: 1 }}>{result.outRate}%</div>
               </div>
-              <div style={{ background: C.greenLight, borderRadius: C.radiusSm, padding: "16px", textAlign: "center" }}>
-                <div style={{ fontSize: "10px", color: C.green, fontWeight: 600, letterSpacing: "0.05em",
-                  textTransform: "uppercase", marginBottom: "6px" }}>Payout (Rs.)</div>
-                <div style={{ fontSize: "34px", fontWeight: 700, color: C.green, lineHeight: 1 }}>
-                  {result.payoutAmt.toLocaleString("en-IN")}
+              {form.premium && (
+                <div style={{ background: C.greenLight, borderRadius: C.radiusSm, padding: "16px", textAlign: "center" }}>
+                  <div style={{ fontSize: "10px", color: C.green, fontWeight: 600, letterSpacing: "0.05em",
+                    textTransform: "uppercase", marginBottom: "6px" }}>Payout (Rs.)</div>
+                  <div style={{ fontSize: "34px", fontWeight: 700, color: C.green, lineHeight: 1 }}>
+                    {result.payoutAmt.toLocaleString("en-IN")}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: "12px" }}>
@@ -379,10 +382,10 @@ export default function CommissionCalculator() {
                 { label: "Insurer",     value: form.insurer },
                 { label: "Plan",        value: form.plan },
                 { label: "Sum Insured", value: SI_OPTIONS.find(s => s.value === Number(form.si))?.label || form.si },
-                { label: "Net Premium", value: "Rs." + Number(form.premium).toLocaleString("en-IN") },
+                form.premium ? { label: "Net Premium", value: "Rs." + Number(form.premium).toLocaleString("en-IN") } : null,
                 { label: "Payout %",    value: result.outRate + "%" },
-                { label: "Payout",      value: "Rs." + result.payoutAmt.toLocaleString("en-IN") },
-              ].map((r, i, arr) => (
+                form.premium ? { label: "Payout",      value: "Rs." + result.payoutAmt.toLocaleString("en-IN") } : null,
+              ].filter(Boolean).map((r, i, arr) => (
                 <div key={i} style={{ display: "flex", justifyContent: "space-between",
                   padding: "7px 0", borderBottom: i < arr.length-1 ? `1px solid ${C.border}` : "none" }}>
                   <span style={{ fontSize: "12px", color: C.muted }}>{r.label}</span>
