@@ -122,12 +122,13 @@ function getRecommendations(form) {
   else                        ordered = [...row.value,  ...row.low,   ...row.premium];
   const seen = new Set();
   const candidates = ordered.filter(n => { if (seen.has(n)) return false; seen.add(n); return true; });
+  const hasPed = ped && ped !== "none";
   // Per-plan BMI limits (based on underwriting guidelines)
   const PLAN_BMI_LIMITS = {
     "Niva Reassure 3.0":           45,
     "Niva Aspire":                 45,
     "HDFC Optima Secure":          35,
-    "ICICI Elevate":               40,
+    "ICICI Elevate":               hasPed ? 35 : 39, // 39 clean, 35 with any comorbidity
     "TATA Medicare Select":        40,
     "Star Assure":                 40,
     "Care Supreme":                40,
