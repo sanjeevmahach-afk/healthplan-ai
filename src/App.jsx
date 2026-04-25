@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import HealthRecommender    from "./HealthRecommender";
 import ContestDashboard     from "./ContestDashboard";
 import CommissionCalculator from "./CommissionCalculator";
+import { Analytics }        from "./analytics";
 
 
 /* ── TAB CONFIG ──────────────────────────────────────────────── */
@@ -63,7 +64,7 @@ function TabBar({ active, onChange }) {
       {TABS.map(tab => {
         const isActive = active === tab.id;
         return (
-          <div key={tab.id} onClick={() => onChange(tab.id)}
+          <div key={tab.id} onClick={() => { onChange(tab.id); Analytics.tabClick(tab.label); }}
             style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
               justifyContent: "center", padding: "10px 4px 8px", cursor: "pointer",
               WebkitTapHighlightColor: "transparent",
@@ -255,7 +256,7 @@ function HomeScreen({ onNavigate }) {
 
         {/* TOOL CARDS */}
         {tools.map((t, i) => (
-          <div key={i} onClick={() => onNavigate(t.tab)}
+          <div key={i} onClick={() => { onNavigate(t.tab); Analytics.toolCardClick(t.title); }}
             style={{ background: C.card, borderRadius: C.radius, padding: "16px",
             marginBottom: "10px", display: "flex", alignItems: "center", gap: "14px",
             boxShadow: C.shadow, cursor: "pointer" }}>
