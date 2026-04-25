@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { C } from "./theme";
+import { Analytics } from "./analytics";
 
 /* ═══════════════════════════════════════════════════════════════
    PAYOUT RATES (from Apps Script commission grid)
@@ -407,8 +408,10 @@ export default function HealthRecommender({ onBack }) {
     const recs = getRecommendations({...form,bmi});
     setResults(recs);
 
-    // ── LOG TO GOOGLE SHEETS ──
-    const SHEET_URL = "https://script.google.com/macros/s/AKfycbzChn1PRSOBEBN8TZ8U03nsUK833NvOqfqCR93g4dyD7d4CUwCPh40jOFX5HLqNbsg/exec";
+    // ── ANALYTICS ──
+    Analytics.recommendRun(form.ped || "none", form.age, bmi);
+    (recs || []).forEach(plan => Analytics.planRecommended(plan, form.ped || "none"));
+
     setLoading(false);
   };
 
@@ -530,7 +533,7 @@ export default function HealthRecommender({ onBack }) {
             <div style={{fontSize:"13px",color:C.muted,marginBottom:"22px"}}>Select up to 2 pre-existing conditions</div>
 
             <Field label="Pre-existing Disease (PED)">
-              <select value={form.ped} onChange={e=>set("ped")(e.target.value)} style={{
+              <select value={form.ped} onChange={e=>{ set("ped")(e.target.value); Analytics.pedSelected(e.target.value); }} style={{
                 ...baseInp, paddingRight:"36px", cursor:"pointer",
                 backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23999'/%3E%3C/svg%3E")`,
                 backgroundRepeat:"no-repeat", backgroundPosition:"right 14px center",
