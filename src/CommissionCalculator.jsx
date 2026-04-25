@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { C } from './theme';
+import { Analytics } from "./analytics";
 
 const CALC_URL = "https://script.google.com/macros/s/AKfycbxcf2Fg9GtszMdbq36m9q0ynfzlrnT0dG-Y2jiOFCp90S4cuSqgjaAHJS6bN2uKVrNU/exec";
 
@@ -152,6 +153,7 @@ export default function CommissionCalculator() {
   function handleInsurer(val) {
     setForm(f => ({ ...f, insurer: val, plan: "", state: "", city: "" }));
     setResult(null);
+    Analytics.insurerSelected(val);
   }
 
   async function calculate() {
@@ -162,6 +164,7 @@ export default function CommissionCalculator() {
     if (needsLocation && !form.state) { setError("State is required for " + form.insurer.split(" ")[0] + " — it affects the payout rate."); return; }
     if (needsLocation && !form.city)  { setError("Please select a city to determine the correct rate."); return; }
     setError(""); setResult(null); setLoading(true);
+    Analytics.calculateClick(form.insurer, form.plan, form.si);
     try {
       const isPlanPA = form.plan.toLowerCase().includes("personal accident") || form.plan.toLowerCase().includes("accident guard") || form.plan.toLowerCase().includes(" pa)");
       const params = new URLSearchParams({
@@ -209,7 +212,7 @@ export default function CommissionCalculator() {
           {/* PLAN */}
           {form.insurer && (
             <FieldGroup label="Plan" required>
-              <select value={form.plan} onChange={e => set("plan")(e.target.value)} style={baseSelect}>
+              <select value={form.plan} onChange={e => { set("plan")(e.target.value); Analytics.planSelected(e.target.value, form.insurer); }} style={baseSelect}>
                 <option value="">Select plan</option>
                 {plans.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
