@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { C } from './theme';
+import { Analytics } from "./analytics";
 
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec";
@@ -294,6 +295,7 @@ export default function ContestDashboard() {
     const q = gid.trim().toUpperCase();
     if (!q) { setError("Please enter your GID or GCD code."); return; }
     setLoading(true); setError(""); setData(null);
+    Analytics.gidLookup(q);
     try {
       const resp = await fetch(`${APPS_SCRIPT_URL}?gid=${encodeURIComponent(q)}`);
       if (!resp.ok) throw new Error("network");
@@ -571,7 +573,7 @@ export default function ContestDashboard() {
                   </div>
 
                   {/* Leaderboard tile */}
-                  <div onClick={() => setShowLb(true)}
+                  <div onClick={() => { setShowLb(true); Analytics.leaderboardOpen("Thailand Chalo"); }}
                     style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
                       background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
                       cursor: "pointer", border: `1px solid ${C.border}`,
@@ -662,7 +664,7 @@ export default function ContestDashboard() {
                   </div>
 
                   {/* VLI Leaderboard tile */}
-                  <div onClick={() => setShowVliLb(true)}
+                  <div onClick={() => { setShowVliLb(true); Analytics.leaderboardOpen("VLI"); }}
                     style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
                       background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
                       cursor: "pointer", border: `1px solid ${C.border}`,
