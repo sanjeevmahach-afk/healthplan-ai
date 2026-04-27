@@ -5,6 +5,8 @@ import ContestDashboard     from "./ContestDashboard";
 import CommissionCalculator from "./CommissionCalculator";
 import { Analytics }        from "./analytics";
 
+/* ── MAINTENANCE MODE — set to false to restore the app ── */
+const MAINTENANCE = true;
 
 /* ── TAB CONFIG ──────────────────────────────────────────────── */
 const TABS = [
@@ -84,6 +86,32 @@ function TabBar({ active, onChange }) {
 /* ── MAIN APP ────────────────────────────────────────────────── */
 export default function App() {
   const [screen, setScreen] = useState("home");
+
+  /* ── MAINTENANCE SCREEN ── */
+  if (MAINTENANCE) return (
+    <div style={{ fontFamily: C.font, background: C.bg, minHeight: "100vh",
+      maxWidth: "480px", margin: "0 auto", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: "32px 24px", textAlign: "center" }}>
+      <div style={{ width: 64, height: 64, borderRadius: "16px", background: C.redLight,
+        display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
+            stroke={C.red} strokeWidth="1.8"/>
+          <path d="M12 7V13" stroke={C.red} strokeWidth="2" strokeLinecap="round"/>
+          <circle cx="12" cy="16.5" r="1" fill={C.red}/>
+        </svg>
+      </div>
+      <div style={{ fontSize: 20, fontWeight: 700, color: C.text, marginBottom: 10 }}>
+        Site temporarily down
+      </div>
+      <div style={{ fontSize: 14, color: C.muted, lineHeight: 1.6, maxWidth: 300 }}>
+        We're making some updates to improve your experience. The tool will be back shortly.
+      </div>
+      <div style={{ marginTop: 24, fontSize: 12, color: C.hint }}>
+        For urgent queries, contact your manager.
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ fontFamily: C.font, background: C.bg, minHeight: "100vh",
