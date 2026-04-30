@@ -410,7 +410,7 @@ export default function HealthRecommender({ onBack }) {
 
     // ── ANALYTICS ──
     Analytics.recommendRun(form.ped || "none", form.age, bmi);
-    (recs || []).forEach(plan => Analytics.planRecommended(plan, form.ped || "none"));
+    (recs || []).forEach(plan => Analytics.planRecommended(typeof plan === "string" ? plan : (plan.name || JSON.stringify(plan)), form.ped || "none"));
 
     setLoading(false);
   };
