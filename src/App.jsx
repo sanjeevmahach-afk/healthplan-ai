@@ -6,7 +6,7 @@ import CommissionCalculator from "./CommissionCalculator";
 import { Analytics }        from "./analytics";
 
 /* ── MAINTENANCE MODE — set to false to restore the app ── */
-const MAINTENANCE = false;
+const MAINTENANCE = true;
 
 /* ── TAB CONFIG ──────────────────────────────────────────────── */
 const TABS = [
