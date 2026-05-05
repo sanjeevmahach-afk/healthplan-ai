@@ -6,7 +6,7 @@ import CommissionCalculator from "./CommissionCalculator";
 import { Analytics }        from "./analytics";
 
 /* ── MAINTENANCE MODE — set to false to restore the app ── */
-const MAINTENANCE = false;
+const MAINTENANCE = true;
 
 /* ── TAB CONFIG ──────────────────────────────────────────────── */
 const TABS = [
@@ -165,7 +165,6 @@ function useCountUp(target, duration = 1200) {
 function HomeScreen({ onNavigate }) {
   const [carouselIdx, setCarouselIdx]   = useState(0);
   const [visits, setVisits]             = useState({ today: 0, total: 0 });
-  const [showInAppBanner, setShowInAppBanner] = useState(false);
 
   const todayDisplay = useCountUp(visits.today, 1000);
   const totalDisplay = useCountUp(visits.total, 1400);
@@ -197,23 +196,6 @@ function HomeScreen({ onNavigate }) {
       })
       .catch(() => {});
   }, []);
-
-  /* ── IN-APP BANNER — show once per day ── */
-  useEffect(() => {
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      const last  = localStorage.getItem("hpt_inapp_banner_date");
-      if (last !== today) setShowInAppBanner(true);
-    } catch (e) { setShowInAppBanner(true); }
-  }, []);
-
-  function closeInAppBanner() {
-    try {
-      const today = new Date().toISOString().slice(0, 10);
-      localStorage.setItem("hpt_inapp_banner_date", today);
-    } catch (e) {}
-    setShowInAppBanner(false);
-  }
 
   /* ── CAROUSEL AUTO-SCROLL ── */
   useEffect(() => {
@@ -301,35 +283,6 @@ function HomeScreen({ onNavigate }) {
           textTransform: "uppercase", marginBottom: "12px" }}>
           Quick Actions
         </div>
-
-        {/* ── IN-APP BANNER OVERLAY ── */}
-        {showInAppBanner && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex",
-            alignItems: "center", justifyContent: "center",
-            background: "rgba(0,0,0,0.55)", padding: "24px" }}
-            onClick={closeInAppBanner}>
-            <div style={{ position: "relative", width: "100%", maxWidth: "420px",
-              borderRadius: C.radius, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,0.35)" }}
-              onClick={e => e.stopPropagation()}>
-              <img
-                src="/Thailand_Chalo_in-App.png"
-                alt="Thailand Chalo — Get additional 50% Weightage"
-                style={{ width: "100%", display: "block" }}
-              />
-              {/* Close button */}
-              <button onClick={closeInAppBanner}
-                style={{ position: "absolute", top: "10px", right: "10px",
-                  width: "28px", height: "28px", borderRadius: "50%",
-                  background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  WebkitTapHighlightColor: "transparent" }}>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M1 1L11 11M11 1L1 11" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* TOOL CARDS */}
         {tools.map((t, i) => (
