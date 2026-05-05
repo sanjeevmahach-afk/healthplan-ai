@@ -8,19 +8,19 @@ import { Analytics } from "./analytics";
    SI assumed ≥ 10L (most common recommendation case)
 ═══════════════════════════════════════════════════════════════ */
 const PAYOUT = {
-  // Rates from runCalculator v8 · SI >= 10L · Family · Fresh · Updated Apr 2026
-  "Niva Reassure 3.0":            { fresh: "23%", port: "13%" },
-  "Niva Aspire":                  { fresh: "23%", port: "13%" },
+  // Rates from runCalculator v12 · SI >= 10L · Family · Fresh · Updated May 2026
+  "Niva Reassure 3.0":            { fresh: "21%", port: "13%" },
+  "Niva Aspire":                  { fresh: "21%", port: "13%" },
   "HDFC Optima Secure":           { fresh: "25%", port: "15%" },
-  "ICICI Elevate":                { fresh: "23%", port: "10%" },
+  "ICICI Elevate":                { fresh: "22%", port: "10%" },
   "TATA Medicare Select":         { fresh: "27%", port: "12%" },
-  "Star Assure":                  { fresh: "25%", port: "15%" },
+  "Star Assure":                  { fresh: "23%", port: "10%" },
   "Care Supreme":                 { fresh: "22%", port: "15%" },
   "Care Freedom":                 { fresh: "22%", port: "15%" },
   "Care Heart / Star Cardiac":    { fresh: "22%", port: "15%" },
-  "Star Cancer Care":             { fresh: "25%", port: "15%" },
-  "Reliance Health Gain":         { fresh: "30%", port: "15%" },
-  "Reliance Health Infinity":     { fresh: "30%", port: "15%" },
+  "Star Cancer Care":             { fresh: "23%", port: "10%" },
+  "Reliance Health Gain":         { fresh: "28%", port: "15%" },
+  "Reliance Health Infinity":     { fresh: "28%", port: "15%" },
   "Aditya Birla Active One Max":  { fresh: "25%", port: "15%" },
   "Aditya Birla Active One Vytl": { fresh: "25%", port: "15%" },
   "SBI Health Alpha":             { fresh: "35%", port: "10%" },
