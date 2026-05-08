@@ -722,7 +722,6 @@ export default function ContestDashboard() {
                         strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                    </div>
                   </div>
                 )}
               </div>
@@ -857,8 +856,7 @@ export default function ContestDashboard() {
                     Port, Renewal and Cancelled cases excluded.
                   </div>
                 </div>
-                    </div>
-                  </div>
+                </div>
                 )}
               </div>
             )}
