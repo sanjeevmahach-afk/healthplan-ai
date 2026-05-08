@@ -488,6 +488,14 @@ export default function ContestDashboard() {
               </div>
             </div>
 
+            {/* ── ACTIVE CONTESTS HEADER ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "20px", marginBottom: "4px" }}>
+              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.green,
+                boxShadow: "0 0 0 3px rgba(22,163,74,0.2)", flexShrink: 0 }} />
+              <div style={{ fontSize: "12px", fontWeight: 700, color: C.green,
+                textTransform: "uppercase", letterSpacing: "0.08em" }}>Active Contest</div>
+            </div>
+
             {/* ── THAILAND CHALO ── */}
             {showThailand && (
               <>
@@ -620,6 +628,13 @@ export default function ContestDashboard() {
                 </div>
               </>
             )}
+
+            {/* ── PAST CONTESTS HEADER ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "24px", marginBottom: "4px" }}>
+              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.muted, flexShrink: 0 }} />
+              <div style={{ fontSize: "12px", fontWeight: 700, color: C.muted,
+                textTransform: "uppercase", letterSpacing: "0.08em" }}>Past Contests</div>
+            </div>
 
             {/* ── VLI ── */}
             {showVLI && (
@@ -802,24 +817,11 @@ export default function ContestDashboard() {
               </>
             )}
 
-            {/* ── COMING SOON ── */}
-            <SectionHeader title="Coming Soon" />
-            <div style={{ background: C.card, borderRadius: C.radius, padding: "14px 16px",
-              boxShadow: C.shadow, opacity: 0.5 }}>
-              <div style={{ display: "inline-block", background: C.bg, border: `1px solid ${C.border}`,
-                borderRadius: "20px", padding: "2px 10px", fontSize: "10px", fontWeight: 600,
-                color: C.muted, marginBottom: "6px" }}>Coming Soon</div>
-              <div style={{ fontSize: "14px", fontWeight: 600, color: C.muted }}>Next Contest</div>
-              <div style={{ fontSize: "12px", color: C.hint, marginTop: "3px" }}>Stay tuned for the next contest</div>
-            </div>
-
             {/* Dates */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "20px" }}>
               {[
                 { label: "Thailand Payment",  value: "1 Apr – 30 Jun 2026" },
                 { label: "Thailand Booking",  value: "Till 10 Jul 2026"    },
-                { label: "VLI Booking",       value: "1 Apr – 30 Apr 2026" },
-                { label: "VLI Max Payout",    value: "15%"                 },
               ].map((d, i) => (
                 <div key={i} style={{ background: C.card, borderRadius: C.radiusSm,
                   padding: "10px 12px", boxShadow: C.shadow }}>
