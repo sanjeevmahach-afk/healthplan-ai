@@ -50,7 +50,7 @@ const LOCATION_INSURERS = [
 /* ── STATE → CITIES ──────────────────────────────────────────── */
 const STATE_CITIES = {
   "Delhi / NCR":    ["New Delhi","Noida","Ghaziabad","Faridabad","Gurgaon","Greater Noida"],
-  "Haryana":        ["Ambala","Hisar","Rohtak","Panipat","Sonipat","Karnal","Kurukshetra","Rewari","Palwal","Sirsa","Fatehabad","Bhiwani","Jhajjar","Narnaul","Kaithal","Bahadurgarh"],
+  "Haryana":        ["Gurgaon","Ambala","Hisar","Rohtak","Panipat","Sonipat","Karnal","Kurukshetra","Rewari","Palwal","Sirsa","Fatehabad","Bhiwani","Jhajjar","Narnaul","Kaithal","Bahadurgarh","Panchkula","Yamunanagar","Faridabad"],
   "Punjab":         ["Amritsar","Ludhiana","Jalandhar","Patiala","Mansa","Tarn Taran","Bathinda","Mohali"],
   "Uttar Pradesh":  ["Agra","Aligarh","Mathura","Bareilly","Lucknow","Kanpur","Varanasi","Allahabad","Meerut","Gorakhpur"],
   "Gujarat":        ["Ahmedabad","Surat","Vadodara","Rajkot","Gandhinagar","Anand","Navsari","Jamnagar","Bhavnagar","Junagadh"],
