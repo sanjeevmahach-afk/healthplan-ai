@@ -258,6 +258,7 @@ export default function ContestDashboard() {
   const [vliLeaderboard, setVliLeaderboard] = useState([]);
   const [showLb,         setShowLb]         = useState(false);
   const [showVliLb,      setShowVliLb]      = useState(false);
+  const [expandedPast,   setExpandedPast]   = useState(null); // "vli" | "second" | null
   const inputRef = useRef(null);
 
   /* ── LOAD CACHED GID ── */
@@ -636,10 +637,30 @@ export default function ContestDashboard() {
                 textTransform: "uppercase", letterSpacing: "0.08em" }}>Past Contests</div>
             </div>
 
-            {/* ── VLI ── */}
+            {/* ── VLI — collapsible ── */}
             {showVLI && (
-              <>
-                <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Apr 2026  |  Max 15%" />
+              <div style={{ background: C.card, borderRadius: C.radius,
+                boxShadow: C.shadow, marginBottom: "8px", overflow: "hidden" }}>
+                {/* Header row — always visible */}
+                <div onClick={() => setExpandedPast(expandedPast === "vli" ? null : "vli")}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "14px 16px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+                  <div style={{ fontSize: "14px", fontWeight: 600, color: C.muted }}>
+                    Health Payout Incentive · April
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    style={{ transform: expandedPast === "vli" ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s", flexShrink: 0 }}>
+                    <path d="M6 9L12 15L18 9" stroke={C.muted} strokeWidth="2"
+                      strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+
+                {/* Expanded content */}
+                {expandedPast === "vli" && (
+                  <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                    <div style={{ paddingTop: "14px" }}>
+                      <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Apr 2026  |  Max 15%" />
                 <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
                   boxShadow: C.shadow }}>
 
@@ -701,13 +722,35 @@ export default function ContestDashboard() {
                         strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                </div>
-              </>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
-            {/* ── SECOND POLICY CONTEST ── */}
+            {/* ── SECOND POLICY CONTEST — collapsible ── */}
             {showSecond && (
-              <>
+              <div style={{ background: C.card, borderRadius: C.radius,
+                boxShadow: C.shadow, marginBottom: "8px", overflow: "hidden" }}>
+                {/* Header row */}
+                <div onClick={() => setExpandedPast(expandedPast === "second" ? null : "second")}
+                  style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "14px 16px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+                  <div style={{ fontSize: "14px", fontWeight: 600, color: C.muted }}>
+                    Second Policy Contest · April
+                  </div>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    style={{ transform: expandedPast === "second" ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 0.2s", flexShrink: 0 }}>
+                    <path d="M6 9L12 15L18 9" stroke={C.muted} strokeWidth="2"
+                      strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+
+                {/* Expanded content */}
+                {expandedPast === "second" && (
+                  <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                    <div style={{ paddingTop: "14px" }}>
                 <SectionHeader title="Second Policy Contest" subtitle="9 Apr – 30 Apr 2026  |  Rs.800 on 2nd Policy" />
                 <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
                   boxShadow: C.shadow }}>
@@ -814,7 +857,10 @@ export default function ContestDashboard() {
                     Port, Renewal and Cancelled cases excluded.
                   </div>
                 </div>
-              </>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Dates */}
