@@ -377,6 +377,14 @@ export default function ContestDashboard() {
   const showThailand = booked > 0 || sourced > 0;
   const showVLI      = vliPremium > 0;
 
+  // If Contests Config sheet not yet set up, fall back to hardcoded past contests
+  const effectivePastContests = pastContests.length > 0 ? pastContests : [
+    ...(showVLI       ? [{ name: "Health Payout Incentive", type: "vli",    month: "April" }] : []),
+    ...(showSecond    ? [{ name: "Second Policy Contest",   type: "second", month: "April" }] : []),
+    ...(vliPremiumMay > 0   ? [{ name: "Health Payout Incentive", type: "vli",    month: "May"   }] : []),
+    ...(secondNopMay  > 0   ? [{ name: "Second Policy Contest",   type: "second", month: "May"   }] : []),
+  ];
+
   return (
     <div style={{ fontFamily: C.font }}>
 
@@ -671,7 +679,7 @@ export default function ContestDashboard() {
             )}
 
             {/* ── PAST CONTESTS HEADER ── */}
-            {data && pastContests.length > 0 && (
+            {data && effectivePastContests.length > 0 && (
               <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "24px", marginBottom: "4px" }}>
                 <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.muted, flexShrink: 0 }} />
                 <div style={{ fontSize: "12px", fontWeight: 700, color: C.muted,
@@ -680,7 +688,7 @@ export default function ContestDashboard() {
             )}
 
             {/* ── DYNAMIC PAST CONTESTS ── */}
-            {data && pastContests.map((contest, ci) => {
+            {data && effectivePastContests.map((contest, ci) => {
               const key = contest.type + "_" + ci;
               const isExpanded = expandedPast === key;
               const vd = contest.type === "vli" ? getVliData(contest.month) : null;
