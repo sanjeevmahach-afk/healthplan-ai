@@ -16,7 +16,6 @@ const INSURER_PLANS = {
   "Tata AIG General Insurance Company Limited":      ["Medicare Select","Medicare Premier","Medicare Plus","Medicare","Medicare Lite","Elder Care","CritiMedicare","Supercharge","Accident Guard (PA)"],
   "SBI General Insurance Company Limited":           ["Health Alpha","Super Health","Arogya Supreme","Arogya Top Up","Personal Accident"],
   "Digit Insurance Company Limited":                 ["Health Care","Arogya Sanjeevani","Personal Accident"],
-  "Bajaj General Insurance Co. Ltd":                 ["Health Guard","Extra Care Plus","Personal Accident"],
   "New India Assurance Company Ltd":                 ["Premier Mediclaim","Overseas Mediclaim","Yuva Bharat","Floater Mediclaim"],
   "Oriental Insurance Company Ltd":                  ["Happy Family Floater","Individual Mediclaim","Senior Citizen"],
   "National Insurance Company Ltd":                  ["National Mediclaim","Sanjeevani","Super Top Up","Young Mediclaim","Parivar Mediclaim","Mediclaim Plus","New Parivar Plus"],
@@ -417,6 +416,26 @@ export default function CommissionCalculator() {
             )}
           </div>
         )}
+
+        {/* TDS / GST note */}
+        <div style={{ marginTop: "12px", fontSize: "11px", color: C.muted,
+          textAlign: "center", lineHeight: 1.5 }}>
+          TDS and GST applicable on all payouts
+        </div>
+
+        {/* Health Grid PDF download */}
+        <a href="/Grid_with_Addendum_8th_May.pdf" target="_blank" rel="noreferrer"
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+            marginTop: "12px", padding: "12px 16px", background: C.card, borderRadius: C.radiusSm,
+            border: `1px solid ${C.border}`, textDecoration: "none", boxShadow: C.shadow }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M14 2H6C5.45 2 5 2.45 5 3V21C5 21.55 5.45 22 6 22H18C18.55 22 19 21.55 19 21V7L14 2Z"
+              fill={C.redLight} stroke={C.red} strokeWidth="1.5"/>
+            <path d="M14 2V7H19" stroke={C.red} strokeWidth="1.5" strokeLinecap="round"/>
+            <path d="M12 11V17M9 14L12 17L15 14" stroke={C.red} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: C.red }}>Download Health Grid — May 2026</span>
+        </a>
       </div>
 
       <style>{`
