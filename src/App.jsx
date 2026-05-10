@@ -6,7 +6,7 @@ import CommissionCalculator from "./CommissionCalculator";
 import { Analytics }        from "./analytics";
 
 /* ── MAINTENANCE MODE — set to false to restore the app ── */
-const MAINTENANCE = false;
+const MAINTENANCE = true;
 
 /* ── TAB CONFIG ──────────────────────────────────────────────── */
 const TABS = [
@@ -185,7 +185,7 @@ function HomeScreen({ onNavigate }) {
       }
     } catch (e) {}
 
-    // Fetch fresh from Apps Script (Z1=total, Z3=today cross-device)
+    // Fetch fresh from Apps Script (AD1=total, AD3=today cross-device)
     const VISIT_URL = "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec?action=visit";
     fetch(VISIT_URL)
       .then(r => r.json())
