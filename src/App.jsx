@@ -170,9 +170,9 @@ function HomeScreen({ onNavigate }) {
   const totalDisplay = useCountUp(visits.total, 1400);
 
   const BANNERS = [
-    { src: "/App banner Thailand Chalo.png",          alt: "Thailand Chalo Contest" },
-    { src: "/App Banner VLI.png",                     alt: "VLI Health Payout"      },
-    { src: "/Second Policy Contest 2_App Banner.png", alt: "Second Policy Contest"  },
+    { src: "/App banner Thailand Chalo.png",      alt: "Thailand Chalo Contest" },
+    { src: "/VLI_4__Banner.png",                  alt: "VLI Health Payout"      },
+    { src: "/Second_Policy_Contest_2_Banner.jpg", alt: "Second Policy Contest"  },
   ];
 
   /* ── VISIT COUNTER — both cross-device via Apps Script ── */
@@ -258,11 +258,14 @@ function HomeScreen({ onNavigate }) {
 
         {/* ── BANNER CAROUSEL ── */}
         <div style={{ position: "relative", marginBottom: "14px",
-          borderRadius: C.radius, overflow: "hidden", boxShadow: C.shadow }}>
+          borderRadius: C.radius, overflow: "hidden", boxShadow: C.shadow,
+          height: "160px" }}>
           {BANNERS.map((b, i) => (
             <img key={i} src={b.src} alt={b.alt}
               onError={e => { e.target.style.display = "none"; }}
-              style={{ width: "100%", display: i === carouselIdx ? "block" : "none",
+              style={{ width: "100%", height: "160px", objectFit: "cover",
+                objectPosition: "center",
+                display: i === carouselIdx ? "block" : "none",
                 borderRadius: C.radius }} />
           ))}
           {/* Dot indicators */}
