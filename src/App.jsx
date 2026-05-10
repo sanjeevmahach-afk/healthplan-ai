@@ -161,6 +161,75 @@ function useCountUp(target, duration = 1200) {
   return display;
 }
 
+/* ── FEEDBACK FORM ───────────────────────────────────────────── */
+function FeedbackForm() {
+  const [text, setText]       = useState("");
+  const [name, setName]       = useState("");
+  const [status, setStatus]   = useState(null); // null | "sending" | "done" | "error"
+
+  async function submit() {
+    if (!text.trim()) return;
+    setStatus("sending");
+    try {
+      const params = new URLSearchParams({
+        action:   "feedback",
+        message:  text.trim(),
+        name:     name.trim() || "Anonymous",
+      });
+      await fetch(`https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec?${params.toString()}`);
+      setStatus("done");
+      setText(""); setName("");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "done") return (
+    <div style={{ background: C.greenLight, border: `1px solid #86EFAC`, borderRadius: C.radiusSm,
+      padding: "16px", textAlign: "center" }}>
+      <div style={{ fontSize: "20px", marginBottom: "6px" }}>✅</div>
+      <div style={{ fontSize: "13px", fontWeight: 600, color: C.green }}>Feedback sent — thank you!</div>
+      <button onClick={() => setStatus(null)}
+        style={{ marginTop: "10px", fontSize: "12px", color: C.green, background: "none",
+          border: `1px solid ${C.green}`, borderRadius: C.radiusXs, padding: "4px 12px",
+          cursor: "pointer", fontFamily: C.font }}>
+        Send another
+      </button>
+    </div>
+  );
+
+  return (
+    <div style={{ background: C.card, borderRadius: C.radiusSm,
+      padding: "14px", boxShadow: C.shadow }}>
+      <input value={name} onChange={e => setName(e.target.value)}
+        placeholder="Your name (optional)"
+        style={{ width: "100%", border: `1px solid ${C.border}`, borderRadius: C.radiusXs,
+          padding: "9px 12px", fontSize: "13px", fontFamily: C.font, color: C.text,
+          background: C.bg, outline: "none", marginBottom: "8px", boxSizing: "border-box" }} />
+      <textarea value={text} onChange={e => setText(e.target.value)}
+        placeholder="Share your feedback, report an issue, or suggest an improvement..."
+        rows={3}
+        style={{ width: "100%", border: `1px solid ${C.border}`, borderRadius: C.radiusXs,
+          padding: "9px 12px", fontSize: "13px", fontFamily: C.font, color: C.text,
+          background: C.bg, outline: "none", resize: "none", boxSizing: "border-box",
+          lineHeight: 1.5 }} />
+      <button onClick={submit} disabled={!text.trim() || status === "sending"}
+        style={{ marginTop: "8px", width: "100%", padding: "11px",
+          background: !text.trim() || status === "sending" ? C.muted : C.red,
+          color: "#fff", border: "none", borderRadius: C.radiusXs, fontSize: "13px",
+          fontWeight: 600, cursor: !text.trim() ? "not-allowed" : "pointer",
+          fontFamily: C.font }}>
+        {status === "sending" ? "Sending..." : "Send Feedback"}
+      </button>
+      {status === "error" && (
+        <div style={{ fontSize: "11px", color: C.red, marginTop: "6px", textAlign: "center" }}>
+          Something went wrong — try again.
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── HOME SCREEN ─────────────────────────────────────────────── */
 function HomeScreen({ onNavigate }) {
   const [carouselIdx, setCarouselIdx]   = useState(0);
@@ -331,6 +400,15 @@ function HomeScreen({ onNavigate }) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* WRITE TO US */}
+        <div style={{ margin: "16px 0 8px" }}>
+          <div style={{ fontSize: "12px", fontWeight: 600, color: C.muted,
+            textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "10px" }}>
+            Write to us
+          </div>
+          <FeedbackForm />
         </div>
 
       </div>
