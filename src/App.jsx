@@ -171,8 +171,8 @@ function HomeScreen({ onNavigate }) {
 
   const BANNERS = [
     { src: "/App banner Thailand Chalo.png",      alt: "Thailand Chalo Contest" },
-    { src: "/VLI_4__Banner.png",                  alt: "VLI Health Payout"      },
-    { src: "/Second_Policy_Contest_2_Banner.jpg", alt: "Second Policy Contest"  },
+    { src: "/VLI_4__Banner.png",                  alt: "VLI Health Payout May"  },
+    { src: "/Second_Policy_Contest_2_Banner.jpg", alt: "Second Policy May"      },
   ];
 
   /* ── VISIT COUNTER — both cross-device via Apps Script ── */
