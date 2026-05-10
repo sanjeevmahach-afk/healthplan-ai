@@ -6,7 +6,7 @@ import CommissionCalculator from "./CommissionCalculator";
 import { Analytics }        from "./analytics";
 
 /* ── MAINTENANCE MODE — set to false to restore the app ── */
-const MAINTENANCE = false;
+const MAINTENANCE = true;
 
 /* ── TAB CONFIG ──────────────────────────────────────────────── */
 const TABS = [
@@ -17,6 +17,17 @@ const TABS = [
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <path d="M3 9.5L12 3L21 9.5V20C21 20.55 20.55 21 20 21H15V15H9V21H4C3.45 21 3 20.55 3 20V9.5Z"
           fill={active ? C.red : "none"} stroke={active ? C.red : C.muted} strokeWidth="1.8" strokeLinejoin="round"/>
+      </svg>
+    ),
+  },
+  {
+    id: "recommender",
+    label: "Recommend",
+    icon: (active) => (
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M9 11L11 13L15 9" stroke={active ? C.red : C.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M21 12C21 16.97 16.97 21 12 21C7.03 21 3 16.97 3 12C3 7.03 7.03 3 12 3C16.97 3 21 7.03 21 12Z"
+          fill={active ? C.redLight : "none"} stroke={active ? C.red : C.muted} strokeWidth="1.8"/>
       </svg>
     ),
   },
@@ -37,17 +48,6 @@ const TABS = [
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
         <rect x="4" y="2" width="16" height="20" rx="2" fill={active ? C.red : "none"} stroke={active ? C.red : C.muted} strokeWidth="1.8"/>
         <path d="M8 7H16M8 11H16M8 15H12" stroke={active ? "#fff" : C.muted} strokeWidth="1.8" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    id: "recommender",
-    label: "Recommend",
-    icon: (active) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M9 11L11 13L15 9" stroke={active ? C.red : C.muted} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M21 12C21 16.97 16.97 21 12 21C7.03 21 3 16.97 3 12C3 7.03 7.03 3 12 3C16.97 3 21 7.03 21 12Z"
-          fill={active ? C.redLight : "none"} stroke={active ? C.red : C.muted} strokeWidth="1.8"/>
       </svg>
     ),
   },
