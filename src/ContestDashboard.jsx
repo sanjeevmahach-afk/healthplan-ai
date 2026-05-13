@@ -12,8 +12,9 @@ const SLABS = [
   { min: 300000,  amt: "3L",  reward: "10K Cash"       },
   { min: 400000,  amt: "4L",  reward: "Thailand 1 Pax" },
   { min: 700000,  amt: "7L",  reward: "Thailand 2 Pax" },
+  { min: 1400000, amt: "14L", reward: "Thailand 4 Pax" },
 ];
-const THAILAND_TOTAL = 735000;
+const THAILAND_TOTAL = 1470000;
 
 const VLI_SLABS = [
   { min: 25000,  amt: "25K",  pct: "4%"  },
@@ -46,11 +47,12 @@ function fmtLakhFixed(n) {
 }
 function getSlabReward(bookedLakhs) {
   const n = bookedLakhs * 100000;
-  if (n >= 700000) return "Thailand 2 Pax";
-  if (n >= 400000) return "Thailand 1 Pax";
-  if (n >= 300000) return "10K Cash";
-  if (n >= 200000) return "5K Cash";
-  if (n >= 100000) return "2K Cash";
+  if (n >= 1400000) return "Thailand 4 Pax";
+  if (n >= 700000)  return "Thailand 2 Pax";
+  if (n >= 400000)  return "Thailand 1 Pax";
+  if (n >= 300000)  return "10K Cash";
+  if (n >= 200000)  return "5K Cash";
+  if (n >= 100000)  return "2K Cash";
   return null;
 }
 function getSlabInfo(premium, slabs) {
@@ -624,7 +626,7 @@ export default function ContestDashboard() {
                     fontSize: "12px", color: tNxt ? C.red : C.green }}>
                     {tNxt
                       ? <>Book <strong>{fmtL(tNxt.min - booked)} more</strong> to unlock {tNxt.reward}</>
-                      : <strong>Top slab achieved — Thailand for 2!</strong>
+                      : <strong>Top slab achieved — Thailand for 4!</strong>
                     }
                   </div>
 
