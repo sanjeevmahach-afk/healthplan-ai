@@ -87,6 +87,24 @@ function TabBar({ active, onChange }) {
 export default function App() {
   const [screen, setScreen] = useState("home");
 
+  /* ── BACK TO POS — sends native message to InsuranceDekho app ── */
+  function backToPOS() {
+    try {
+      const os = navigator.userAgent;
+      if (/android/i.test(os)) {
+        window.Android.postMessage("onBackClick");
+      } else if (/iPad|iPhone|iPod/.test(os)) {
+        window.webkit.messageHandlers.common.postMessage(
+          JSON.stringify({ event: "onBackClick", data: "Hello" })
+        );
+      } else {
+        console.log("Not Able To Fetch Device");
+      }
+    } catch (err) {
+      console.error("Error while sending message to devices:", err);
+    }
+  }
+
   /* ── MAINTENANCE SCREEN ── */
   if (MAINTENANCE) return (
     <div style={{ fontFamily: C.font, background: C.bg, minHeight: "100vh",
@@ -117,6 +135,23 @@ export default function App() {
     <div style={{ fontFamily: C.font, background: C.bg, minHeight: "100vh",
       maxWidth: "480px", margin: "0 auto", paddingBottom: "72px" }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+      {/* ── BACK TO POS HEADER ── */}
+      <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`,
+        padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between",
+        position: "sticky", top: 0, zIndex: 50 }}>
+        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Health Partner Tool</div>
+        <button onClick={backToPOS}
+          style={{ display: "flex", alignItems: "center", gap: "6px", background: C.redLight,
+            border: "none", borderRadius: C.radiusXs, padding: "6px 12px",
+            cursor: "pointer", fontFamily: C.font, WebkitTapHighlightColor: "transparent" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+            <path d="M19 12H5M11 6L5 12L11 18" stroke={C.red} strokeWidth="2"
+              strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span style={{ fontSize: 12, fontWeight: 600, color: C.red }}>Back to POS</span>
+        </button>
+      </div>
 
       {/* SCREEN CONTENT */}
       {screen === "home"        && <HomeScreen onNavigate={setScreen} />}
