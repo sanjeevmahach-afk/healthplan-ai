@@ -90,18 +90,19 @@ export default function App() {
   /* ── BACK TO POS — sends native message to InsuranceDekho app ── */
   function backToPOS() {
     try {
-      const os = navigator.userAgent;
-      if (/android/i.test(os)) {
+      const ua = navigator.userAgent;
+      if (/android/i.test(ua)) {
         window.Android.postMessage("onBackClick");
-      } else if (/iPad|iPhone|iPod/.test(os)) {
+      } else if (/iPad|iPhone|iPod/.test(ua)) {
         window.webkit.messageHandlers.common.postMessage(
           JSON.stringify({ event: "onBackClick", data: "Hello" })
         );
       } else {
-        console.log("Not Able To Fetch Device");
+        window.location.href = "https://pos.insurancedekho.com/core/sell/health";
       }
     } catch (err) {
-      console.error("Error while sending message to devices:", err);
+      // Native bridge failed — fall back to POS URL
+      window.location.href = "https://pos.insurancedekho.com/core/sell/health";
     }
   }
 
@@ -133,24 +134,46 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: C.font, background: C.bg, minHeight: "100vh",
-      maxWidth: "480px", margin: "0 auto", paddingBottom: "72px" }}>
+      maxWidth: "480px", margin: "0 auto", paddingBottom: "72px" }}
+      onTouchStart={e => {
+        const t = e.touches[0];
+        window._swipeStart = { x: t.clientX, y: t.clientY, time: Date.now() };
+      }}
+      onTouchEnd={e => {
+        if (!window._swipeStart) return;
+        const t = e.changedTouches[0];
+        const dx = t.clientX - window._swipeStart.x;
+        const dy = t.clientY - window._swipeStart.y;
+        const dt = Date.now() - window._swipeStart.time;
+        window._swipeStart = null;
+        if (dt > 500) return; // too slow
+        // Swipe left→right (back to POS) — fast horizontal swipe from left edge
+        if (dx > 80 && Math.abs(dy) < 60 && t.clientX - dx < 40) {
+          backToPOS();
+        }
+        // Swipe down (pull to refresh)
+        if (dy > 100 && Math.abs(dx) < 60) {
+          window.location.reload();
+        }
+      }}>
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
-      {/* ── BACK TO POS HEADER ── */}
+      {/* ── HEADER ── */}
       <div style={{ background: C.card, borderBottom: `1px solid ${C.border}`,
-        padding: "10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "10px 16px", display: "flex", alignItems: "center", gap: "12px",
         position: "sticky", top: 0, zIndex: 50 }}>
-        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Health Partner Tool</div>
         <button onClick={backToPOS}
-          style={{ display: "flex", alignItems: "center", gap: "6px", background: C.redLight,
-            border: "none", borderRadius: C.radiusXs, padding: "6px 12px",
-            cursor: "pointer", fontFamily: C.font, WebkitTapHighlightColor: "transparent" }}>
+          style={{ display: "flex", alignItems: "center", gap: "5px", background: C.redLight,
+            border: "none", borderRadius: C.radiusXs, padding: "6px 10px",
+            cursor: "pointer", fontFamily: C.font, WebkitTapHighlightColor: "transparent",
+            flexShrink: 0 }}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
             <path d="M19 12H5M11 6L5 12L11 18" stroke={C.red} strokeWidth="2"
               strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           <span style={{ fontSize: 12, fontWeight: 600, color: C.red }}>Back to POS</span>
         </button>
+        <div style={{ fontSize: 14, fontWeight: 700, color: C.text }}>Health Partner Tool</div>
       </div>
 
       {/* SCREEN CONTENT */}
