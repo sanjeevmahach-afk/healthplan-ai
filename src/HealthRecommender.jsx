@@ -424,7 +424,6 @@ export default function HealthRecommender({ onBack }) {
 
     // ── ANALYTICS ──
     Analytics.recommendRun(form.ped || "none", form.age, bmi);
-    Analytics.track("Recommendation Run", "Recommender", `PED:${form.ped||"none"} City:${form.city||"tier1"}`, `Age:${form.age} BMI:${bmi}`);
     (recs || []).forEach(plan => Analytics.planRecommended(typeof plan === "string" ? plan : (plan.name || JSON.stringify(plan)), form.ped || "none"));
 
     setLoading(false);
