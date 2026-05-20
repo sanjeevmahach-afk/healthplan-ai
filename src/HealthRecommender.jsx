@@ -146,11 +146,25 @@ function getRecommendations(form) {
   const eligible = candidates.filter(name => {
     const plan = PLANS_DATA[name];
     if (!plan) return false;
-    // Age filter — hard remove if customer exceeds plan max entry age
+    // Age filter
     if (ageNum > plan.maxAge) return false;
-    // BMI filter — hard remove if customer BMI exceeds plan limit
+    // BMI filter
     const bmiLimit = PLAN_BMI_LIMITS[name] || 40;
     if (bmiNum > 0 && bmiNum > bmiLimit) return false;
+    // Gujarat filter — remove plans with 0% payout for Gujarat location
+    if (form.city === "gujarat") {
+      const isFamily = (form.familySize !== "1a" && form.familySize !== "1");
+      const siNum10L = (parseInt(form.sumInsured) || 10) >= 10;
+      const GUJARAT_ZERO = [
+        // IndusInd/Reliance — excluded city → 0% always
+        "Reliance Health Gain",
+        "Reliance Health Infinity",
+        // HDFC — NonPreferred → Individual always 0%, Family <10L = 0%
+        ...(!isFamily ? ["HDFC Optima Secure"] : []),
+        ...(!siNum10L && isFamily ? ["HDFC Optima Secure"] : []),
+      ];
+      if (GUJARAT_ZERO.includes(name)) return false;
+    }
     return true;
   });
   const buildReasons = (name) => {
@@ -410,6 +424,7 @@ export default function HealthRecommender({ onBack }) {
 
     // ── ANALYTICS ──
     Analytics.recommendRun(form.ped || "none", form.age, bmi);
+    Analytics.track("Recommendation Run", "Recommender", `PED:${form.ped||"none"} City:${form.city||"tier1"}`, `Age:${form.age} BMI:${bmi}`);
     (recs || []).forEach(plan => Analytics.planRecommended(typeof plan === "string" ? plan : (plan.name || JSON.stringify(plan)), form.ped || "none"));
 
     setLoading(false);
@@ -518,7 +533,7 @@ export default function HealthRecommender({ onBack }) {
             <div style={{height:"1px",background:C.border,margin:"4px 0 20px"}}/>
 
             <Field label="City Tier">
-              <Seg value={form.city} onChange={set("city")} options={[{value:"tier1",label:"Metro",emoji:"🏙️"},{value:"tier2",label:"Tier 2",emoji:"🏘️"},{value:"tier3",label:"Tier 3",emoji:"🌾"}]}/>
+              <Seg value={form.city} onChange={set("city")} options={[{value:"tier1",label:"Metro",emoji:"🏙️"},{value:"tier2",label:"Tier 2",emoji:"🏘️"},{value:"gujarat",label:"Gujarat",emoji:"🏗️"},{value:"tier3",label:"Tier 3",emoji:"🌾"}]}/>
             </Field>
             <Field label="Case Type">
               <Seg value={form.isPort} onChange={set("isPort")} options={[{value:"no",label:"Fresh Policy"},{value:"yes",label:"Porting"}]}/>
