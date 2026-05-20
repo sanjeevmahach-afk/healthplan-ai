@@ -15,6 +15,7 @@ const INSURER_PLANS = {
   "Star Health":                                     ["Star Comprehensive","Star Assure","Star Family Health Optima","Star Senior Citizens Red Carpet","Star Cancer Care","Star Cardiac Care","Personal Accident"],
   "Tata AIG General Insurance Company Limited":      ["Medicare Select","Medicare Premier","Medicare Plus","Medicare","Medicare Lite","Elder Care","CritiMedicare","Supercharge","Accident Guard (PA)"],
   "SBI General Insurance Company Limited":           ["Health Alpha","Super Health","Arogya Supreme","Arogya Top Up","Personal Accident"],
+  "Bajaj Allianz General Insurance Co. Ltd":         ["MHC Plan 1","MHC EDGE+","ECP","CI","Hospi Cash","Personal Accident"],
   "Digit Insurance Company Limited":                 ["Health Care","Arogya Sanjeevani","Personal Accident"],
   "New India Assurance Company Ltd":                 ["Premier Mediclaim","Overseas Mediclaim","Yuva Bharat","Floater Mediclaim"],
   "Oriental Insurance Company Ltd":                  ["Happy Family Floater","Individual Mediclaim","Senior Citizen"],
