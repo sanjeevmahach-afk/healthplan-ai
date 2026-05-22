@@ -8,7 +8,6 @@ const CALC_URL = "https://script.google.com/macros/s/AKfycbxcf2Fg9GtszMdbq36m9q0
 const INSURER_PLANS = {
   "Care Health Insurance Limited":                    ["Care Supreme Classic","Care Supreme Enhance","Care Supreme VFM","Care Joy","Care Arogya","Care SuperMediclaim","Care PA"],
   "Aditya Birla Health Insurance Co Ltd":             ["Activ One Max","Activ One Max Plus","Activ One Vytl","Activ Fit","Activ Health Platinum Enhanced","Activ Health Platinum Essential","Arogya Sanjeevani"],
-  "Bajaj General Insurance Co. Ltd":                 ["Health Guard","Extra Care Plus","Personal Accident"],
   "Niva Bupa Health Insurance Co Ltd":               ["ReAssure 3.0","ReAssure 2.0","Gold","Gold Plus","Bronze","Bronze Plus","Aspire","Senior First"],
   "HDFC ERGO General Insurance Company":             ["Optima Secure","Optima Restore","my:health Suraksha","Personal Accident"],
   "ICICI Lombard":                                   ["Elevate","Complete Health Insurance","Health Advantage","Max Protect","Personal Accident"],
