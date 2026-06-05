@@ -424,7 +424,7 @@ export default function CommissionCalculator() {
         </div>
 
         {/* Health Grid PDF download */}
-        <a href="/Grid_with_Addendum_8th_May.pdf" target="_blank" rel="noreferrer"
+        <a href="/Health_Grid_June26.pdf" target="_blank" rel="noreferrer"
           style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
             marginTop: "12px", padding: "12px 16px", background: C.card, borderRadius: C.radiusSm,
             border: `1px solid ${C.border}`, textDecoration: "none", boxShadow: C.shadow }}>
@@ -434,7 +434,7 @@ export default function CommissionCalculator() {
             <path d="M14 2V7H19" stroke={C.red} strokeWidth="1.5" strokeLinecap="round"/>
             <path d="M12 11V17M9 14L12 17L15 14" stroke={C.red} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-          <span style={{ fontSize: "13px", fontWeight: 600, color: C.red }}>Download Health Grid — May 2026</span>
+          <span style={{ fontSize: "13px", fontWeight: 600, color: C.red }}>Download Health Grid — June 2026</span>
         </a>
       </div>
 
