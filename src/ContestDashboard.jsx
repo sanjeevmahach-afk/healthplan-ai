@@ -346,29 +346,39 @@ export default function ContestDashboard() {
   const vliAmountApr  = data ? parseRaw(data["vli amount"] || 0) : 0;
   // May VLI
   const vliPremiumMay = data ? parseRaw(data["vli premium may"] || 0) : 0;
-  const vliPctMay     = data ? parseRaw(data["vli % may"] || 0) : 0;
-  const vliAmountMay  = data ? parseRaw(data["vli amount may"] || 0) : 0;
+  const vliPctMay     = data ? parseRaw(data["vli % may"]       || 0) : 0;
+  const vliAmountMay  = data ? parseRaw(data["vli amount may"]  || 0) : 0;
   // April Second
-  const secondNopApr  = data ? Math.round(parseRaw(data["second nop"] || 0)) : 0;
+  const secondNopApr  = data ? Math.round(parseRaw(data["second nop"]     || 0)) : 0;
   // May Second
   const secondNopMay  = data ? Math.round(parseRaw(data["second nop may"] || 0)) : 0;
+  // June VLI
+  const vliPremiumJun = data ? parseRaw(data["vli premium jun"] || 0) : 0;
+  const vliPctJun     = data ? parseRaw(data["vli % jun"]       || 0) : 0;
+  const vliAmountJun  = data ? parseRaw(data["vli amount jun"]  || 0) : 0;
+  // June Second
+  const secondNopJun  = data ? Math.round(parseRaw(data["second nop jun"] || 0)) : 0;
 
   // Pick data based on contest month
   function getVliData(month) {
-    const isMay = (month || "").toLowerCase().includes("may");
-    const premium = isMay ? vliPremiumMay : vliPremiumApr;
-    const pct     = isMay ? vliPctMay     : vliPctApr;
-    const amount  = isMay ? vliAmountMay  : vliAmountApr;
+    const m = (month || "").toLowerCase();
+    const isJun = m.includes("jun");
+    const isMay = m.includes("may");
+    const premium = isJun ? vliPremiumJun : isMay ? vliPremiumMay : vliPremiumApr;
+    const pct     = isJun ? vliPctJun     : isMay ? vliPctMay     : vliPctApr;
+    const amount  = isJun ? vliAmountJun  : isMay ? vliAmountMay  : vliAmountApr;
     const pctDisplay = pct > 0 ? (pct * 100).toFixed(0) + "%" : "0%";
     const { cur: vCur, nxt: vNxt } = getSlabInfo(premium, VLI_SLABS);
     return { premium, pct, amount, pctDisplay, vCur, vNxt };
   }
   function getSecondData(month) {
-    const isMay = (month || "").toLowerCase().includes("may");
-    return isMay ? secondNopMay : secondNopApr;
+    const m = (month || "").toLowerCase();
+    if (m.includes("jun")) return secondNopJun;
+    if (m.includes("may")) return secondNopMay;
+    return secondNopApr;
   }
 
-  // Legacy refs for Thailand card (unchanged)
+  // Legacy refs for Thailand card
   const vliPremium    = vliPremiumApr;
   const vliPctRaw     = vliPctApr;
   const vliAmount     = vliAmountApr;
@@ -379,11 +389,12 @@ export default function ContestDashboard() {
   const showThailand = booked > 0 || sourced > 0;
   const showVLI      = vliPremium > 0;
 
-  // If Contests Config sheet not yet set up, fall back to hardcoded past contests
-  // Only show April as past — May is current month (active or ongoing)
+  // Fallback past contests — April and May are past, June is active
   const effectivePastContests = pastContests.length > 0 ? pastContests : [
-    ...(showVLI    ? [{ name: "Health Payout Incentive", type: "vli",    month: "April" }] : []),
-    ...(showSecond ? [{ name: "Second Policy Contest",   type: "second", month: "April" }] : []),
+    ...(showVLI       ? [{ name: "Health Payout Incentive", type: "vli",    month: "April" }] : []),
+    ...(showSecond    ? [{ name: "Second Policy Contest",   type: "second", month: "April" }] : []),
+    ...(vliPremiumMay > 0  ? [{ name: "Health Payout Incentive", type: "vli",    month: "May" }] : []),
+    ...(secondNopMay  >= 0 && data ? [{ name: "Second Policy Contest", type: "second", month: "May" }] : []),
   ];
 
   return (
@@ -679,12 +690,12 @@ export default function ContestDashboard() {
               </>
             )}
 
-            {/* ── MAY VLI — active contest ── */}
-            {vliPremiumMay > 0 && (() => {
-              const vd = getVliData("May");
+            {/* ── JUNE VLI — active contest ── */}
+            {vliPremiumJun > 0 && (() => {
+              const vd = getVliData("Jun");
               return (
                 <>
-                  <SectionHeader title="Health Payout Incentive (VLI)" subtitle="May 2026  |  Max 15%" />
+                  <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Jun 2026  |  Max 15%" />
                   <div style={{ background: C.card, borderRadius: C.radius, padding: "16px", boxShadow: C.shadow, marginBottom: "4px" }}>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
                       <StatTile label="VLI Premium" value={fmtL(vd.premium)} valueColor={C.red} />
@@ -736,12 +747,12 @@ export default function ContestDashboard() {
               );
             })()}
 
-            {/* ── MAY SECOND POLICY — active contest ── */}
-            {secondNopMay >= 0 && data && (() => {
-              const sn = secondNopMay;
+            {/* ── JUNE SECOND POLICY — active contest ── */}
+            {secondNopJun >= 0 && data && (() => {
+              const sn = secondNopJun;
               return (
                 <>
-                  <SectionHeader title="Second Policy Contest" subtitle="May 2026  |  Rs.800 on 2nd Policy" />
+                  <SectionHeader title="Second Policy Contest" subtitle="3 Jun – 10 Jun 2026  |  Rs.800 on 2nd Policy" />
                   <div style={{ background: C.card, borderRadius: C.radius, padding: "16px", boxShadow: C.shadow, marginBottom: "4px" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
                       <div>
