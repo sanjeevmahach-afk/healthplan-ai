@@ -752,7 +752,7 @@ export default function ContestDashboard() {
               const sn = secondNopJun;
               return (
                 <>
-                  <SectionHeader title="Second Policy Contest" subtitle="3 Jun – 10 Jun 2026  |  Rs.800 on 2nd Policy" />
+                  <SectionHeader title="Second Policy Contest" subtitle="3 Jun – 10 Jun 2026  |  Rs.1,600 on 2nd Policy" />
                   <div style={{ background: C.card, borderRadius: C.radius, padding: "16px", boxShadow: C.shadow, marginBottom: "4px" }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
                       <div>
@@ -763,7 +763,7 @@ export default function ContestDashboard() {
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
-                        <div style={{ fontSize: "24px", fontWeight: 700, color: sn >= 2 ? C.green : C.muted }}>{sn >= 2 ? "Rs.800" : "Rs.0"}</div>
+                        <div style={{ fontSize: "24px", fontWeight: 700, color: sn >= 2 ? C.green : C.muted }}>{sn >= 2 ? "Rs.1,600" : "Rs.0"}</div>
                       </div>
                     </div>
                     <div style={{ position: "relative", marginBottom: "20px" }}>
@@ -772,7 +772,7 @@ export default function ContestDashboard() {
                           width: sn >= 2 ? "100%" : sn === 1 ? "50%" : "0%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
                       </div>
                       <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
-                        {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.800"}].map((m, i) => {
+                        {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.1,600"}].map((m, i) => {
                           const achieved = sn >= m.count && m.count > 0;
                           const isCurrent = sn === m.count;
                           return (
@@ -796,12 +796,14 @@ export default function ContestDashboard() {
                       background: sn >= 2 ? C.greenLight : C.redLight,
                       border: `1px solid ${sn >= 2 ? "#86EFAC" : "#FECACA"}`,
                       fontSize: "12px", color: sn >= 2 ? C.green : C.red }}>
-                      {sn >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong>
-                        : sn === 1 ? <>1 more policy needed to unlock <strong>Rs.800 reward</strong></>
-                        : <>Do <strong>2 New/PA policies</strong> (min Rs.15,000 each) to earn Rs.800</>}
+                      {sn >= 2 ? <strong>Reward unlocked — Rs.1,600 earned!</strong>
+                        : sn === 1 ? <>1 more policy needed to unlock <strong>Rs.1,600 reward</strong></>
+                        : <>Source <strong>2 policies (3–10 Jun)</strong> with min Rs.20,000 premium each to earn Rs.1,600</>}
                     </div>
-                    <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
-                      Only New and PA policies counted. Min premium Rs.15,000 per policy. Port, Renewal and Cancelled cases excluded.
+                    <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.6 }}>
+                      New, PA, Port Fresh, Multi Year and PSU policies counted. Min premium Rs.20,000 per policy.
+                      Both policies must be sourced 3–10 Jun and booked till 30 Jun.
+                      Port Renewal, Renewal, Cancelled and 0% payout cases excluded.
                     </div>
                   </div>
                 </>
