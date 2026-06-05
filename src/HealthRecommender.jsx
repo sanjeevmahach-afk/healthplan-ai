@@ -8,22 +8,22 @@ import { Analytics } from "./analytics";
    SI assumed ≥ 10L (most common recommendation case)
 ═══════════════════════════════════════════════════════════════ */
 const PAYOUT = {
-  // Rates from runCalculator v12 · SI >= 10L · Family · Fresh · Updated May 2026
-  "Niva Reassure 3.0":            { fresh: "21%", port: "13%" },
-  "Niva Aspire":                  { fresh: "21%", port: "13%" },
+  // Rates from runCalculator v13 · SI >= 10L · Family · Fresh · Updated June 2026
+  "Niva Reassure 3.0":            { fresh: "23%", port: "13%" },
+  "Niva Aspire":                  { fresh: "23%", port: "13%" },
   "HDFC Optima Secure":           { fresh: "25%", port: "15%" },
-  "ICICI Elevate":                { fresh: "22%", port: "10%" },
+  "ICICI Elevate":                { fresh: "23%", port: "11%" },
   "TATA Medicare Select":         { fresh: "27%", port: "12%" },
-  "Star Assure":                  { fresh: "23%", port: "10%" },
+  "Star Assure":                  { fresh: "26%", port: "13%" },
   "Care Supreme":                 { fresh: "22%", port: "15%" },
-  "Care Freedom":                 { fresh: "22%", port: "15%" },
-  "Care Heart / Star Cardiac":    { fresh: "22%", port: "15%" },
-  "Star Cancer Care":             { fresh: "23%", port: "10%" },
-  "Reliance Health Gain":         { fresh: "28%", port: "15%" },
-  "Reliance Health Infinity":     { fresh: "28%", port: "15%" },
-  "Aditya Birla Active One Max":  { fresh: "25%", port: "15%" },
-  "Aditya Birla Active One Vytl": { fresh: "25%", port: "15%" },
-  "SBI Health Alpha":             { fresh: "35%", port: "10%" },
+  "Care Freedom":                 { fresh: "23%", port: "15%" },
+  "Care Heart / Star Cardiac":    { fresh: "23%", port: "15%" },
+  "Star Cancer Care":             { fresh: "26%", port: "13%" },
+  "Reliance Health Gain":         { fresh: "25%", port: "15%" },
+  "Reliance Health Infinity":     { fresh: "25%", port: "15%" },
+  "Aditya Birla Active One Max":  { fresh: "27%", port: "15%" },
+  "Aditya Birla Active One Vytl": { fresh: "27%", port: "15%" },
+  "SBI Health Alpha":             { fresh: "35%", port: "13%" },
 };
 
 
@@ -418,7 +418,7 @@ export default function HealthRecommender({ onBack }) {
 
   const handleGenerate = async () => {
     setLoading(true); setResults(null);  setExpanded(null);
-    setStep(3);
+    setStep(2);
     const recs = getRecommendations({...form,bmi});
     setResults(recs);
 
@@ -461,23 +461,23 @@ export default function HealthRecommender({ onBack }) {
             <div>
               <div style={{fontWeight:700,fontSize:"14px",color:C.text}}>Plan Recommender</div>
               <div style={{fontSize:"10px",color:C.muted,marginTop:"1px"}}>
-                {step < 3 ? `Step ${step + 1} of 3 — ${["Customer info","Health profile","Coverage needs","Results"][step]}` : "Recommendations ready"}
+                {step < 2 ? `Step ${step + 1} of 2 — ${["Customer info","Health profile"][step]}` : "Recommendations ready"}
               </div>
             </div>
           </div>
-          {step===3&&(
+          {step===2&&(
             <div style={{display:"flex",gap:"8px",flexShrink:0}}>
-              <button onClick={()=>{setStep(2);setResults(null);}} style={{background:C.card,border:`1.5px solid ${C.border}`,color:C.text,borderRadius:"20px",padding:"7px 12px",fontSize:"12px",fontWeight:600,cursor:"pointer",fontFamily:C.font}}>Edit</button>
+              <button onClick={()=>{setStep(1);setResults(null);}} style={{background:C.card,border:`1.5px solid ${C.border}`,color:C.text,borderRadius:"20px",padding:"7px 12px",fontSize:"12px",fontWeight:600,cursor:"pointer",fontFamily:C.font}}>Edit</button>
               <button onClick={()=>{setStep(0);setResults(null);}} style={{background:C.red,border:"none",color:"#fff",borderRadius:"20px",padding:"7px 14px",fontSize:"12px",fontWeight:600,cursor:"pointer",fontFamily:C.font}}>New</button>
             </div>
           )}
         </div>
         {/* Step indicator — clean dots */}
-        {step < 3 && (
+        {step < 2 && (
           <div>
             <div style={{display:"flex",alignItems:"center",gap:"0",marginBottom:"6px"}}>
-              {[0,1,2].map((i)=>(
-                <div key={i} style={{display:"flex",alignItems:"center",flex:i<2?1:"auto"}}>
+              {[0,1].map((i)=>(
+                <div key={i} style={{display:"flex",alignItems:"center",flex:i<1?1:"auto"}}>
                   <div style={{width:"22px",height:"22px",borderRadius:"50%",
                     background:i<step?C.green:i===step?C.red:"#E0E0E0",
                     color:i<=step?"#fff":C.muted,fontSize:"10px",fontWeight:700,
@@ -485,14 +485,13 @@ export default function HealthRecommender({ onBack }) {
                     transition:"all 0.2s",flexShrink:0}}>
                     {i<step?"✓":i+1}
                   </div>
-                  {i<2&&<div style={{flex:1,height:"2px",background:i<step?C.green:C.border,margin:"0 4px",transition:"background 0.3s",minWidth:"8px"}}/>}
+                  {i<1&&<div style={{flex:1,height:"2px",background:i<step?C.green:C.border,margin:"0 4px",transition:"background 0.3s",minWidth:"8px"}}/>}
                 </div>
               ))}
             </div>
             <div style={{fontSize:"11px",color:C.muted}}>
-              {step===0 && "Step 1 of 3 — Basic info"}
-              {step===1 && "Step 2 of 3 — Health profile"}
-              {step===2 && "Step 3 of 3 — Budget & cover"}
+              {step===0 && "Step 1 of 2 — Basic info"}
+              {step===1 && "Step 2 of 2 — Health profile"}
             </div>
           </div>
         )}
@@ -593,22 +592,8 @@ export default function HealthRecommender({ onBack }) {
           </div>
         )}
 
-        {/* STEP 2 */}
+        {/* STEP 2 — Results */}
         {step===2&&(
-          <div>
-            <div style={{fontWeight:700,fontSize:"19px",color:C.text,marginBottom:"4px",letterSpacing:"-0.3px"}}>Coverage Needs</div>
-            <div style={{fontSize:"13px",color:C.muted,marginBottom:"22px"}}>Almost done!</div>
-            <Field label="Budget Preference">
-              <Seg value={form.budget} onChange={set("budget")} options={[{value:"low",label:"Low",emoji:"💸"},{value:"medium",label:"Medium",emoji:"💰"},{value:"high",label:"High",emoji:"💎"}]}/>
-            </Field>
-            <Field label="Sum Insured">
-              <PillRow value={form.sumInsured} onChange={set("sumInsured")} options={[{value:"5",label:"₹5L"},{value:"10",label:"₹10L"},{value:"15",label:"₹15L"},{value:"25",label:"₹25L"},{value:"50",label:"₹50L"},{value:"1cr",label:"₹1Cr"}]}/>
-            </Field>
-          </div>
-        )}
-
-        {/* STEP 3 — Results */}
-        {step===3&&(
           <div>
             {loading&&(
               <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"80px 20px",gap:"16px"}}>
@@ -621,7 +606,7 @@ export default function HealthRecommender({ onBack }) {
               <>
                 {/* Summary chips */}
                 <div style={{display:"flex",flexWrap:"wrap",gap:"5px",marginBottom:"16px"}}>
-                  {[`Age ${form.age}`, bmi?`BMI ${bmi}`:"", form.ped&&form.ped!=="none"?PED_OPTIONS.find(o=>o.value===form.ped)?.label||form.ped:"", form.maternity==="yes"?"Maternity":"", `${form.budget} budget`, form.isPort==="yes"?"Port":"Fresh"].filter(Boolean).map((chip,i)=>(
+                  {[`Age ${form.age}`, bmi?`BMI ${bmi}`:"", form.ped&&form.ped!=="none"?PED_OPTIONS.find(o=>o.value===form.ped)?.label||form.ped:"", form.maternity==="yes"?"Maternity":"", form.isPort==="yes"?"Port":"Fresh"].filter(Boolean).map((chip,i)=>(
                     <span key={i} style={{background:C.card,border:`1px solid ${C.border}`,borderRadius:"20px",padding:"3px 9px",fontSize:"11px",color:C.muted,fontWeight:500}}>{chip}</span>
                   ))}
                 </div>
@@ -881,12 +866,12 @@ export default function HealthRecommender({ onBack }) {
       </div>
 
       {/* ── BOTTOM NAV ── */}
-      {step<3&&(
+      {step<2&&(
         <div style={{position:"fixed",bottom:"72px",left:"50%",transform:"translateX(-50%)",width:"100%",maxWidth:"480px",background:C.card,borderTop:`1px solid ${C.border}`,padding:"12px 18px",display:"flex",gap:"9px",boxSizing:"border-box",zIndex:200,boxShadow:"0 -4px 16px rgba(0,0,0,0.05)"}}>
           {step>0&&(
             <button onClick={()=>setStep(s=>s-1)} style={{flex:1,padding:"13px",borderRadius:C.radiusSm,border:`1.5px solid ${C.border}`,background:C.card,color:C.text,fontSize:"14px",fontWeight:600,cursor:"pointer",fontFamily:C.font,WebkitTapHighlightColor:"transparent"}}>Back</button>
           )}
-          {step<2?(
+          {step<1?(
             <button onClick={()=>canNext[step]&&setStep(s=>s+1)} disabled={!canNext[step]} style={{flex:3,padding:"13px",borderRadius:C.radiusSm,border:"none",background:canNext[step]?C.red:"#EBEBEB",color:canNext[step]?"#fff":C.muted,fontSize:"14px",fontWeight:600,cursor:canNext[step]?"pointer":"not-allowed",fontFamily:C.font,WebkitTapHighlightColor:"transparent"}}>Continue</button>
           ):(
             <button onClick={handleGenerate} style={{flex:3,padding:"13px",borderRadius:C.radiusSm,border:"none",background:C.red,color:"#fff",fontSize:"14px",fontWeight:600,cursor:"pointer",fontFamily:C.font,WebkitTapHighlightColor:"transparent",display:"flex",alignItems:"center",justifyContent:"center",gap:"7px"}}>
