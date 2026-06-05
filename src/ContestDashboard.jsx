@@ -691,7 +691,7 @@ export default function ContestDashboard() {
             )}
 
             {/* ── JUNE VLI — active contest ── */}
-            {vliPremiumJun > 0 && (() => {
+            {data && (() => {
               const vd = getVliData("Jun");
               return (
                 <>
