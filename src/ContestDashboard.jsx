@@ -419,7 +419,7 @@ export default function ContestDashboard() {
       {showVliLb && (
         <LeaderboardOverlay
           title="Health Payout Incentive (VLI)"
-          subtitle="Top 10 · VLI Premium · Apr 2026"
+          subtitle="Top 10 · VLI Premium · Jun 2026"
           entries={vliLeaderboard}
           loading={lbLoading}
           myGid={gidCode || gid}
