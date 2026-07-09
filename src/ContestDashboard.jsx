@@ -15,16 +15,7 @@ const SLABS = [
 ];
 const JEETO_TOTAL = 450000;
 
-const VLI_SLABS = [
-  { min: 25000,  amt: "25K",  pct: "4%"  },
-  { min: 50000,  amt: "50K",  pct: "6%"  },
-  { min: 75000,  amt: "75K",  pct: "7%"  },
-  { min: 100000, amt: "1L",   pct: "8%"  },
-  { min: 150000, amt: "1.5L", pct: "10%" },
-  { min: 200000, amt: "2L",   pct: "12%" },
-  { min: 300000, amt: "3L",   pct: "15%" },
-];
-const VLI_TOTAL = 315000;
+
 
 /* ── HELPERS ─────────────────────────────────────────────────── */
 function parseLakh(val) {
@@ -353,53 +344,6 @@ export default function ContestDashboard() {
   const { cur: gCur, nxt: gNxt } = getSlabInfo(goldBooked, GOLD_SLABS);
   const GOLD_TOTAL = 1200000;
 
-  // April VLI
-  const vliPremiumApr = data ? parseRaw(data["vli premium"] || 0) : 0;
-  const vliPctApr     = data ? parseRaw(data["vli %"] || 0) : 0;
-  const vliAmountApr  = data ? parseRaw(data["vli amount"] || 0) : 0;
-  // May VLI
-  const vliPremiumMay = data ? parseRaw(data["vli premium may"] || 0) : 0;
-  const vliPctMay     = data ? parseRaw(data["vli % may"]       || 0) : 0;
-  const vliAmountMay  = data ? parseRaw(data["vli amount may"]  || 0) : 0;
-  // April Second
-  const secondNopApr  = data ? Math.round(parseRaw(data["second nop"]     || 0)) : 0;
-  // May Second
-  const secondNopMay  = data ? Math.round(parseRaw(data["second nop may"] || 0)) : 0;
-  // June VLI
-  const vliPremiumJun = data ? parseRaw(data["vli premium jun"] || 0) : 0;
-  const vliPctJun     = data ? parseRaw(data["vli % jun"]       || 0) : 0;
-  const vliAmountJun  = data ? parseRaw(data["vli amount jun"]  || 0) : 0;
-  // June Second
-  const secondNopJun  = data ? Math.round(parseRaw(data["second nop jun"] || 0)) : 0;
-
-  // Pick data based on contest month
-  function getVliData(month) {
-    const m = (month || "").toLowerCase();
-    const isJun = m.includes("jun");
-    const isMay = m.includes("may");
-    const premium = isJun ? vliPremiumJun : isMay ? vliPremiumMay : vliPremiumApr;
-    const pct     = isJun ? vliPctJun     : isMay ? vliPctMay     : vliPctApr;
-    const amount  = isJun ? vliAmountJun  : isMay ? vliAmountMay  : vliAmountApr;
-    const pctDisplay = pct > 0 ? (pct * 100).toFixed(0) + "%" : "0%";
-    const { cur: vCur, nxt: vNxt } = getSlabInfo(premium, VLI_SLABS);
-    return { premium, pct, amount, pctDisplay, vCur, vNxt };
-  }
-  function getSecondData(month) {
-    const m = (month || "").toLowerCase();
-    if (m.includes("jun")) return secondNopJun;
-    if (m.includes("may")) return secondNopMay;
-    return secondNopApr;
-  }
-
-  // VLI legacy refs
-  const vliPremium    = vliPremiumApr;
-  const vliPctRaw     = vliPctApr;
-  const vliAmount     = vliAmountApr;
-  const vliPctDisplay = vliPctRaw > 0 ? (vliPctRaw * 100).toFixed(0) + "%" : "0%";
-  const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremium, VLI_SLABS);
-  const secondNop  = secondNopApr;
-  const showSecond = data !== null;
-  const showVLI    = vliPremium > 0;
 
   return (
     <div style={{ fontFamily: C.font }}>
@@ -416,24 +360,6 @@ export default function ContestDashboard() {
           valueLabel="Net Booked Premium"
           formatValue={v => fmtL(v * 100000)}
           onClose={() => setShowLb(false)}
-        />
-      )}
-
-      {/* ── VLI LEADERBOARD OVERLAY ── */}
-      {showVliLb && (
-        <LeaderboardOverlay
-          title="Health Payout Incentive (VLI)"
-          subtitle="Top 10 · VLI Premium · Jun 2026"
-          entries={vliLeaderboard}
-          loading={lbLoading}
-          myGid={gidCode || gid}
-          valueKey="vliPremium"
-          valueLabel="VLI Premium"
-          formatValue={v => fmtL(v)}
-          extraKey="vliAmount"
-          extraLabel="VLI Amount"
-          formatExtra={v => "Rs." + Math.round(v).toLocaleString("en-IN")}
-          onClose={() => setShowVliLb(false)}
         />
       )}
 
@@ -513,7 +439,7 @@ export default function ContestDashboard() {
         )}
 
         {/* EMPTY STATE — data loaded but no contest activity yet */}
-        {data && !loading && !showJeeto && !showVLI && (
+        {data && !loading && !showJeeto && (
           <div style={{ background: C.card, borderRadius: C.radius, padding: "32px 20px",
             marginTop: "12px", boxShadow: C.shadow, textAlign: "center" }}>
             <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: C.redLight,
