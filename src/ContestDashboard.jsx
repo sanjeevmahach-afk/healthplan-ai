@@ -5,16 +5,15 @@ import { Analytics } from "./analytics";
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec";
 
-/* ── SLABS ───────────────────────────────────────────────────── */
+/* ── SLABS — JEETO JULY ──────────────────────────────────────── */
 const SLABS = [
-  { min: 100000,  amt: "1L",  reward: "2K Cash"        },
-  { min: 200000,  amt: "2L",  reward: "5K Cash"        },
-  { min: 300000,  amt: "3L",  reward: "10K Cash"       },
-  { min: 400000,  amt: "4L",  reward: "Thailand 1 Pax" },
-  { min: 700000,  amt: "7L",  reward: "Thailand 2 Pax" },
-  { min: 1400000, amt: "14L", reward: "Thailand 4 Pax" },
+  { min: 75000,   amt: "75K",  reward: "Rs.1K Cash"    },
+  { min: 100000,  amt: "1L",   reward: "Rs.4K Cash"    },
+  { min: 200000,  amt: "2L",   reward: "Rs.15K Cash"   },
+  { min: 300000,  amt: "3L",   reward: "Goa 1 Pax"     },
+  { min: 450000,  amt: "4.5L", reward: "Thailand 1 Pax"},
 ];
-const THAILAND_TOTAL = 1470000;
+const JEETO_TOTAL = 450000;
 
 const VLI_SLABS = [
   { min: 25000,  amt: "25K",  pct: "4%"  },
@@ -47,12 +46,11 @@ function fmtLakhFixed(n) {
 }
 function getSlabReward(bookedLakhs) {
   const n = bookedLakhs * 100000;
-  if (n >= 1400000) return "Thailand 4 Pax";
-  if (n >= 700000)  return "Thailand 2 Pax";
-  if (n >= 400000)  return "Thailand 1 Pax";
-  if (n >= 300000)  return "10K Cash";
-  if (n >= 200000)  return "5K Cash";
-  if (n >= 100000)  return "2K Cash";
+  if (n >= 450000) return "Thailand 1 Pax";
+  if (n >= 300000) return "Goa 1 Pax";
+  if (n >= 200000) return "Rs.15K Cash";
+  if (n >= 100000) return "Rs.4K Cash";
+  if (n >= 75000)  return "Rs.1K Cash";
   return null;
 }
 function getSlabInfo(premium, slabs) {
@@ -196,11 +194,11 @@ function LeaderboardOverlay({ title, subtitle, entries, loading, myGid, onClose,
                           padding: "2px 5px" }}>You</span>
                       )}
                     </div>
-                    {/* Reward slab badge — Thailand only */}
+                    {/* Reward slab badge */}
                     {valueKey === "booked" && (() => {
                       const reward = getSlabReward(val);
                       if (!reward) return null;
-                      const isTrip = reward.includes("Thailand");
+                      const isTrip = reward.includes("Thailand") || reward.includes("Goa");
                       return (
                         <span style={{ fontSize: "9px", fontWeight: 700,
                           background: isTrip ? "#FEF3C7" : C.greenLight,
@@ -338,7 +336,12 @@ export default function ContestDashboard() {
   const booked    = data ? parseLakh(data["net booked premium"]  || 0) : 0;
   const offer     = data ? (data["offer"] || "") : "";
   const gidCode   = data ? (data["gid"] || gid.toUpperCase()) : "";
-  const { cur: tCur, nxt: tNxt } = getSlabInfo(booked, SLABS);
+
+  // July — Jeeto July
+  const jeetoSourced = data ? parseRaw(data["jeeto sourced"] || 0) : 0;
+  const jeetoBooked  = data ? parseRaw(data["jeeto booked"]  || 0) : 0;
+  const { cur: tCur, nxt: tNxt } = getSlabInfo(jeetoBooked, SLABS);
+  const showJeeto = data !== null;
 
   // April VLI
   const vliPremiumApr = data ? parseRaw(data["vli premium"] || 0) : 0;
@@ -378,7 +381,7 @@ export default function ContestDashboard() {
     return secondNopApr;
   }
 
-  // Legacy refs for Thailand card
+  // VLI legacy refs
   const vliPremium    = vliPremiumApr;
   const vliPctRaw     = vliPctApr;
   const vliAmount     = vliAmountApr;
@@ -386,8 +389,7 @@ export default function ContestDashboard() {
   const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremium, VLI_SLABS);
   const secondNop  = secondNopApr;
   const showSecond = data !== null;
-  const showThailand = booked > 0 || sourced > 0;
-  const showVLI      = vliPremium > 0;
+  const showVLI    = vliPremium > 0;
 
   // Fallback past contests — April and May are past, June is active
   const effectivePastContests = pastContests.length > 0 ? pastContests : [
@@ -400,10 +402,10 @@ export default function ContestDashboard() {
   return (
     <div style={{ fontFamily: C.font }}>
 
-      {/* ── THAILAND LEADERBOARD OVERLAY ── */}
+      {/* ── JEETO JULY LEADERBOARD OVERLAY ── */}
       {showLb && (
         <LeaderboardOverlay
-          title="Thailand Chalo"
+          title="Jeeto July"
           subtitle="Top 10 · Net Booked Premium"
           entries={leaderboard}
           loading={lbLoading}
@@ -509,7 +511,7 @@ export default function ContestDashboard() {
         )}
 
         {/* EMPTY STATE — data loaded but no contest activity yet */}
-        {data && !loading && !showThailand && !showVLI && (
+        {data && !loading && !showJeeto && !showVLI && (
           <div style={{ background: C.card, borderRadius: C.radius, padding: "32px 20px",
             marginTop: "12px", boxShadow: C.shadow, textAlign: "center" }}>
             <div style={{ width: "52px", height: "52px", borderRadius: "50%", background: C.redLight,
@@ -557,17 +559,17 @@ export default function ContestDashboard() {
                 textTransform: "uppercase", letterSpacing: "0.08em" }}>Active Contest</div>
             </div>
 
-            {/* ── THAILAND CHALO ── */}
-            {showThailand && (
+            {/* ── JEETO JULY ── */}
+            {showJeeto && (
               <>
-                <SectionHeader title="Thailand Chalo" subtitle="Apr – Jun 2026  |  Payment window" />
+                <SectionHeader title="Jeeto July" subtitle="Apr – Jun 2026  |  Payment window" />
                 <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
                   boxShadow: C.shadow, marginBottom: "4px" }}>
 
                   {/* Numbers */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                    <StatTile label="Wtd. Premium - Booked"  value={fmtL(booked)}  valueColor={C.red} />
-                    <StatTile label="Wtd. Premium - Sourced" value={fmtL(sourced)} valueColor={C.muted} />
+                    <StatTile label="Net Booked Premium"  value={fmtL(jeetoBooked)}  valueColor={C.red} />
+                    <StatTile label="Net Sourced Premium" value={fmtL(jeetoSourced)} valueColor={C.muted} />
                   </div>
 
                   {/* Bar */}
@@ -576,11 +578,11 @@ export default function ContestDashboard() {
                       {/* Sourced underlay */}
                       <div style={{ height: "8px", background: "#E8ECF4", borderRadius: "99px", overflow: "hidden", position: "relative" }}>
                         <div style={{ position: "absolute", top: 0, bottom: 0, left: 0,
-                          width: Math.min(100,(sourced/THAILAND_TOTAL)*100) + "%",
+                          width: Math.min(100,(sourced/JEETO_TOTAL)*100) + "%",
                           background: "#FCA5A5", borderRadius: "99px",
                           transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
                         <div style={{ position: "absolute", top: 0, bottom: 0, left: 0,
-                          width: Math.min(100,(booked/THAILAND_TOTAL)*100) + "%",
+                          width: Math.min(100,(booked/JEETO_TOTAL)*100) + "%",
                           background: C.red, borderRadius: "99px",
                           transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
                       </div>
@@ -588,8 +590,8 @@ export default function ContestDashboard() {
                     {/* Amount ticks */}
                     <div style={{ position: "relative", height: "18px" }}>
                       {SLABS.map((s, i) => {
-                        const pct = Math.min(96, (s.min / THAILAND_TOTAL) * 100);
-                        const ach = booked >= s.min;
+                        const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
+                        const ach = jeetoBooked >= s.min;
                         return (
                           <div key={i} style={{ position: "absolute", left: pct + "%",
                             transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
@@ -604,8 +606,8 @@ export default function ContestDashboard() {
                   {/* Reward pills */}
                   <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "4px", marginBottom: "12px" }}>
                     {SLABS.map((s, i) => {
-                      const bAch = booked >= s.min;
-                      const sAch = sourced >= s.min;
+                      const bAch = jeetoBooked >= s.min;
+                      const sAch = jeetoSourced >= s.min;
                       return (
                         <div key={i} style={{ flexShrink: 0, borderRadius: C.radiusSm, padding: "6px 10px",
                           background: bAch ? C.greenLight : sAch ? "#FFF7ED" : C.bg,
@@ -636,13 +638,13 @@ export default function ContestDashboard() {
                     border: `1px solid ${tNxt ? "#FECACA" : "#86EFAC"}`,
                     fontSize: "12px", color: tNxt ? C.red : C.green }}>
                     {tNxt
-                      ? <>Book <strong>{fmtL(tNxt.min - booked)} more</strong> to unlock {tNxt.reward}</>
-                      : <strong>Top slab achieved — Thailand for 4!</strong>
+                      ? <>Book <strong>{fmtL(tNxt.min - jeetoBooked)} more</strong> to unlock {tNxt.reward}</>
+                      : <strong>Top slab — Thailand 1 Pax unlocked!</strong>
                     }
                   </div>
 
                   {/* Leaderboard tile */}
-                  <div onClick={() => { setShowLb(true); Analytics.leaderboardOpen("Thailand Chalo"); }}
+                  <div onClick={() => { setShowLb(true); Analytics.leaderboardOpen("Jeeto July"); }}
                     style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
                       background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
                       cursor: "pointer", border: `1px solid ${C.border}`,
@@ -656,7 +658,7 @@ export default function ContestDashboard() {
                       </svg>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Thailand Chalo Leaderboard</div>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Jeeto July Leaderboard</div>
                       <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners by Net Booked</div>
                     </div>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -683,7 +685,7 @@ export default function ContestDashboard() {
                       {tCur ? tCur.reward : "No slab yet"}
                     </div>
                     <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>
-                      {tNxt ? `${fmtL(tNxt.min - booked)} more to upgrade to ${tNxt.reward}` : "Booking allowed till 10 Jul 2026"}
+                      {tNxt ? `${fmtL(tNxt.min - jeetoBooked)} more to upgrade to ${tNxt.reward}` : "Booking allowed till 10 Aug 2026"}
                     </div>
                   </div>
                 </div>
@@ -949,8 +951,8 @@ export default function ContestDashboard() {
             {/* Dates */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "20px" }}>
               {[
-                { label: "Thailand Payment", value: "1 Apr – 30 Jun 2026" },
-                { label: "Thailand Booking", value: "Till 10 Jul 2026"    },
+                { label: "Jeeto July Period", value: "1 Jul – 31 Jul 2026" },
+                { label: "Booking Allowed Till", value: "10 Aug 2026"    },
               ].map((d, i) => (
                 <div key={i} style={{ background: C.card, borderRadius: C.radiusSm, padding: "10px 12px", boxShadow: C.shadow }}>
                   <div style={{ fontSize: "10px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{d.label}</div>
