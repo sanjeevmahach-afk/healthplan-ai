@@ -338,8 +338,8 @@ export default function ContestDashboard() {
   const goldBooked  = data ? parseRaw(data["gold booked"]  || 0) : 0;
   const goldSourced = data ? parseRaw(data["gold sourced"] || 0) : 0;
   const GOLD_SLABS = [
-    { min: 800000,  reward: "Gold Voucher Rs.65,000 (~5g Gold)"  },
-    { min: 1200000, reward: "Gold Voucher Rs.1,30,000 (~10g Gold)" },
+    { min: 800000,  reward: "Gold Voucher Rs.65,000"  },
+    { min: 1200000, reward: "Gold Voucher Rs.1,30,000" },
   ];
   const { cur: gCur, nxt: gNxt } = getSlabInfo(goldBooked, GOLD_SLABS);
   const GOLD_TOTAL = 1200000;
@@ -676,8 +676,8 @@ export default function ContestDashboard() {
                   {/* Slab cards */}
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
                     {[
-                      { slab: "8L", reward: "Rs.65,000", sub: "~5g Gold",   min: 800000  },
-                      { slab: "12L", reward: "Rs.1,30,000", sub: "~10g Gold", min: 1200000 },
+                      { slab: "8L", reward: "Rs.65,000", sub: "",   min: 800000  },
+                      { slab: "12L", reward: "Rs.1,30,000", sub: "", min: 1200000 },
                     ].map((s, i) => {
                       const ach = goldBooked >= s.min;
                       return (
