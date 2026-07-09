@@ -343,6 +343,16 @@ export default function ContestDashboard() {
   const { cur: tCur, nxt: tNxt } = getSlabInfo(jeetoBooked, SLABS);
   const showJeeto = data !== null;
 
+  // July — Gold Jackpot
+  const goldBooked  = data ? parseRaw(data["gold booked"]  || 0) : 0;
+  const goldSourced = data ? parseRaw(data["gold sourced"] || 0) : 0;
+  const GOLD_SLABS = [
+    { min: 800000,  reward: "Gold Voucher Rs.65,000 (~5g Gold)"  },
+    { min: 1200000, reward: "Gold Voucher Rs.1,30,000 (~10g Gold)" },
+  ];
+  const { cur: gCur, nxt: gNxt } = getSlabInfo(goldBooked, GOLD_SLABS);
+  const GOLD_TOTAL = 1200000;
+
   // April VLI
   const vliPremiumApr = data ? parseRaw(data["vli premium"] || 0) : 0;
   const vliPctApr     = data ? parseRaw(data["vli %"] || 0) : 0;
@@ -390,14 +400,6 @@ export default function ContestDashboard() {
   const secondNop  = secondNopApr;
   const showSecond = data !== null;
   const showVLI    = vliPremium > 0;
-
-  // Fallback past contests — April and May are past, June is active
-  const effectivePastContests = pastContests.length > 0 ? pastContests : [
-    ...(showVLI       ? [{ name: "Health Payout Incentive", type: "vli",    month: "April" }] : []),
-    ...(showSecond    ? [{ name: "Second Policy Contest",   type: "second", month: "April" }] : []),
-    ...(vliPremiumMay > 0  ? [{ name: "Health Payout Incentive", type: "vli",    month: "May" }] : []),
-    ...(secondNopMay  >= 0 && data ? [{ name: "Second Policy Contest", type: "second", month: "May" }] : []),
-  ];
 
   return (
     <div style={{ fontFamily: C.font }}>
@@ -562,7 +564,7 @@ export default function ContestDashboard() {
             {/* ── JEETO JULY ── */}
             {showJeeto && (
               <>
-                <SectionHeader title="Jeeto July" subtitle="Apr – Jun 2026  |  Payment window" />
+                <SectionHeader title="Jeeto July" subtitle="Jul 2026  |  Booking till 10 Aug" />
                 <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
                   boxShadow: C.shadow, marginBottom: "4px" }}>
 
@@ -692,261 +694,88 @@ export default function ContestDashboard() {
               </>
             )}
 
-            {/* ── JUNE VLI — active contest ── */}
-            {data && (() => {
-              const vd = getVliData("Jun");
-              return (
-                <>
-                  <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Jun 2026  |  Max 15%" />
-                  <div style={{ background: C.card, borderRadius: C.radius, padding: "16px", boxShadow: C.shadow, marginBottom: "4px" }}>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                      <StatTile label="VLI Premium" value={fmtL(vd.premium)} valueColor={C.red} />
-                      <StatTile label="VLI %" value={vd.pctDisplay} valueColor={C.green} />
-                      <StatTile label="VLI Amount" value={"Rs." + Math.round(vd.amount).toLocaleString("en-IN")} valueColor={C.red} />
+
+            {/* ── GOLD JACKPOT ── */}
+            {data && (
+              <>
+                <SectionHeader title="Gold Jackpot" subtitle="Jul – Sep 2026  |  Booking till 10 Oct 2026" />
+                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+                  boxShadow: C.shadow, marginBottom: "4px" }}>
+
+                  {/* Numbers */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium"  value={fmtL(goldBooked)}  valueColor={C.red} />
+                    <StatTile label="Net Sourced Premium" value={fmtL(goldSourced)} valueColor={C.muted} />
+                  </div>
+
+                  {/* Progress bar */}
+                  <div style={{ marginBottom: "8px" }}>
+                    <div style={{ height: "8px", background: "#E8ECF4", borderRadius: "99px", overflow: "hidden", position: "relative" }}>
+                      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0,
+                        width: Math.min(100, (goldBooked / GOLD_TOTAL) * 100) + "%",
+                        background: "#B8860B", borderRadius: "99px",
+                        transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
                     </div>
-                    <ProgressBar value={vd.premium} total={VLI_TOTAL} />
-                    <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
-                      {VLI_SLABS.map((s, i) => {
-                        const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
-                        const ach = vd.premium >= s.min;
+                    {/* Slab ticks */}
+                    <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "4px" }}>
+                      {GOLD_SLABS.map((s, i) => {
+                        const pct = Math.min(96, (s.min / GOLD_TOTAL) * 100);
+                        const ach = goldBooked >= s.min;
                         return (
                           <div key={i} style={{ position: "absolute", left: pct + "%",
                             transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
-                            color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
-                            {s.pct}
+                            color: ach ? "#B8860B" : C.hint, whiteSpace: "nowrap" }}>
+                            {s.min >= 1000000 ? (s.min/100000).toFixed(0)+"L" : (s.min/100000).toFixed(0)+"L"}
                           </div>
                         );
                       })}
                     </div>
-                    <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                      background: vd.vNxt ? C.redLight : C.greenLight,
-                      border: `1px solid ${vd.vNxt ? "#FECACA" : "#86EFAC"}`,
-                      fontSize: "12px", color: vd.vNxt ? C.red : C.green }}>
-                      {vd.vNxt
-                        ? <>Book <strong>{fmtL(vd.vNxt.min - vd.premium)} more</strong> to unlock {vd.vNxt.pct} extra payout</>
-                        : <strong>Top VLI slab — earning 15% extra payout!</strong>}
-                    </div>
-                    <div onClick={() => { setShowVliLb(true); Analytics.leaderboardOpen("VLI"); }}
-                      style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
-                        background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
-                        cursor: "pointer", border: `1px solid ${C.border}`, WebkitTapHighlightColor: "transparent" }}>
-                      <div style={{ width: "34px", height: "34px", background: C.greenLight, borderRadius: "8px",
-                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                          <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>VLI Leaderboard</div>
-                        <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners by VLI Premium</div>
-                      </div>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                        <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
                   </div>
-                </>
-              );
-            })()}
 
-            {/* ── JUNE SECOND POLICY — active contest ── */}
-            {secondNopJun >= 0 && data && (() => {
-              const sn = secondNopJun;
-              return (
-                <>
-                  <SectionHeader title="Second Policy Contest" subtitle="3 Jun – 10 Jun 2026  |  Rs.1,600 on 2nd Policy" />
-                  <div style={{ background: C.card, borderRadius: C.radius, padding: "16px", boxShadow: C.shadow, marginBottom: "4px" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
-                      <div>
-                        <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
-                        <div style={{ fontSize: "32px", fontWeight: 700, color: sn >= 2 ? C.green : C.red }}>
-                          {sn}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span>
-                        </div>
-                      </div>
-                      <div style={{ textAlign: "right" }}>
-                        <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
-                        <div style={{ fontSize: "24px", fontWeight: 700, color: sn >= 2 ? C.green : C.muted }}>{sn >= 2 ? "Rs.1,600" : "Rs.0"}</div>
-                      </div>
-                    </div>
-                    <div style={{ position: "relative", marginBottom: "20px" }}>
-                      <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px", height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
-                        <div style={{ height: "100%", borderRadius: "99px", background: C.red,
-                          width: sn >= 2 ? "100%" : sn === 1 ? "50%" : "0%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
-                      </div>
-                      <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
-                        {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.1,600"}].map((m, i) => {
-                          const achieved = sn >= m.count && m.count > 0;
-                          const isCurrent = sn === m.count;
-                          return (
-                            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
-                              <div style={{ fontSize: "10px", fontWeight: 700, height: "16px", color: achieved ? C.green : C.hint }}>{m.reward || ""}</div>
-                              <div style={{ width: "32px", height: "32px", borderRadius: "50%",
-                                background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border,
-                                border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`,
-                                display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
-                                {achieved
-                                  ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                  : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
-                              </div>
-                              <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center", color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                      background: sn >= 2 ? C.greenLight : C.redLight,
-                      border: `1px solid ${sn >= 2 ? "#86EFAC" : "#FECACA"}`,
-                      fontSize: "12px", color: sn >= 2 ? C.green : C.red }}>
-                      {sn >= 2 ? <strong>Reward unlocked — Rs.1,600 earned!</strong>
-                        : sn === 1 ? <>1 more policy needed to unlock <strong>Rs.1,600 reward</strong></>
-                        : <>Source <strong>2 policies (3–10 Jun)</strong> with min Rs.20,000 premium each to earn Rs.1,600</>}
-                    </div>
-                    <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.6 }}>
-                      New, PA, Port Fresh, Multi Year and PSU policies counted. Min premium Rs.20,000 per policy.
-                      Both policies must be sourced 3–10 Jun and booked till 30 Jun.
-                      Port Renewal, Renewal, Cancelled and 0% payout cases excluded.
-                    </div>
+                  {/* Status message */}
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
+                    background: gNxt ? "#FEF3C7" : "#D4AF3720",
+                    border: `1px solid ${gNxt ? "#FCD34D" : "#B8860B"}`,
+                    fontSize: "12px", color: gNxt ? "#92400E" : "#B8860B" }}>
+                    {gCur
+                      ? gNxt
+                        ? <>Unlocked <strong>{gCur.reward}</strong> — Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to upgrade to {gNxt.reward}</>
+                        : <strong>🥇 Top slab achieved — {gCur.reward}!</strong>
+                      : gNxt
+                        ? <>Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to unlock <strong>{gNxt.reward}</strong></>
+                        : <strong>Start booking to win Gold!</strong>
+                    }
                   </div>
-                </>
-              );
-            })()}
 
-            {/* ── PAST CONTESTS HEADER ── */}
-            {data && effectivePastContests.length > 0 && (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "24px", marginBottom: "4px" }}>
-                <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.muted, flexShrink: 0 }} />
-                <div style={{ fontSize: "12px", fontWeight: 700, color: C.muted,
-                  textTransform: "uppercase", letterSpacing: "0.08em" }}>Past Contests</div>
-              </div>
-            )}
-
-            {/* ── DYNAMIC PAST CONTESTS ── */}
-            {data && effectivePastContests.map((contest, ci) => {
-              const key = contest.type + "_" + ci;
-              const isExpanded = expandedPast === key;
-              const vd = contest.type === "vli" ? getVliData(contest.month) : null;
-              const sn = contest.type === "second" ? getSecondData(contest.month) : null;
-              if (contest.type === "vli" && vd && vd.premium === 0) return null;
-              return (
-                <div key={key} style={{ background: C.card, borderRadius: C.radius,
-                  boxShadow: C.shadow, marginBottom: "8px", overflow: "hidden" }}>
-                  <div onClick={() => setExpandedPast(isExpanded ? null : key)}
-                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
-                      padding: "14px 16px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
-                    <div style={{ fontSize: "14px", fontWeight: 600, color: C.muted }}>
-                      {contest.name} · {contest.month}
-                    </div>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                      style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }}>
-                      <path d="M6 9L12 15L18 9" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                  {/* Slab cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
+                    {[
+                      { slab: "8L", reward: "Rs.65,000", sub: "~5g Gold",   min: 800000  },
+                      { slab: "12L", reward: "Rs.1,30,000", sub: "~10g Gold", min: 1200000 },
+                    ].map((s, i) => {
+                      const ach = goldBooked >= s.min;
+                      return (
+                        <div key={i} style={{ background: ach ? "#FEF3C7" : C.bg,
+                          border: `1px solid ${ach ? "#FCD34D" : C.border}`,
+                          borderRadius: C.radiusSm, padding: "10px 12px" }}>
+                          <div style={{ fontSize: "10px", color: C.muted, fontWeight: 600,
+                            textTransform: "uppercase", letterSpacing: "0.05em" }}>₹{s.slab} slab</div>
+                          <div style={{ fontSize: "14px", fontWeight: 700,
+                            color: ach ? "#B8860B" : C.text, marginTop: "2px" }}>{s.reward}</div>
+                          <div style={{ fontSize: "10px", color: C.muted, marginTop: "2px" }}>{s.sub}</div>
+                          {ach && <div style={{ fontSize: "10px", color: "#B8860B", fontWeight: 600, marginTop: "4px" }}>✓ Unlocked</div>}
+                        </div>
+                      );
+                    })}
                   </div>
-                  {isExpanded && contest.type === "vli" && vd && (
-                    <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
-                      <div style={{ paddingTop: "14px", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                        <StatTile label="VLI Premium" value={fmtL(vd.premium)} valueColor={C.red} />
-                        <StatTile label="VLI %" value={vd.pctDisplay} valueColor={C.green} />
-                        <StatTile label="VLI Amount" value={"Rs." + Math.round(vd.amount).toLocaleString("en-IN")} valueColor={C.red} />
-                      </div>
-                      <ProgressBar value={vd.premium} total={VLI_TOTAL} />
-                      <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
-                        {VLI_SLABS.map((s, i) => {
-                          const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
-                          const ach = vd.premium >= s.min;
-                          return (
-                            <div key={i} style={{ position: "absolute", left: pct + "%",
-                              transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
-                              color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
-                              {s.pct}
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                        background: vd.vNxt ? C.redLight : C.greenLight,
-                        border: `1px solid ${vd.vNxt ? "#FECACA" : "#86EFAC"}`,
-                        fontSize: "12px", color: vd.vNxt ? C.red : C.green }}>
-                        {vd.vNxt
-                          ? <>Earned at <strong>{vd.vCur ? vd.vCur.pct : "base"}</strong> slab</>
-                          : <strong>Top VLI slab achieved — 15% extra payout!</strong>}
-                      </div>
-                      <div onClick={() => { setShowVliLb(true); Analytics.leaderboardOpen("VLI"); }}
-                        style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
-                          background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
-                          cursor: "pointer", border: `1px solid ${C.border}`, WebkitTapHighlightColor: "transparent" }}>
-                        <div style={{ width: "34px", height: "34px", background: C.greenLight, borderRadius: "8px",
-                          display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>VLI Leaderboard</div>
-                          <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners by VLI Premium</div>
-                        </div>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                          <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                  {isExpanded && contest.type === "second" && (
-                    <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: "14px", marginBottom: "16px" }}>
-                        <div>
-                          <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
-                          <div style={{ fontSize: "32px", fontWeight: 700, color: sn >= 2 ? C.green : C.red }}>
-                            {sn}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span>
-                          </div>
-                        </div>
-                        <div style={{ textAlign: "right" }}>
-                          <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
-                          <div style={{ fontSize: "24px", fontWeight: 700, color: sn >= 2 ? C.green : C.muted }}>{sn >= 2 ? "Rs.800" : "Rs.0"}</div>
-                        </div>
-                      </div>
-                      <div style={{ position: "relative", marginBottom: "20px" }}>
-                        <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px", height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
-                          <div style={{ height: "100%", borderRadius: "99px", background: C.red,
-                            width: sn >= 2 ? "100%" : sn === 1 ? "50%" : "0%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
-                          {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.800"}].map((m, i) => {
-                            const achieved = sn >= m.count && m.count > 0;
-                            const isCurrent = sn === m.count;
-                            return (
-                              <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
-                                <div style={{ fontSize: "10px", fontWeight: 700, height: "16px", color: achieved ? C.green : C.hint }}>{m.reward || ""}</div>
-                                <div style={{ width: "32px", height: "32px", borderRadius: "50%",
-                                  background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border,
-                                  border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`,
-                                  display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
-                                  {achieved
-                                    ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                    : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
-                                </div>
-                                <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center", color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                      <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                        background: sn >= 2 ? C.greenLight : C.redLight,
-                        border: `1px solid ${sn >= 2 ? "#86EFAC" : "#FECACA"}`,
-                        fontSize: "12px", color: sn >= 2 ? C.green : C.red }}>
-                        {sn >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong>
-                          : sn === 1 ? <>1 more policy needed to unlock <strong>Rs.800 reward</strong></>
-                          : <>Do <strong>2 New/PA policies</strong> (min Rs.15,000 each) to earn Rs.800</>}
-                      </div>
-                      <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
-                        Only New and PA policies counted. Min premium Rs.15,000 per policy. Port, Renewal and Cancelled cases excluded.
-                      </div>
-                    </div>
-                  )}
+
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
+                    New Business carries 100% weightage. Port carries 50% weightage.
+                    Only policies with SI ≥ 10L considered.
+                  </div>
                 </div>
-              );
-            })}
+              </>
+            )}
 
             {/* Dates */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "20px" }}>
