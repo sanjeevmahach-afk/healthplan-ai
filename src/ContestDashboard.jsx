@@ -5,6 +5,18 @@ import { Analytics } from "./analytics";
 const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec";
 
+/* ── VLI SLABS — JULY ───────────────────────────────────────── */
+const VLI_SLABS = [
+  { min: 20000,  amt: "20K",  pct: "4%"  },
+  { min: 50000,  amt: "50K",  pct: "6%"  },
+  { min: 75000,  amt: "75K",  pct: "7%"  },
+  { min: 100000, amt: "1L",   pct: "8%"  },
+  { min: 150000, amt: "1.5L", pct: "10%" },
+  { min: 200000, amt: "2L",   pct: "12%" },
+  { min: 300000, amt: "3L",   pct: "15%" },
+];
+const VLI_TOTAL = 300000;
+
 /* ── SLABS — JEETO JULY ──────────────────────────────────────── */
 const SLABS = [
   { min: 75000,   amt: "75K",  reward: "Rs.1K Cash"    },
@@ -334,6 +346,13 @@ export default function ContestDashboard() {
   const { cur: tCur, nxt: tNxt } = getSlabInfo(jeetoBooked, SLABS);
   const showJeeto = data !== null;
 
+  // July — VLI July (from Jeeto July Summary cols E, F, G)
+  const vliPremJul = data ? parseRaw(data["vli premium jul"] || 0) : 0;
+  const vliPctJul  = data ? parseRaw(data["vli % jul"]       || 0) : 0;
+  const vliAmtJul  = data ? parseRaw(data["vli amount jul"]  || 0) : 0;
+  const vliPctDisplay = vliPctJul > 0 ? (vliPctJul * 100).toFixed(0) + "%" : "0%";
+  const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremJul, VLI_SLABS);
+
   // July — Gold Jackpot
   const goldBooked  = data ? parseRaw(data["gold booked"]  || 0) : 0;
   const goldSourced = data ? parseRaw(data["gold sourced"] || 0) : 0;
@@ -620,6 +639,43 @@ export default function ContestDashboard() {
               </>
             )}
 
+
+            {/* ── VLI JULY ── */}
+            {data && (
+              <>
+                <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Jul 2026  |  Upto 15% extra payout" />
+                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+                  boxShadow: C.shadow, marginBottom: "4px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
+                    <StatTile label="VLI Premium" value={fmtL(vliPremJul)} valueColor={C.red} />
+                    <StatTile label="VLI %" value={vliPctDisplay} valueColor={C.green} />
+                    <StatTile label="VLI Amount" value={"Rs." + Math.round(vliAmtJul).toLocaleString("en-IN")} valueColor={C.red} />
+                  </div>
+                  <ProgressBar value={vliPremJul} total={VLI_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
+                    {VLI_SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
+                      const ach = vliPremJul >= s.min;
+                      return (
+                        <div key={i} style={{ position: "absolute", left: pct + "%",
+                          transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
+                          color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
+                          {s.pct}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
+                    background: vNxt ? C.redLight : C.greenLight,
+                    border: `1px solid ${vNxt ? "#FECACA" : "#86EFAC"}`,
+                    fontSize: "12px", color: vNxt ? C.red : C.green }}>
+                    {vNxt
+                      ? <>Book <strong>{fmtL(vNxt.min - vliPremJul)} more</strong> to unlock {vNxt.pct} extra payout</>
+                      : <strong>Top VLI slab — earning 15% extra payout!</strong>}
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* ── GOLD JACKPOT ── */}
             {data && (
