@@ -296,8 +296,7 @@ function HomeScreen({ onNavigate }) {
   const totalDisplay = useCountUp(visits.total, 1400);
 
   const BANNERS = [
-    { src: "/App banner Thailand Chalo.png", alt: "Thailand Chalo Contest" },
-    { src: "/VLI_4__Banner.png",             alt: "VLI Health Payout May"  },
+    { src: "/VLI_4__Banner.png", alt: "VLI Health Payout" },
   ];
 
   /* ── VISIT COUNTER — both cross-device via Apps Script ── */
