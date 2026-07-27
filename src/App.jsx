@@ -2,7 +2,7 @@ import { C } from './theme';
 import { useState, useEffect, useRef } from "react";
 import HealthRecommender    from "./HealthRecommender";
 import ContestDashboard     from "./ContestDashboard";
-import CommissionCalculator from "./CommissionCalculator";
+import CommissionCalculator from "./CommissionCalculator"; // kept for reference, not rendered
 import { Analytics }        from "./analytics";
 
 /* ── MAINTENANCE MODE — set to false to restore the app ── */
@@ -42,7 +42,7 @@ const TABS = [
     ),
   },
   {
-    id: "calculator",
+    id: "pos",
     label: "Payout",
     icon: (active) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -66,7 +66,15 @@ function TabBar({ active, onChange }) {
       {TABS.map(tab => {
         const isActive = active === tab.id;
         return (
-          <div key={tab.id} onClick={() => { onChange(tab.id); Analytics.tabClick(tab.label); }}
+          <div key={tab.id} onClick={() => {
+            if (tab.id === "pos") {
+              Analytics.tabClick(tab.label);
+              window.location.href = "https://pos.insurancedekho.com/core/sell/health";
+            } else {
+              onChange(tab.id);
+              Analytics.tabClick(tab.label);
+            }
+          }}
             style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
               justifyContent: "center", padding: "10px 4px 8px", cursor: "pointer",
               WebkitTapHighlightColor: "transparent",
@@ -178,7 +186,6 @@ export default function App() {
       {/* SCREEN CONTENT */}
       {screen === "home"        && <HomeScreen onNavigate={setScreen} />}
       {screen === "contests"    && <ContestDashboard />}
-      {screen === "calculator"  && <CommissionCalculator />}
       {screen === "recommender" && <HealthRecommender onBack={() => setScreen("home")} />}
 
       {/* BOTTOM TAB BAR */}
@@ -342,23 +349,12 @@ function HomeScreen({ onNavigate }) {
     },
     {
       title: "Contest Achievement",
-      desc: "Track Thailand Chalo milestones and VLI payout progress",
+      desc: "Track Jeeto July, VLI and Gold Jackpot progress",
       tab: "contests",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
           <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
             fill={C.redLight} stroke={C.red} strokeWidth="2" strokeLinejoin="round"/>
-        </svg>
-      ),
-    },
-    {
-      title: "Base Payout Calculator",
-      desc: "Estimate your base commission before selling a policy",
-      tab: "calculator",
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-          <rect x="4" y="2" width="16" height="20" rx="2" fill={C.redLight} stroke={C.red} strokeWidth="2"/>
-          <path d="M8 7H16M8 11H16M8 15H12" stroke={C.red} strokeWidth="2" strokeLinecap="round"/>
         </svg>
       ),
     },
