@@ -3,7 +3,7 @@ import { C } from './theme';
 import { Analytics } from "./analytics";
 
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwMvAhAkTki6mrfoHNBFie-fD2k9k2riLSPE4dKd83ljW9icN3YX2wIHxqFijtaOmxZ/exec";
+  "https://script.google.com/macros/s/AKfycbwDHuyDVjVgCQczNQgrbQfGJ6DkboGk1Q3wIXXHZIi_QQzRQu03mF4E_XLusSl1UGfm/exec";
 
 /* ── VLI SLABS — JULY ───────────────────────────────────────── */
 const VLI_SLABS = [
