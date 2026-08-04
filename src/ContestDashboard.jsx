@@ -3,7 +3,7 @@ import { C } from './theme';
 import { Analytics } from "./analytics";
 
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwDHuyDVjVgCQczNQgrbQfGJ6DkboGk1Q3wIXXHZIi_QQzRQu03mF4E_XLusSl1UGfm/exec";
+  "https://script.google.com/macros/s/AKfycbwOEskh5U07L6SerB9E2JBs-CI16pnjDddz3ChMqk7oDmRPOkcHKyjT6zvtU353a-N2/exec";
 
 /* ── VLI SLABS — JULY ───────────────────────────────────────── */
 const VLI_SLABS = [
@@ -352,6 +352,12 @@ export default function ContestDashboard() {
   const vliAmtJul  = data ? parseRaw(data["vli amount jul"]  || 0) : 0;
   const vliPctDisplay = vliPctJul > 0 ? (vliPctJul * 100).toFixed(0) + "%" : "0%";
   const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremJul, VLI_SLABS);
+
+  // Online Policy Contest
+  const onlineNop       = data ? parseRaw(data["online nop"]       || 0) : 0;
+  const onlinePolicies  = data ? parseRaw(data["online policies"]   || 0) : 0;
+  const offlinePolicies = data ? parseRaw(data["offline policies"]  || 0) : 0;
+  const onlineReward    = data ? parseRaw(data["online reward"]     || 0) : 0;
 
   // July — Gold Jackpot
   const goldBooked  = data ? parseRaw(data["gold booked"]  || 0) : 0;
@@ -754,6 +760,39 @@ export default function ContestDashboard() {
                   <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
                     New Business carries 100% weightage. Port carries 50% weightage.
                     Only policies with SI ≥ 10L considered.
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── ONLINE HEALTH BOOKING CONTEST ── */}
+            {data && (
+              <>
+                <SectionHeader title="Online Health Booking Contest" subtitle="Aug 2026  |  Rs.500 per online policy" />
+                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+                  boxShadow: C.shadow, marginBottom: "4px" }}>
+
+                  {/* Stats */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
+                    <StatTile label="Online Policies" value={Math.round(onlinePolicies)} valueColor={C.red} />
+                    <StatTile label="Offline Policies" value={Math.round(offlinePolicies)} valueColor={C.muted} />
+                    <StatTile label="Reward Earned" value={"Rs." + Math.round(onlineReward).toLocaleString("en-IN")} valueColor={C.green} />
+                  </div>
+
+                  {/* Status */}
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
+                    background: onlineReward > 0 ? C.greenLight : C.redLight,
+                    border: `1px solid ${onlineReward > 0 ? "#86EFAC" : "#FECACA"}`,
+                    fontSize: "12px", color: onlineReward > 0 ? C.green : C.red }}>
+                    {onlineReward > 0
+                      ? <><strong>Rs.{Math.round(onlineReward).toLocaleString("en-IN")} earned</strong> from {Math.round(onlinePolicies)} online {Math.round(onlinePolicies) === 1 ? "policy" : "policies"}</>
+                      : <>Book health policies via <strong>PoS/IDEdge</strong> to earn Rs.500 per online policy</>}
+                  </div>
+
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.6 }}>
+                    Only New + Port policies via PoS/IDEdge counted. Min premium Rs.15,000.
+                    PA and 0% payout policies excluded. Max payout Rs.500.
+                    Booking: 1 Aug–10 Sep · Payment: 1–31 Aug.
                   </div>
                 </div>
               </>
