@@ -240,7 +240,7 @@ function FeedbackForm() {
         message:  text.trim(),
         name:     name.trim() || "Anonymous",
       });
-      await fetch(`https://script.google.com/macros/s/AKfycbwDHuyDVjVgCQczNQgrbQfGJ6DkboGk1Q3wIXXHZIi_QQzRQu03mF4E_XLusSl1UGfm/exec?${params.toString()}`);
+      await fetch(`https://script.google.com/macros/s/AKfycbwOEskh5U07L6SerB9E2JBs-CI16pnjDddz3ChMqk7oDmRPOkcHKyjT6zvtU353a-N2/exec?${params.toString()}`);
       setStatus("done");
       setText(""); setName("");
     } catch {
@@ -317,7 +317,7 @@ function HomeScreen({ onNavigate }) {
     } catch (e) {}
 
     // Fetch fresh from Apps Script (AD1=total, AD3=today cross-device)
-    const VISIT_URL = "https://script.google.com/macros/s/AKfycbwDHuyDVjVgCQczNQgrbQfGJ6DkboGk1Q3wIXXHZIi_QQzRQu03mF4E_XLusSl1UGfm/exec?action=visit";
+    const VISIT_URL = "https://script.google.com/macros/s/AKfycbwOEskh5U07L6SerB9E2JBs-CI16pnjDddz3ChMqk7oDmRPOkcHKyjT6zvtU353a-N2/exec?action=visit";
     fetch(VISIT_URL)
       .then(r => r.json())
       .then(d => {
