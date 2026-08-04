@@ -354,10 +354,7 @@ export default function ContestDashboard() {
   const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremJul, VLI_SLABS);
 
   // Online Policy Contest
-  const onlineNop       = data ? parseRaw(data["online nop"]       || 0) : 0;
-  const onlinePolicies  = data ? parseRaw(data["online policies"]   || 0) : 0;
-  const offlinePolicies = data ? parseRaw(data["offline policies"]  || 0) : 0;
-  const onlineReward    = data ? parseRaw(data["online reward"]     || 0) : 0;
+  const onlineReward    = data ? parseRaw(data["online reward"] || 0) : 0;
 
   // July — Gold Jackpot
   const goldBooked  = data ? parseRaw(data["gold booked"]  || 0) : 0;
@@ -649,7 +646,7 @@ export default function ContestDashboard() {
             {/* ── VLI JULY ── */}
             {data && (
               <>
-                <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Jul 2026  |  Upto 15% extra payout" />
+                <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Aug 2026  |  Upto 15% extra payout" />
                 <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
                   boxShadow: C.shadow, marginBottom: "4px" }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
@@ -773,9 +770,7 @@ export default function ContestDashboard() {
                   boxShadow: C.shadow, marginBottom: "4px" }}>
 
                   {/* Stats */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                    <StatTile label="Online Policies" value={Math.round(onlinePolicies)} valueColor={C.red} />
-                    <StatTile label="Offline Policies" value={Math.round(offlinePolicies)} valueColor={C.muted} />
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "8px", marginBottom: "16px" }}>
                     <StatTile label="Reward Earned" value={"Rs." + Math.round(onlineReward).toLocaleString("en-IN")} valueColor={C.green} />
                   </div>
 
@@ -785,7 +780,7 @@ export default function ContestDashboard() {
                     border: `1px solid ${onlineReward > 0 ? "#86EFAC" : "#FECACA"}`,
                     fontSize: "12px", color: onlineReward > 0 ? C.green : C.red }}>
                     {onlineReward > 0
-                      ? <><strong>Rs.{Math.round(onlineReward).toLocaleString("en-IN")} earned</strong> from {Math.round(onlinePolicies)} online {Math.round(onlinePolicies) === 1 ? "policy" : "policies"}</>
+                      ? <><strong>Rs.{Math.round(onlineReward).toLocaleString("en-IN")} earned</strong> via PoS/IDEdge</>
                       : <>Book health policies via <strong>PoS/IDEdge</strong> to earn Rs.500 per online policy</>}
                   </div>
 
