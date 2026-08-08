@@ -346,6 +346,14 @@ export default function ContestDashboard() {
   const { cur: tCur, nxt: tNxt } = getSlabInfo(jeetoBooked, SLABS);
   const showJeeto = data !== null;
 
+  // August — Jeeto August (same slabs as July)
+  const augustSourced = data ? parseRaw(data["august sourced"] || 0) : 0;
+  const augustBooked  = data ? parseRaw(data["august booked"]  || 0) : 0;
+  const { cur: aCur, nxt: aNxt } = getSlabInfo(augustBooked, SLABS);
+
+  // Second NoP
+  const secondNop = data ? Math.round(parseRaw(data["second nop"] || 0)) : 0;
+
   // July — VLI July (from Jeeto July Summary cols E, F, G)
   const vliPremJul = data ? parseRaw(data["vli premium jul"] || 0) : 0;
   const vliPctJul  = data ? parseRaw(data["vli % jul"]       || 0) : 0;
@@ -642,6 +650,114 @@ export default function ContestDashboard() {
               </>
             )}
 
+
+            {/* ── JEETO AUGUST ── */}
+            {data && (
+              <>
+                <SectionHeader title="Jeeto August" subtitle="Aug 2026  |  Booking till 10 Sep" />
+                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+                  boxShadow: C.shadow, marginBottom: "4px" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium"  value={fmtL(augustBooked)}  valueColor={C.red} />
+                    <StatTile label="Net Sourced Premium" value={fmtL(augustSourced)} valueColor={C.muted} />
+                  </div>
+                  <ProgressBar value={augustBooked} total={JEETO_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
+                    {SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
+                      const ach = augustBooked >= s.min;
+                      return (
+                        <div key={i} style={{ position: "absolute", left: pct + "%",
+                          transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
+                          color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
+                          {s.amt}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
+                    background: aNxt ? C.redLight : C.greenLight,
+                    border: `1px solid ${aNxt ? "#FECACA" : "#86EFAC"}`,
+                    fontSize: "12px", color: aNxt ? C.red : C.green }}>
+                    {aCur
+                      ? aNxt
+                        ? <>Unlocked <strong>{aCur.reward}</strong> — Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> for {aNxt.reward}</>
+                        : <strong>Top slab — Thailand 1 Pax unlocked!</strong>
+                      : aNxt
+                        ? <>Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> to unlock <strong>{aNxt.reward}</strong></>
+                        : <strong>Start booking to win!</strong>
+                    }
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ── SECOND NOP ── */}
+            {data && (
+              <>
+                <SectionHeader title="Second Policy Contest" subtitle="Aug 2026  |  Rs.800 on 2nd Policy" />
+                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
+                  boxShadow: C.shadow, marginBottom: "4px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600,
+                        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
+                      <div style={{ fontSize: "32px", fontWeight: 700, color: secondNop >= 2 ? C.green : C.red }}>
+                        {secondNop}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600,
+                        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
+                      <div style={{ fontSize: "24px", fontWeight: 700, color: secondNop >= 2 ? C.green : C.muted }}>
+                        {secondNop >= 2 ? "Rs.800" : "Rs.0"}
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ position: "relative", marginBottom: "20px" }}>
+                    <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px",
+                      height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
+                      <div style={{ height: "100%", borderRadius: "99px", background: C.red,
+                        width: secondNop >= 2 ? "100%" : secondNop === 1 ? "50%" : "0%",
+                        transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
+                      {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.800"}].map((m, i) => {
+                        const achieved = secondNop >= m.count && m.count > 0;
+                        const isCurrent = secondNop === m.count;
+                        return (
+                          <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                            <div style={{ fontSize: "10px", fontWeight: 700, height: "16px", color: achieved ? C.green : C.hint }}>{m.reward || ""}</div>
+                            <div style={{ width: "32px", height: "32px", borderRadius: "50%",
+                              background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border,
+                              border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`,
+                              display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
+                              {achieved
+                                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
+                            </div>
+                            <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center",
+                              color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
+                    background: secondNop >= 2 ? C.greenLight : C.redLight,
+                    border: `1px solid ${secondNop >= 2 ? "#86EFAC" : "#FECACA"}`,
+                    fontSize: "12px", color: secondNop >= 2 ? C.green : C.red }}>
+                    {secondNop >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong>
+                      : secondNop === 1 ? <>1 more New policy needed to unlock <strong>Rs.800</strong></>
+                      : <>Book <strong>2 New policies</strong> (min Rs.15,000 each) to earn Rs.800</>}
+                  </div>
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
+                    Only New policies counted. Min premium Rs.15,000. Port, Renewal and PA excluded.
+                    Sourcing: 1–31 Aug · Booking till 10 Sep.
+                  </div>
+                </div>
+              </>
+            )}
 
             {/* ── VLI JULY ── */}
             {data && (
