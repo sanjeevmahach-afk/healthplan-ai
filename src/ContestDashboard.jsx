@@ -262,6 +262,7 @@ export default function ContestDashboard() {
   const [showLb,         setShowLb]         = useState(false);
   const [showVliLb,      setShowVliLb]      = useState(false);
   const [expandedPast,   setExpandedPast]   = useState(null);
+  const [expandedContest, setExpandedContest] = useState(null);
   const [activeContests, setActiveContests] = useState([]);
   const [pastContests,   setPastContests]   = useState([]); // "vli" | "second" | null
   const inputRef = useRef(null);
@@ -363,6 +364,10 @@ export default function ContestDashboard() {
 
   // Online Policy Contest
   const onlineReward    = data ? parseRaw(data["online reward"] || 0) : 0;
+
+  // Multi Year Dhamaka
+  const multiyearReward = data ? parseRaw(data["multiyear reward"] || 0) : 0;
+  const multiyearNop    = multiyearReward > 0 ? Math.round(multiyearReward / 2000) : 0;
 
   // July — Gold Jackpot
   const goldBooked  = data ? parseRaw(data["gold booked"]  || 0) : 0;
@@ -516,149 +521,50 @@ export default function ContestDashboard() {
               <div style={{ fontSize: "12px", fontWeight: 700, color: C.green,
                 textTransform: "uppercase", letterSpacing: "0.08em" }}>Active Contest</div>
             </div>
+            {/* ── ACTIVE CONTESTS HEADER ── */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "20px", marginBottom: "4px" }}>
+              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.green,
+                boxShadow: "0 0 0 3px rgba(22,163,74,0.2)", flexShrink: 0 }} />
+              <div style={{ fontSize: "12px", fontWeight: 700, color: C.green,
+                textTransform: "uppercase", letterSpacing: "0.08em" }}>Active Contests</div>
+            </div>
 
-            {/* ── JEETO JULY ── */}
-            {showJeeto && (
-              <>
-                <SectionHeader title="Jeeto July" subtitle="Jul 2026  |  Booking till 10 Aug" />
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
-                  boxShadow: C.shadow, marginBottom: "4px" }}>
-
-                  {/* Numbers */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                    <StatTile label="Net Booked Premium"  value={fmtL(jeetoBooked)}  valueColor={C.red} />
+            {/* ── ACCORDION HELPER ── */}
+            {data && [{
+              key: "jeeto-jul",
+              title: "Jeeto July",
+              period: "Jul 2026 · Booking till 10 Aug",
+              badge: jeetoBooked > 0 ? (tCur ? tCur.reward : fmtL(jeetoBooked) + " booked") : "No bookings yet",
+              badgeColor: tCur ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium" value={fmtL(jeetoBooked)} valueColor={C.red} />
                     <StatTile label="Net Sourced Premium" value={fmtL(jeetoSourced)} valueColor={C.muted} />
                   </div>
-
-                  {/* Bar */}
-                  <div style={{ marginBottom: "8px" }}>
-                    <div style={{ position: "relative", marginBottom: "4px" }}>
-                      {/* Sourced underlay */}
-                      <div style={{ height: "8px", background: "#E8ECF4", borderRadius: "99px", overflow: "hidden", position: "relative" }}>
-                        <div style={{ position: "absolute", top: 0, bottom: 0, left: 0,
-                          width: Math.min(100,(sourced/JEETO_TOTAL)*100) + "%",
-                          background: "#FCA5A5", borderRadius: "99px",
-                          transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
-                        <div style={{ position: "absolute", top: 0, bottom: 0, left: 0,
-                          width: Math.min(100,(booked/JEETO_TOTAL)*100) + "%",
-                          background: C.red, borderRadius: "99px",
-                          transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
-                      </div>
-                    </div>
-                    {/* Amount ticks */}
-                    <div style={{ position: "relative", height: "18px" }}>
-                      {SLABS.map((s, i) => {
-                        const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
-                        const ach = jeetoBooked >= s.min;
-                        return (
-                          <div key={i} style={{ position: "absolute", left: pct + "%",
-                            transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
-                            color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
-                            Rs.{s.amt}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Reward pills */}
-                  <div style={{ display: "flex", gap: "6px", overflowX: "auto", paddingBottom: "4px", marginBottom: "12px" }}>
+                  <ProgressBar value={jeetoBooked} total={JEETO_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
                     {SLABS.map((s, i) => {
-                      const bAch = jeetoBooked >= s.min;
-                      const sAch = jeetoSourced >= s.min;
-                      return (
-                        <div key={i} style={{ flexShrink: 0, borderRadius: C.radiusSm, padding: "6px 10px",
-                          background: bAch ? C.greenLight : sAch ? "#FFF7ED" : C.bg,
-                          border: `1px solid ${bAch ? "#86EFAC" : sAch ? "#FCD34D" : C.border}` }}>
-                          <div style={{ fontSize: "10px", fontWeight: 700,
-                            color: bAch ? C.green : sAch ? "#B45309" : C.muted }}>Rs.{s.amt}</div>
-                          <div style={{ fontSize: "9px", color: bAch ? C.green : sAch ? "#B45309" : C.hint,
-                            marginTop: "1px" }}>{s.reward}</div>
-                        </div>
-                      );
+                      const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
+                      const ach = jeetoBooked >= s.min;
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.amt}</div>;
                     })}
                   </div>
-
-                  {/* Legend */}
-                  <div style={{ display: "flex", gap: "14px", marginBottom: "12px" }}>
-                    {[{ color: C.red, label: "Booked" }, { color: "#FCA5A5", label: "Sourced" }].map((l, i) => (
-                      <div key={i} style={{ display: "flex", alignItems: "center", gap: "5px",
-                        fontSize: "11px", color: C.muted }}>
-                        <div style={{ width: "8px", height: "8px", borderRadius: "2px", background: l.color }} />
-                        {l.label}
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Gap message */}
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                    background: tNxt ? C.redLight : C.greenLight,
-                    border: `1px solid ${tNxt ? "#FECACA" : "#86EFAC"}`,
-                    fontSize: "12px", color: tNxt ? C.red : C.green }}>
-                    {tNxt
-                      ? <>Book <strong>{fmtL(tNxt.min - jeetoBooked)} more</strong> to unlock {tNxt.reward}</>
-                      : <strong>Top slab — Thailand 1 Pax unlocked!</strong>
-                    }
-                  </div>
-
-                  {/* Leaderboard tile */}
-                  <div onClick={() => { setShowLb(true); Analytics.leaderboardOpen("Jeeto July"); }}
-                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
-                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
-                      cursor: "pointer", border: `1px solid ${C.border}`,
-                      WebkitTapHighlightColor: "transparent" }}>
-                    <div style={{ width: "34px", height: "34px", background: C.redLight,
-                      borderRadius: "8px", display: "flex", alignItems: "center",
-                      justifyContent: "center", flexShrink: 0 }}>
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.red} strokeWidth="2"
-                          strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Jeeto July Leaderboard</div>
-                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners by Net Booked</div>
-                    </div>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2"
-                        strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: tNxt ? C.redLight : C.greenLight, border: `1px solid ${tNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: tNxt ? C.red : C.green }}>
+                    {tCur ? tNxt ? <>Unlocked <strong>{tCur.reward}</strong> — Book <strong>{fmtL(tNxt.min - jeetoBooked)} more</strong> for {tNxt.reward}</> : <strong>Top slab — Thailand 1 Pax unlocked!</strong> : tNxt ? <>Book <strong>{fmtL(tNxt.min - jeetoBooked)} more</strong> to unlock <strong>{tNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
                   </div>
                 </div>
-
-                {/* Current reward card */}
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "14px 16px",
-                  marginTop: "8px", boxShadow: C.shadow, display: "flex", alignItems: "center", gap: "12px" }}>
-                  <div style={{ width: "40px", height: "40px", borderRadius: "10px", background: C.redLight,
-                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                        fill={C.redLight} stroke={C.red} strokeWidth="2" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: "10px", color: C.muted, fontWeight: 600, textTransform: "uppercase",
-                      letterSpacing: "0.05em" }}>Current Reward</div>
-                    <div style={{ fontSize: "15px", fontWeight: 700, color: C.red, marginTop: "2px" }}>
-                      {tCur ? tCur.reward : "No slab yet"}
-                    </div>
-                    <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>
-                      {tNxt ? `${fmtL(tNxt.min - jeetoBooked)} more to upgrade to ${tNxt.reward}` : "Booking allowed till 10 Aug 2026"}
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
-
-
-            {/* ── JEETO AUGUST ── */}
-            {data && (
-              <>
-                <SectionHeader title="Jeeto August" subtitle="Aug 2026  |  Booking till 10 Sep" />
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
-                  boxShadow: C.shadow, marginBottom: "4px" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                    <StatTile label="Net Booked Premium"  value={fmtL(augustBooked)}  valueColor={C.red} />
+              )
+            }, {
+              key: "jeeto-aug",
+              title: "Jeeto August",
+              period: "Aug 2026 · Booking till 10 Sep",
+              badge: augustBooked > 0 ? (aCur ? aCur.reward : fmtL(augustBooked) + " booked") : "No bookings yet",
+              badgeColor: aCur ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium" value={fmtL(augustBooked)} valueColor={C.red} />
                     <StatTile label="Net Sourced Premium" value={fmtL(augustSourced)} valueColor={C.muted} />
                   </div>
                   <ProgressBar value={augustBooked} total={JEETO_TOTAL} />
@@ -666,60 +572,35 @@ export default function ContestDashboard() {
                     {SLABS.map((s, i) => {
                       const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
                       const ach = augustBooked >= s.min;
-                      return (
-                        <div key={i} style={{ position: "absolute", left: pct + "%",
-                          transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
-                          color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
-                          {s.amt}
-                        </div>
-                      );
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.amt}</div>;
                     })}
                   </div>
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                    background: aNxt ? C.redLight : C.greenLight,
-                    border: `1px solid ${aNxt ? "#FECACA" : "#86EFAC"}`,
-                    fontSize: "12px", color: aNxt ? C.red : C.green }}>
-                    {aCur
-                      ? aNxt
-                        ? <>Unlocked <strong>{aCur.reward}</strong> — Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> for {aNxt.reward}</>
-                        : <strong>Top slab — Thailand 1 Pax unlocked!</strong>
-                      : aNxt
-                        ? <>Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> to unlock <strong>{aNxt.reward}</strong></>
-                        : <strong>Start booking to win!</strong>
-                    }
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: aNxt ? C.redLight : C.greenLight, border: `1px solid ${aNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: aNxt ? C.red : C.green }}>
+                    {aCur ? aNxt ? <>Unlocked <strong>{aCur.reward}</strong> — Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> for {aNxt.reward}</> : <strong>Top slab — Thailand 1 Pax unlocked!</strong> : aNxt ? <>Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> to unlock <strong>{aNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
                   </div>
                 </div>
-              </>
-            )}
-
-            {/* ── SECOND NOP ── */}
-            {data && (
-              <>
-                <SectionHeader title="Second Policy Contest" subtitle="Aug 2026  |  Rs.800 on 2nd Policy" />
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
-                  boxShadow: C.shadow, marginBottom: "4px" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "16px" }}>
+              )
+            }, {
+              key: "second-nop",
+              title: "Second Policy Contest",
+              period: "Aug 2026 · Booking till 10 Sep",
+              badge: secondNop >= 2 ? "Rs.800 Earned ✓" : secondNop === 1 ? "1/2 Policies" : "0 Policies",
+              badgeColor: secondNop >= 2 ? C.green : secondNop === 1 ? "#F59E0B" : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "14px", marginBottom: "16px" }}>
                     <div>
-                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600,
-                        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
-                      <div style={{ fontSize: "32px", fontWeight: 700, color: secondNop >= 2 ? C.green : C.red }}>
-                        {secondNop}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span>
-                      </div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
+                      <div style={{ fontSize: "32px", fontWeight: 700, color: secondNop >= 2 ? C.green : C.red }}>{secondNop}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span></div>
                     </div>
                     <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600,
-                        textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
-                      <div style={{ fontSize: "24px", fontWeight: 700, color: secondNop >= 2 ? C.green : C.muted }}>
-                        {secondNop >= 2 ? "Rs.800" : "Rs.0"}
-                      </div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
+                      <div style={{ fontSize: "24px", fontWeight: 700, color: secondNop >= 2 ? C.green : C.muted }}>{secondNop >= 2 ? "Rs.800" : "Rs.0"}</div>
                     </div>
                   </div>
                   <div style={{ position: "relative", marginBottom: "20px" }}>
-                    <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px",
-                      height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
-                      <div style={{ height: "100%", borderRadius: "99px", background: C.red,
-                        width: secondNop >= 2 ? "100%" : secondNop === 1 ? "50%" : "0%",
-                        transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                    <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px", height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
+                      <div style={{ height: "100%", borderRadius: "99px", background: C.red, width: secondNop >= 2 ? "100%" : secondNop === 1 ? "50%" : "0%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
                       {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.800"}].map((m, i) => {
@@ -728,44 +609,29 @@ export default function ContestDashboard() {
                         return (
                           <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
                             <div style={{ fontSize: "10px", fontWeight: 700, height: "16px", color: achieved ? C.green : C.hint }}>{m.reward || ""}</div>
-                            <div style={{ width: "32px", height: "32px", borderRadius: "50%",
-                              background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border,
-                              border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`,
-                              display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
-                              {achieved
-                                ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                                : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
+                            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border, border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
+                              {achieved ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg> : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
                             </div>
-                            <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center",
-                              color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
+                            <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center", color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                    background: secondNop >= 2 ? C.greenLight : C.redLight,
-                    border: `1px solid ${secondNop >= 2 ? "#86EFAC" : "#FECACA"}`,
-                    fontSize: "12px", color: secondNop >= 2 ? C.green : C.red }}>
-                    {secondNop >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong>
-                      : secondNop === 1 ? <>1 more New policy needed to unlock <strong>Rs.800</strong></>
-                      : <>Book <strong>2 New policies</strong> (min Rs.15,000 each) to earn Rs.800</>}
-                  </div>
-                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
-                    Only New policies counted. Min premium Rs.15,000. Port, Renewal and PA excluded.
-                    Sourcing: 1–31 Aug · Booking till 10 Sep.
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: secondNop >= 2 ? C.greenLight : C.redLight, border: `1px solid ${secondNop >= 2 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: secondNop >= 2 ? C.green : C.red }}>
+                    {secondNop >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong> : secondNop === 1 ? <>1 more New policy needed to unlock <strong>Rs.800</strong></> : <>Book <strong>2 New policies</strong> (min Rs.15,000) to earn Rs.800</>}
                   </div>
                 </div>
-              </>
-            )}
-
-            {/* ── VLI JULY ── */}
-            {data && (
-              <>
-                <SectionHeader title="Health Payout Incentive (VLI)" subtitle="Aug 2026  |  Upto 15% extra payout" />
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
-                  boxShadow: C.shadow, marginBottom: "4px" }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "16px" }}>
+              )
+            }, {
+              key: "vli-aug",
+              title: "Health Payout Incentive (VLI)",
+              period: "Aug 2026 · Upto 15% extra",
+              badge: vliPremJul > 0 ? (vCur ? vCur.pct + " extra" : fmtL(vliPremJul) + " premium") : "No premium yet",
+              badgeColor: vCur ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
                     <StatTile label="VLI Premium" value={fmtL(vliPremJul)} valueColor={C.red} />
                     <StatTile label="VLI %" value={vliPctDisplay} valueColor={C.green} />
                     <StatTile label="VLI Amount" value={"Rs." + Math.round(vliAmtJul).toLocaleString("en-IN")} valueColor={C.red} />
@@ -775,139 +641,107 @@ export default function ContestDashboard() {
                     {VLI_SLABS.map((s, i) => {
                       const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
                       const ach = vliPremJul >= s.min;
-                      return (
-                        <div key={i} style={{ position: "absolute", left: pct + "%",
-                          transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
-                          color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>
-                          {s.pct}
-                        </div>
-                      );
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.pct}</div>;
                     })}
                   </div>
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                    background: vNxt ? C.redLight : C.greenLight,
-                    border: `1px solid ${vNxt ? "#FECACA" : "#86EFAC"}`,
-                    fontSize: "12px", color: vNxt ? C.red : C.green }}>
-                    {vNxt
-                      ? <>Book <strong>{fmtL(vNxt.min - vliPremJul)} more</strong> to unlock {vNxt.pct} extra payout</>
-                      : <strong>Top VLI slab — earning 15% extra payout!</strong>}
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: vNxt ? C.redLight : C.greenLight, border: `1px solid ${vNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: vNxt ? C.red : C.green }}>
+                    {vNxt ? <>Book <strong>{fmtL(vNxt.min - vliPremJul)} more</strong> to unlock {vNxt.pct} extra payout</> : <strong>Top VLI slab — earning 15% extra payout!</strong>}
                   </div>
                 </div>
-              </>
-            )}
-
-            {/* ── GOLD JACKPOT ── */}
-            {data && (
-              <>
-                <SectionHeader title="Gold Jackpot" subtitle="Jul – Sep 2026  |  Booking till 10 Oct 2026" />
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
-                  boxShadow: C.shadow, marginBottom: "4px" }}>
-
-                  {/* Numbers */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "16px" }}>
-                    <StatTile label="Net Booked Premium"  value={fmtL(goldBooked)}  valueColor={C.red} />
+              )
+            }, {
+              key: "gold",
+              title: "Gold Jackpot",
+              period: "Jul–Sep 2026 · Booking till 10 Oct",
+              badge: gCur ? gCur.reward : goldBooked > 0 ? fmtL(goldBooked) + " booked" : "No bookings yet",
+              badgeColor: gCur ? "#B8860B" : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium" value={fmtL(goldBooked)} valueColor={C.red} />
                     <StatTile label="Net Sourced Premium" value={fmtL(goldSourced)} valueColor={C.muted} />
                   </div>
-
-                  {/* Progress bar */}
-                  <div style={{ marginBottom: "8px" }}>
-                    <div style={{ height: "8px", background: "#E8ECF4", borderRadius: "99px", overflow: "hidden", position: "relative" }}>
-                      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0,
-                        width: Math.min(100, (goldBooked / GOLD_TOTAL) * 100) + "%",
-                        background: "#B8860B", borderRadius: "99px",
-                        transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
-                    </div>
-                    {/* Slab ticks */}
-                    <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "4px" }}>
-                      {GOLD_SLABS.map((s, i) => {
-                        const pct = Math.min(96, (s.min / GOLD_TOTAL) * 100);
-                        const ach = goldBooked >= s.min;
-                        return (
-                          <div key={i} style={{ position: "absolute", left: pct + "%",
-                            transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600,
-                            color: ach ? "#B8860B" : C.hint, whiteSpace: "nowrap" }}>
-                            {s.min >= 1000000 ? (s.min/100000).toFixed(0)+"L" : (s.min/100000).toFixed(0)+"L"}
-                          </div>
-                        );
-                      })}
-                    </div>
+                  <div style={{ height: "8px", background: "#E8ECF4", borderRadius: "99px", overflow: "hidden", marginBottom: "4px" }}>
+                    <div style={{ height: "100%", borderRadius: "99px", background: "#B8860B", width: Math.min(100, (goldBooked / GOLD_TOTAL) * 100) + "%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
                   </div>
-
-                  {/* Status message */}
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                    background: gNxt ? "#FEF3C7" : "#D4AF3720",
-                    border: `1px solid ${gNxt ? "#FCD34D" : "#B8860B"}`,
-                    fontSize: "12px", color: gNxt ? "#92400E" : "#B8860B" }}>
-                    {gCur
-                      ? gNxt
-                        ? <>Unlocked <strong>{gCur.reward}</strong> — Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to upgrade to {gNxt.reward}</>
-                        : <strong>🥇 Top slab achieved — {gCur.reward}!</strong>
-                      : gNxt
-                        ? <>Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to unlock <strong>{gNxt.reward}</strong></>
-                        : <strong>Start booking to win Gold!</strong>
-                    }
-                  </div>
-
-                  {/* Slab cards */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px" }}>
-                    {[
-                      { slab: "8L", reward: "Rs.65,000", sub: "",   min: 800000  },
-                      { slab: "12L", reward: "Rs.1,30,000", sub: "", min: 1200000 },
-                    ].map((s, i) => {
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "12px", marginBottom: "12px" }}>
+                    {[{slab:"8L",reward:"Rs.65,000",min:800000},{slab:"12L",reward:"Rs.1,30,000",min:1200000}].map((s, i) => {
                       const ach = goldBooked >= s.min;
                       return (
-                        <div key={i} style={{ background: ach ? "#FEF3C7" : C.bg,
-                          border: `1px solid ${ach ? "#FCD34D" : C.border}`,
-                          borderRadius: C.radiusSm, padding: "10px 12px" }}>
-                          <div style={{ fontSize: "10px", color: C.muted, fontWeight: 600,
-                            textTransform: "uppercase", letterSpacing: "0.05em" }}>₹{s.slab} slab</div>
-                          <div style={{ fontSize: "14px", fontWeight: 700,
-                            color: ach ? "#B8860B" : C.text, marginTop: "2px" }}>{s.reward}</div>
-                          <div style={{ fontSize: "10px", color: C.muted, marginTop: "2px" }}>{s.sub}</div>
+                        <div key={i} style={{ background: ach ? "#FEF3C7" : C.bg, border: `1px solid ${ach ? "#FCD34D" : C.border}`, borderRadius: C.radiusSm, padding: "10px 12px" }}>
+                          <div style={{ fontSize: "10px", color: C.muted, fontWeight: 600, textTransform: "uppercase" }}>₹{s.slab} slab</div>
+                          <div style={{ fontSize: "14px", fontWeight: 700, color: ach ? "#B8860B" : C.text, marginTop: "2px" }}>{s.reward}</div>
                           {ach && <div style={{ fontSize: "10px", color: "#B8860B", fontWeight: 600, marginTop: "4px" }}>✓ Unlocked</div>}
                         </div>
                       );
                     })}
                   </div>
-
-                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>
-                    New Business carries 100% weightage. Port carries 50% weightage.
-                    Only policies with SI ≥ 10L considered.
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: gNxt ? "#FEF3C7" : "#D4AF3720", border: `1px solid ${gNxt ? "#FCD34D" : "#B8860B"}`, fontSize: "12px", color: gNxt ? "#92400E" : "#B8860B" }}>
+                    {gCur ? gNxt ? <>Unlocked <strong>{gCur.reward}</strong> — Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to upgrade</> : <strong>🥇 Top slab — {gCur.reward}!</strong> : gNxt ? <>Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to unlock <strong>{gNxt.reward}</strong></> : <strong>Start booking to win Gold!</strong>}
                   </div>
                 </div>
-              </>
-            )}
-
-            {/* ── ONLINE HEALTH BOOKING CONTEST ── */}
-            {data && (
-              <>
-                <SectionHeader title="Online Health Booking Contest" subtitle="Aug 2026  |  Rs.500 per online policy" />
-                <div style={{ background: C.card, borderRadius: C.radius, padding: "16px",
-                  boxShadow: C.shadow, marginBottom: "4px" }}>
-
-                  {/* Stats */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "8px", marginBottom: "16px" }}>
+              )
+            }, {
+              key: "multiyear",
+              title: "Multi Year Dhamaka",
+              period: "6 Aug–31 Aug · Rs.2,000 per 3yr policy",
+              badge: multiyearReward > 0 ? "Rs." + Math.round(multiyearReward).toLocaleString("en-IN") + " earned" : "No policies yet",
+              badgeColor: multiyearReward > 0 ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="Policies Done" value={multiyearNop} valueColor={C.red} />
+                    <StatTile label="Reward Earned" value={"Rs." + Math.round(multiyearReward).toLocaleString("en-IN")} valueColor={C.green} />
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: multiyearReward > 0 ? C.greenLight : C.redLight, border: `1px solid ${multiyearReward > 0 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: multiyearReward > 0 ? C.green : C.red }}>
+                    {multiyearReward > 0 ? <><strong>Rs.{Math.round(multiyearReward).toLocaleString("en-IN")} earned</strong> from {multiyearNop} 3-year {multiyearNop === 1 ? "policy" : "policies"}</> : <>Book <strong>3-year New policies</strong> (SI ≥ 10L, premium ≥ Rs.30,000) to earn Rs.2,000 each</>}
+                  </div>
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Only 3-year New policies. SI ≥ 10L. Total premium ≥ Rs.30,000. Booking: 6 Aug–10 Sep.</div>
+                </div>
+              )
+            }, {
+              key: "online",
+              title: "Online Health Booking Contest",
+              period: "Aug 2026 · Rs.500 per online policy",
+              badge: onlineReward > 0 ? "Rs." + Math.round(onlineReward).toLocaleString("en-IN") + " earned" : "No bookings yet",
+              badgeColor: onlineReward > 0 ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
                     <StatTile label="Reward Earned" value={"Rs." + Math.round(onlineReward).toLocaleString("en-IN")} valueColor={C.green} />
                   </div>
-
-                  {/* Status */}
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm,
-                    background: onlineReward > 0 ? C.greenLight : C.redLight,
-                    border: `1px solid ${onlineReward > 0 ? "#86EFAC" : "#FECACA"}`,
-                    fontSize: "12px", color: onlineReward > 0 ? C.green : C.red }}>
-                    {onlineReward > 0
-                      ? <><strong>Rs.{Math.round(onlineReward).toLocaleString("en-IN")} earned</strong> via PoS/IDEdge</>
-                      : <>Book health policies via <strong>PoS/IDEdge</strong> to earn Rs.500 per online policy</>}
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: onlineReward > 0 ? C.greenLight : C.redLight, border: `1px solid ${onlineReward > 0 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: onlineReward > 0 ? C.green : C.red }}>
+                    {onlineReward > 0 ? <><strong>Rs.{Math.round(onlineReward).toLocaleString("en-IN")} earned</strong> via PoS/IDEdge</> : <>Book health policies via <strong>PoS/IDEdge</strong> to earn Rs.500 per online policy</>}
                   </div>
-
-                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.6 }}>
-                    Only New + Port policies via PoS/IDEdge counted. Min premium Rs.15,000.
-                    PA and 0% payout policies excluded. Max payout Rs.500.
-                    Booking: 1 Aug–10 Sep · Payment: 1–31 Aug.
-                  </div>
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Only New + Port via PoS/IDEdge. Min Rs.15,000. PA and 0% excluded. Max Rs.500.</div>
                 </div>
-              </>
-            )}
+              )
+            }].map(contest => {
+              const isExpanded = expandedContest === contest.key;
+              return (
+                <div key={contest.key} style={{ background: C.card, borderRadius: C.radius, boxShadow: C.shadow, marginBottom: "8px", overflow: "hidden" }}>
+                  <div onClick={() => setExpandedContest(isExpanded ? null : contest.key)}
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>{contest.title}</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>{contest.period}</div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexShrink: 0 }}>
+                      <div style={{ fontSize: "11px", fontWeight: 700, color: contest.badgeColor,
+                        background: contest.badgeColor === C.green ? C.greenLight : contest.badgeColor === "#B8860B" ? "#FEF3C7" : "#F3F4F6",
+                        padding: "3px 8px", borderRadius: "99px", whiteSpace: "nowrap" }}>
+                        {contest.badge}
+                      </div>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                        style={{ transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s", flexShrink: 0 }}>
+                        <path d="M6 9L12 15L18 9" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
+                  {isExpanded && contest.content}
+                </div>
+              );
+            })}
 
             {/* Dates */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "20px" }}>
