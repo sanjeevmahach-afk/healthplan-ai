@@ -398,39 +398,45 @@ export default function ContestDashboard() {
       {showAugLb && (
         <LeaderboardOverlay
           title="Jeeto August Leaderboard"
-          subtitle="Top 10 · Net Booked Premium"
+          subtitle="Top 10 · Offer Earned"
           entries={augustLeaderboard}
           loading={lbLoading}
           myGid={gidCode || gid}
           valueKey="value"
-          valueLabel="Net Booked"
-          formatValue={v => fmtL(v)}
+          valueLabel="Offer"
+          formatValue={v => v ? String(v) : "—"}
+          extraKey="extra"
+          extraLabel="Net Booked"
+          formatExtra={v => fmtL(v)}
           onClose={() => setShowAugLb(false)}
         />
       )}
       {showVliLb && (
         <LeaderboardOverlay
           title="VLI Leaderboard"
-          subtitle="Top 10 · VLI Premium · Aug 2026"
+          subtitle="Top 10 · VLI Amount · Aug 2026"
           entries={vliLeaderboard}
           loading={lbLoading}
           myGid={gidCode || gid}
           valueKey="value"
-          valueLabel="VLI Premium"
-          formatValue={v => fmtL(v)}
+          valueLabel="VLI Amount"
+          formatValue={v => "Rs." + Math.round(v).toLocaleString("en-IN")}
           onClose={() => setShowVliLb(false)}
         />
       )}
       {showGoldLb && (
         <LeaderboardOverlay
           title="Gold Jackpot Leaderboard"
-          subtitle="Top 10 · Net Booked Premium"
+          subtitle="Top 10 · Gold Reward Earned"
           entries={goldLeaderboard}
           loading={lbLoading}
           myGid={gidCode || gid}
           valueKey="value"
-          valueLabel="Net Booked"
-          formatValue={v => fmtL(v)}
+          valueLabel="Reward"
+          formatValue={v => v ? String(v) : "—"}
+          extraKey="extra"
+          extraLabel="Net Booked"
+          formatExtra={v => fmtL(v)}
           onClose={() => setShowGoldLb(false)}
         />
       )}
