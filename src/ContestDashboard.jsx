@@ -258,9 +258,14 @@ export default function ContestDashboard() {
   const [cachedGid,      setCachedGid]      = useState("");
   const [leaderboard,    setLeaderboard]    = useState([]);
   const [lbLoading,      setLbLoading]      = useState(false);
-  const [vliLeaderboard, setVliLeaderboard] = useState([]);
-  const [showLb,         setShowLb]         = useState(false);
-  const [showVliLb,      setShowVliLb]      = useState(false);
+  const [augustLeaderboard,    setAugustLeaderboard]    = useState([]);
+  const [vliLeaderboard,       setVliLeaderboard]       = useState([]);
+  const [goldLeaderboard,      setGoldLeaderboard]      = useState([]);
+  const [multiyearLeaderboard, setMultiyearLeaderboard] = useState([]);
+  const [showAugLb,     setShowAugLb]     = useState(false);
+  const [showVliLb,     setShowVliLb]     = useState(false);
+  const [showGoldLb,    setShowGoldLb]    = useState(false);
+  const [showMultiyLb,  setShowMultiyLb]  = useState(false);
   const [expandedPast,   setExpandedPast]   = useState(null);
   const [expandedContest, setExpandedContest] = useState(null);
   const [activeContests, setActiveContests] = useState([]);
@@ -280,8 +285,10 @@ export default function ContestDashboard() {
     // Load cached data instantly
     try {
       const cached = JSON.parse(localStorage.getItem("hpt_lb_cache") || "{}");
-      if (cached.leaderboard)    setLeaderboard(cached.leaderboard);
-      if (cached.vliLeaderboard) setVliLeaderboard(cached.vliLeaderboard);
+      if (cached.augustLeaderboard)    setAugustLeaderboard(cached.augustLeaderboard);
+      if (cached.vliLeaderboard)       setVliLeaderboard(cached.vliLeaderboard);
+      if (cached.goldLeaderboard)      setGoldLeaderboard(cached.goldLeaderboard);
+      if (cached.multiyearLeaderboard) setMultiyearLeaderboard(cached.multiyearLeaderboard);
       if (cached.activeContests) setActiveContests(cached.activeContests);
       if (cached.pastContests)   setPastContests(cached.pastContests);
     } catch (e) {}
@@ -290,18 +297,22 @@ export default function ContestDashboard() {
     fetch(`${APPS_SCRIPT_URL}?action=init`)
       .then(r => r.json())
       .then(d => {
-        if (d.leaderboard)    setLeaderboard(d.leaderboard);
-        if (d.vliLeaderboard) setVliLeaderboard(d.vliLeaderboard);
+        if (d.augustLeaderboard)    setAugustLeaderboard(d.augustLeaderboard);
+        if (d.vliLeaderboard)       setVliLeaderboard(d.vliLeaderboard);
+        if (d.goldLeaderboard)      setGoldLeaderboard(d.goldLeaderboard);
+        if (d.multiyearLeaderboard) setMultiyearLeaderboard(d.multiyearLeaderboard);
         if (d.contests) {
           setActiveContests(d.contests.active || []);
           setPastContests(d.contests.past || []);
         }
         try {
           localStorage.setItem("hpt_lb_cache", JSON.stringify({
-            leaderboard:    d.leaderboard    || [],
-            vliLeaderboard: d.vliLeaderboard || [],
-            activeContests: d.contests?.active || [],
-            pastContests:   d.contests?.past   || [],
+            augustLeaderboard:    d.augustLeaderboard    || [],
+            vliLeaderboard:       d.vliLeaderboard       || [],
+            goldLeaderboard:      d.goldLeaderboard      || [],
+            multiyearLeaderboard: d.multiyearLeaderboard || [],
+            activeContests:       d.contests?.active     || [],
+            pastContests:         d.contests?.past       || [],
           }));
         } catch (e) {}
       })
@@ -383,18 +394,57 @@ export default function ContestDashboard() {
   return (
     <div style={{ fontFamily: C.font }}>
 
-      {/* ── JEETO JULY LEADERBOARD OVERLAY ── */}
-      {showLb && (
+      {/* ── LEADERBOARD OVERLAYS ── */}
+      {showAugLb && (
         <LeaderboardOverlay
-          title="Jeeto July"
+          title="Jeeto August Leaderboard"
           subtitle="Top 10 · Net Booked Premium"
-          entries={leaderboard}
+          entries={augustLeaderboard}
           loading={lbLoading}
           myGid={gidCode || gid}
-          valueKey="booked"
-          valueLabel="Net Booked Premium"
-          formatValue={v => fmtL(v * 100000)}
-          onClose={() => setShowLb(false)}
+          valueKey="value"
+          valueLabel="Net Booked"
+          formatValue={v => fmtL(v)}
+          onClose={() => setShowAugLb(false)}
+        />
+      )}
+      {showVliLb && (
+        <LeaderboardOverlay
+          title="VLI Leaderboard"
+          subtitle="Top 10 · VLI Premium · Aug 2026"
+          entries={vliLeaderboard}
+          loading={lbLoading}
+          myGid={gidCode || gid}
+          valueKey="value"
+          valueLabel="VLI Premium"
+          formatValue={v => fmtL(v)}
+          onClose={() => setShowVliLb(false)}
+        />
+      )}
+      {showGoldLb && (
+        <LeaderboardOverlay
+          title="Gold Jackpot Leaderboard"
+          subtitle="Top 10 · Net Booked Premium"
+          entries={goldLeaderboard}
+          loading={lbLoading}
+          myGid={gidCode || gid}
+          valueKey="value"
+          valueLabel="Net Booked"
+          formatValue={v => fmtL(v)}
+          onClose={() => setShowGoldLb(false)}
+        />
+      )}
+      {showMultiyLb && (
+        <LeaderboardOverlay
+          title="Multi Year Dhamaka Leaderboard"
+          subtitle="Top 10 · Reward Earned"
+          entries={multiyearLeaderboard}
+          loading={lbLoading}
+          myGid={gidCode || gid}
+          valueKey="value"
+          valueLabel="Reward"
+          formatValue={v => "Rs." + Math.round(v).toLocaleString("en-IN")}
+          onClose={() => setShowMultiyLb(false)}
         />
       )}
 
@@ -578,6 +628,24 @@ export default function ContestDashboard() {
                   <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: aNxt ? C.redLight : C.greenLight, border: `1px solid ${aNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: aNxt ? C.red : C.green }}>
                     {aCur ? aNxt ? <>Unlocked <strong>{aCur.reward}</strong> — Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> for {aNxt.reward}</> : <strong>Top slab — Thailand 1 Pax unlocked!</strong> : aNxt ? <>Book <strong>{fmtL(aNxt.min - augustBooked)} more</strong> to unlock <strong>{aNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
                   </div>
+                  <div onClick={() => { setShowAugLb(true); Analytics.leaderboardOpen("Jeeto August"); }}
+                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
+                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
+                      cursor: "pointer", border: `1px solid ${C.border}`, WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ width: "34px", height: "34px", background: C.greenLight, borderRadius: "8px",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Jeeto August Leaderboard</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners</div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                 </div>
               )
             }, {
@@ -647,6 +715,24 @@ export default function ContestDashboard() {
                   <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: vNxt ? C.redLight : C.greenLight, border: `1px solid ${vNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: vNxt ? C.red : C.green }}>
                     {vNxt ? <>Book <strong>{fmtL(vNxt.min - vliPremJul)} more</strong> to unlock {vNxt.pct} extra payout</> : <strong>Top VLI slab — earning 15% extra payout!</strong>}
                   </div>
+                  <div onClick={() => { setShowVliLb(true); Analytics.leaderboardOpen("VLI"); }}
+                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
+                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
+                      cursor: "pointer", border: `1px solid ${C.border}`, WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ width: "34px", height: "34px", background: C.greenLight, borderRadius: "8px",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>VLI Leaderboard</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners</div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                 </div>
               )
             }, {
@@ -679,6 +765,24 @@ export default function ContestDashboard() {
                   <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: gNxt ? "#FEF3C7" : "#D4AF3720", border: `1px solid ${gNxt ? "#FCD34D" : "#B8860B"}`, fontSize: "12px", color: gNxt ? "#92400E" : "#B8860B" }}>
                     {gCur ? gNxt ? <>Unlocked <strong>{gCur.reward}</strong> — Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to upgrade</> : <strong>🥇 Top slab — {gCur.reward}!</strong> : gNxt ? <>Book <strong>{fmtL(gNxt.min - goldBooked)} more</strong> to unlock <strong>{gNxt.reward}</strong></> : <strong>Start booking to win Gold!</strong>}
                   </div>
+                  <div onClick={() => { setShowGoldLb(true); Analytics.leaderboardOpen("Gold Jackpot"); }}
+                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
+                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
+                      cursor: "pointer", border: `1px solid ${C.border}`, WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ width: "34px", height: "34px", background: C.greenLight, borderRadius: "8px",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Gold Jackpot Leaderboard</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners</div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                 </div>
               )
             }, {
@@ -697,6 +801,24 @@ export default function ContestDashboard() {
                     {multiyearReward > 0 ? <><strong>Rs.{Math.round(multiyearReward).toLocaleString("en-IN")} earned</strong> from {multiyearNop} 3-year {multiyearNop === 1 ? "policy" : "policies"}</> : <>Book <strong>3-year New policies</strong> (SI ≥ 10L, premium ≥ Rs.30,000) to earn Rs.2,000 each</>}
                   </div>
                   <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Only 3-year New policies. SI ≥ 10L. Total premium ≥ Rs.30,000. Booking: 6 Aug–10 Sep.</div>
+                  <div onClick={() => { setShowMultiyLb(true); Analytics.leaderboardOpen("Multi Year Dhamaka"); }}
+                    style={{ marginTop: "12px", display: "flex", alignItems: "center", gap: "12px",
+                      background: C.bg, borderRadius: C.radiusSm, padding: "12px 14px",
+                      cursor: "pointer", border: `1px solid ${C.border}`, WebkitTapHighlightColor: "transparent" }}>
+                    <div style={{ width: "34px", height: "34px", background: C.greenLight, borderRadius: "8px",
+                      display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 20V10M12 20V4M6 20V14" stroke={C.green} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "13px", fontWeight: 700, color: C.text }}>Multi Year Leaderboard</div>
+                      <div style={{ fontSize: "11px", color: C.muted, marginTop: "2px" }}>Top 10 partners</div>
+                    </div>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
                 </div>
               )
             }, {
