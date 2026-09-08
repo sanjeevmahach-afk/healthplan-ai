@@ -600,7 +600,6 @@ export default function ContestDashboard() {
 
             {/* ── ACCORDION HELPER ── */}
             {data && [{
-{
               key: "gold",
               title: "Gold Jackpot",
               period: "Jul–Sep 2026 · Booking till 10 Oct",
