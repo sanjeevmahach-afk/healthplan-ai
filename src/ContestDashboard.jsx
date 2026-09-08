@@ -700,7 +700,6 @@ export default function ContestDashboard() {
                   </div>
                 </div>
               )
-            }
             }, {
             
               key: "second-nop-sep",
@@ -788,7 +787,6 @@ export default function ContestDashboard() {
                   </div>
                 </div>
               )
-            }
             }, {
             
               key: "second-nop",
@@ -833,7 +831,6 @@ export default function ContestDashboard() {
                   </div>
                 </div>
               )
-            }
             }, {
             
               key: "vli-aug",
@@ -879,7 +876,6 @@ export default function ContestDashboard() {
                   </div>
                 </div>
               )
-            }
             }, {
             
               key: "multiyear",
@@ -917,9 +913,7 @@ export default function ContestDashboard() {
                   </div>
                 </div>
               )
-            }
             }, {
-            
               key: "online",
               title: "Online Health Booking Contest",
               period: "Aug 2026 · Rs.500 per online policy",
@@ -936,8 +930,7 @@ export default function ContestDashboard() {
                   <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Only New + Port via PoS/IDEdge. Min Rs.15,000. PA and 0% excluded. Max Rs.500.</div>
                 </div>
               )
-            }
-            }]].map(contest => {
+            }].map(contest => {
               const isExpanded = expandedContest === contest.key;
               return (
                 <div key={contest.key} style={{ background: C.card, borderRadius: C.radius, boxShadow: C.shadow, marginBottom: "8px", overflow: "hidden" }}>
