@@ -704,7 +704,7 @@ export default function ContestDashboard() {
             
               key: "second-nop-sep",
               title: "Second Policy Contest",
-              period: "Sep 2026 · Booking till 10 Sep",
+              period: "Sep 2026 · Booking till 10 Oct",
               badge: secondNopSep >= 2 ? "Rs.800 Earned ✓" : secondNopSep === 1 ? "1/2 Policies" : "0 Policies",
               badgeColor: secondNopSep >= 2 ? C.green : secondNopSep === 1 ? "#F59E0B" : C.muted,
               content: (
