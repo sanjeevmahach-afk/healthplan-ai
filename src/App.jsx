@@ -228,8 +228,8 @@ function useCountUp(target, duration = 1200) {
 /* ── FEEDBACK FORM ───────────────────────────────────────────── */
 function FeedbackForm() {
   const [text, setText]       = useState("");
-  const [name, setName]       = useState("");
-  const [status, setStatus]   = useState(null); // null | "sending" | "done" | "error"
+  const [gid, setGid]         = useState("");
+  const [status, setStatus]   = useState(null);
 
   async function submit() {
     if (!text.trim()) return;
@@ -238,11 +238,11 @@ function FeedbackForm() {
       const params = new URLSearchParams({
         action:   "feedback",
         message:  text.trim(),
-        name:     name.trim() || "Anonymous",
+        name:     gid.trim() || "Anonymous",
       });
       await fetch(`https://script.google.com/macros/s/AKfycbwOEskh5U07L6SerB9E2JBs-CI16pnjDddz3ChMqk7oDmRPOkcHKyjT6zvtU353a-N2/exec?${params.toString()}`);
       setStatus("done");
-      setText(""); setName("");
+      setText(""); setGid("");
     } catch {
       setStatus("error");
     }
@@ -265,8 +265,8 @@ function FeedbackForm() {
   return (
     <div style={{ background: C.card, borderRadius: C.radiusSm,
       padding: "14px", boxShadow: C.shadow }}>
-      <input value={name} onChange={e => setName(e.target.value)}
-        placeholder="Your name (optional)"
+      <input value={gid} onChange={e => setGid(e.target.value)}
+        placeholder="Your GID / GCD code (optional)"
         style={{ width: "100%", border: `1px solid ${C.border}`, borderRadius: C.radiusXs,
           padding: "9px 12px", fontSize: "13px", fontFamily: C.font, color: C.text,
           background: C.bg, outline: "none", marginBottom: "8px", boxSizing: "border-box" }} />
@@ -312,7 +312,7 @@ function HomeScreen({ onNavigate }) {
     try {
       const cached = JSON.parse(localStorage.getItem("hpt_visits_cache") || "{}");
       if (cached.today || cached.total) {
-        setVisits({ today: cached.today || 0, total: cached.total || 0 });
+        setVisits({ today: cached.today || 0, total: (cached.total || 43050) });
       }
     } catch (e) {}
 
@@ -321,7 +321,7 @@ function HomeScreen({ onNavigate }) {
     fetch(VISIT_URL)
       .then(r => r.json())
       .then(d => {
-        const updated = { today: d.today || 0, total: d.visits || 0 };
+        const updated = { today: d.today || 0, total: (d.visits || 0) + 43050 };
         setVisits(updated);
         try { localStorage.setItem("hpt_visits_cache", JSON.stringify(updated)); } catch (e) {}
       })
