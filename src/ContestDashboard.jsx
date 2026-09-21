@@ -594,13 +594,27 @@ export default function ContestDashboard() {
               <div style={{ marginTop: "12px", marginBottom: "8px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 700, color: C.muted,
                   textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
-                  FLP Payout Eligibility — Sep'26
+                  Final Eligibility — Sep'26
                 </div>
+                {/* Final Eligibility — full width */}
+                <div style={{
+                  borderRadius: C.radiusSm, padding: "12px 14px", marginBottom: "8px",
+                  textAlign: "center",
+                  background: flpAllGood ? C.greenLight : C.redLight,
+                  border: `1.5px solid ${flpAllGood ? "#86EFAC" : "#FECACA"}`,
+                }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, color: C.text, marginBottom: "4px" }}>Final Eligibility</div>
+                  <div style={{ fontSize: "13px", fontWeight: 700, color: flpAllGood ? C.green : C.red }}>
+                    {flpAllGood ? "✓ Eligible for FLP Payout" : "✗ Not Eligible for FLP Payout"}
+                  </div>
+                </div>
+
+                {/* Three condition tiles */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
                   {[
-                    { label: "6 Months Active", val: flp6months, fail: "Stay active for 6 months" },
-                    { label: "Renewal ≥ 85%",   val: flpRenewal, fail: "Improve renewal % to 85%" },
-                    { label: "Cancellation < 1%", val: flpCancellation, fail: "Reduce cancellation to below 1%" },
+                    { label: "6 Months Active",  val: flp6months      },
+                    { label: "Renewal ≥ 85%",    val: flpRenewal      },
+                    { label: "Cancellation < 1%", val: flpCancellation },
                   ].map((c, i) => (
                     <div key={i} style={{
                       borderRadius: C.radiusSm, padding: "10px 8px", textAlign: "center",
