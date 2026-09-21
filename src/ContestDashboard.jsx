@@ -368,6 +368,12 @@ export default function ContestDashboard() {
   const septBooked  = data ? parseRaw(data["sept booked"]  || 0) : 0;
   const { cur: sCur, nxt: sNxt } = getSlabInfo(septBooked, SLABS);
 
+  // FLP Eligibility
+  const flp6months      = data ? parseFloat(data["flp 6months"]      || 0) : null;
+  const flpRenewal      = data ? parseFloat(data["flp renewal"]       || 0) : null;
+  const flpCancellation = data ? parseFloat(data["flp cancellation"]  || 0) : null;
+  const flpAllGood      = flp6months === 1 && flpRenewal === 1 && flpCancellation === 1;
+
   // Second NoP
   const secondNop    = data ? Math.round(parseRaw(data["second nop"]     || 0)) : 0;
   const secondNopSep = data ? Math.round(parseRaw(data["second nop sep"] || 0)) : 0;
@@ -583,15 +589,52 @@ export default function ContestDashboard() {
               </div>
             </div>
 
+            {/* ── FLP ELIGIBILITY BANNER ── */}
+            {data && (
+              <div style={{ marginTop: "12px", marginBottom: "8px" }}>
+                <div style={{ fontSize: "11px", fontWeight: 700, color: C.muted,
+                  textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
+                  FLP Payout Eligibility — Sep'26
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
+                  {[
+                    { label: "6 Months Active", val: flp6months, fail: "Stay active for 6 months" },
+                    { label: "Renewal ≥ 85%",   val: flpRenewal, fail: "Improve renewal % to 85%" },
+                    { label: "Cancellation < 1%", val: flpCancellation, fail: "Reduce cancellation to below 1%" },
+                  ].map((c, i) => (
+                    <div key={i} style={{
+                      borderRadius: C.radiusSm, padding: "10px 8px", textAlign: "center",
+                      background: c.val === 1 ? C.greenLight : C.redLight,
+                      border: `1px solid ${c.val === 1 ? "#86EFAC" : "#FECACA"}`,
+                    }}>
+                      <div style={{ fontSize: "10px", fontWeight: 600, color: C.text,
+                        marginBottom: "6px", lineHeight: 1.3 }}>{c.label}</div>
+                      <div style={{ fontSize: "12px", fontWeight: 700,
+                        color: c.val === 1 ? C.green : C.red }}>
+                        {c.val === 1 ? "✓ Eligible" : "✗ Not Eligible"}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {flpAllGood
+                  ? <div style={{ fontSize: "12px", fontWeight: 600, color: C.green,
+                      background: C.greenLight, border: "1px solid #86EFAC",
+                      borderRadius: C.radiusSm, padding: "10px 12px" }}>
+                      ✅ You are eligible for payout without waiting for Free Look Period for Sep'26
+                    </div>
+                  : <div style={{ fontSize: "11px", color: "#92400E",
+                      background: "#FFFBEB", border: "1px solid #FCD34D",
+                      borderRadius: C.radiusSm, padding: "10px 12px", lineHeight: 1.8 }}>
+                      {flp6months !== 1 && <div>• Improve consistency by staying active for 6 months</div>}
+                      {flpRenewal !== 1 && <div>• Improve renewal % to 85%</div>}
+                      {flpCancellation !== 1 && <div>• Reduce cancellation to below 1%</div>}
+                    </div>
+                }
+              </div>
+            )}
+
             {/* ── ACTIVE CONTESTS HEADER ── */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "20px", marginBottom: "4px" }}>
-              <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.green,
-                boxShadow: "0 0 0 3px rgba(22,163,74,0.2)", flexShrink: 0 }} />
-              <div style={{ fontSize: "12px", fontWeight: 700, color: C.green,
-                textTransform: "uppercase", letterSpacing: "0.08em" }}>Active Contest</div>
-            </div>
-            {/* ── ACTIVE CONTESTS HEADER ── */}
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "20px", marginBottom: "4px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "12px", marginBottom: "4px" }}>
               <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: C.green,
                 boxShadow: "0 0 0 3px rgba(22,163,74,0.2)", flexShrink: 0 }} />
               <div style={{ fontSize: "12px", fontWeight: 700, color: C.green,
@@ -704,7 +747,7 @@ export default function ContestDashboard() {
             
               key: "second-nop-sep",
               title: "Second Policy Contest",
-              period: "Sep 2026 · Booking till 10 Oct",
+              period: "Sep 2026 · Booking till 10 Sep",
               badge: secondNopSep >= 2 ? "Rs.800 Earned ✓" : secondNopSep === 1 ? "1/2 Policies" : "0 Policies",
               badgeColor: secondNopSep >= 2 ? C.green : secondNopSep === 1 ? "#F59E0B" : C.muted,
               content: (
