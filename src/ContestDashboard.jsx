@@ -612,9 +612,9 @@ export default function ContestDashboard() {
                 {/* Three condition tiles */}
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginBottom: "10px" }}>
                   {[
-                    { label: "6 Months Active",  val: flp6months      },
-                    { label: "Renewal ≥ 85%",    val: flpRenewal      },
-                    { label: "Cancellation < 1%", val: flpCancellation },
+                    { label: "Active ≥ 6 times in last 12 months", val: flp6months      },
+                    { label: "Renewal ≥ 85% of last 3 months (NoP level)", val: flpRenewal      },
+                    { label: "Cancellation ≤ 1% (GWP) in last 12 months", val: flpCancellation },
                   ].map((c, i) => (
                     <div key={i} style={{
                       borderRadius: C.radiusSm, padding: "10px 8px", textAlign: "center",
@@ -639,9 +639,9 @@ export default function ContestDashboard() {
                   : <div style={{ fontSize: "11px", color: "#92400E",
                       background: "#FFFBEB", border: "1px solid #FCD34D",
                       borderRadius: C.radiusSm, padding: "10px 12px", lineHeight: 1.8 }}>
-                      {flp6months !== 1 && <div>• Improve consistency by staying active for 6 months</div>}
-                      {flpRenewal !== 1 && <div>• Improve renewal % to 85%</div>}
-                      {flpCancellation !== 1 && <div>• Reduce cancellation to below 1%</div>}
+                      {flp6months !== 1 && <div>• Be active at least 6 times in the last 12 months</div>}
+                      {flpRenewal !== 1 && <div>• Improve renewal % to ≥ 85% (last 3 months, at NoP level)</div>}
+                      {flpCancellation !== 1 && <div>• Reduce overall cancellation to ≤ 1% at GWP in last 12 months</div>}
                     </div>
                 }
               </div>
