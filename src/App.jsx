@@ -294,6 +294,36 @@ function FeedbackForm() {
   );
 }
 
+/* ── BANNER SLIDE — shows image if available, styled fallback otherwise ── */
+function BannerSlide({ banner, visible }) {
+  const [imgFailed, setImgFailed] = React.useState(false);
+  if (!visible) return null;
+  if (!imgFailed) {
+    return (
+      <img src={banner.src} alt={banner.alt}
+        onError={() => setImgFailed(true)}
+        style={{ width: "100%", height: "160px", objectFit: "cover",
+          objectPosition: "center", display: "block", borderRadius: C.radius }} />
+    );
+  }
+  // Fallback styled card
+  return (
+    <div style={{ width: "100%", height: "160px", display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", gap: "8px",
+      background: banner.fallbackBg || "linear-gradient(135deg,#dc2626,#b91c1c)",
+      borderRadius: C.radius, padding: "16px", textAlign: "center" }}>
+      <div style={{ fontSize: "22px", fontWeight: 800, color: "#fff",
+        textShadow: "0 1px 4px rgba(0,0,0,0.3)", lineHeight: 1.2 }}>
+        {banner.fallbackTitle}
+      </div>
+      <div style={{ fontSize: "13px", color: "rgba(255,255,255,0.9)",
+        fontWeight: 500, maxWidth: "260px" }}>
+        {banner.fallbackSub}
+      </div>
+    </div>
+  );
+}
+
 /* ── HOME SCREEN ─────────────────────────────────────────────── */
 function HomeScreen({ onNavigate }) {
   const [carouselIdx, setCarouselIdx]   = useState(0);
@@ -303,7 +333,9 @@ function HomeScreen({ onNavigate }) {
   const totalDisplay = useCountUp(visits.total, 1400);
 
   const BANNERS = [
-    { src: "/VLI_4__Banner.png", alt: "VLI Health Payout" },
+    { src: "/Oct_Mahotsav_Banner.png",    alt: "October Mahotsav",              fallbackTitle: "🏆 October Mahotsav", fallbackSub: "Book Rs.75K → Earn up to Malaysia 1 Pax!", fallbackBg: "linear-gradient(135deg,#7c3aed,#4f46e5)" },
+    { src: "/Online_Contest_Banner.png",  alt: "Online Health Booking Contest",  fallbackTitle: "📱 Online Health Booking", fallbackSub: "Book 1 policy via PoS/IDEdge → Earn Rs.500!", fallbackBg: "linear-gradient(135deg,#0891b2,#0369a1)" },
+    { src: "/VLI_4__Banner.png",          alt: "VLI Health Payout",              fallbackTitle: "💰 VLI Health Payout", fallbackSub: "Earn up to 15% extra on health premium", fallbackBg: "linear-gradient(135deg,#dc2626,#b91c1c)" },
   ];
 
   /* ── VISIT COUNTER — both cross-device via Apps Script ── */
@@ -381,12 +413,7 @@ function HomeScreen({ onNavigate }) {
           borderRadius: C.radius, overflow: "hidden", boxShadow: C.shadow,
           height: "160px" }}>
           {BANNERS.map((b, i) => (
-            <img key={i} src={b.src} alt={b.alt}
-              onError={e => { e.target.style.display = "none"; }}
-              style={{ width: "100%", height: "160px", objectFit: "cover",
-                objectPosition: "center",
-                display: i === carouselIdx ? "block" : "none",
-                borderRadius: C.radius }} />
+            <BannerSlide key={i} banner={b} visible={i === carouselIdx} />
           ))}
           {/* Dot indicators */}
           <div style={{ position: "absolute", bottom: "8px", left: "50%",
