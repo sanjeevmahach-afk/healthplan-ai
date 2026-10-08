@@ -392,6 +392,21 @@ export default function ContestDashboard() {
   const vliPctDisplaySep = vliPctSep > 0 ? (vliPctSep * 100).toFixed(0) + "%" : "0%";
   const { cur: vCurSep, nxt: vNxtSep } = getSlabInfo(vliPremSep, VLI_SLABS);
 
+  // October — Jeeto October
+  const octSourced = data ? parseRaw(data["oct sourced"] || 0) : 0;
+  const octBooked  = data ? parseRaw(data["oct booked"]  || 0) : 0;
+  const { cur: oCur, nxt: oNxt } = getSlabInfo(octBooked, SLABS);
+
+  // October VLI
+  const vliPremOct = data ? parseRaw(data["vli premium oct"] || 0) : 0;
+  const vliPctOct  = data ? parseRaw(data["vli % oct"]       || 0) : 0;
+  const vliAmtOct  = data ? parseRaw(data["vli amount oct"]  || 0) : 0;
+  const vliPctDisplayOct = vliPctOct > 0 ? (vliPctOct * 100).toFixed(0) + "%" : "0%";
+  const { cur: vCurOct, nxt: vNxtOct } = getSlabInfo(vliPremOct, VLI_SLABS);
+
+  // October Second NoP
+  const secondNopOct = data ? Math.round(parseRaw(data["second nop oct"] || 0)) : 0;
+
   // Online Policy Contest
   const onlineReward    = data ? parseRaw(data["online reward"] || 0) : 0;
 
@@ -657,6 +672,100 @@ export default function ContestDashboard() {
 
             {/* ── ACCORDION HELPER ── */}
             {data && [{
+              key: "jeeto-oct",
+              title: "Jeeto October",
+              period: "Oct 2026 · Booking till 10 Nov",
+              badge: octBooked > 0 ? (oCur ? oCur.reward : fmtL(octBooked) + " booked") : "No bookings yet",
+              badgeColor: oCur ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium" value={fmtL(octBooked)} valueColor={C.red} />
+                    <StatTile label="Net Sourced Premium" value={fmtL(octSourced)} valueColor={C.muted} />
+                  </div>
+                  <ProgressBar value={octBooked} total={JEETO_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
+                    {SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
+                      const ach = octBooked >= s.min;
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.amt}</div>;
+                    })}
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: oNxt ? C.redLight : C.greenLight, border: `1px solid ${oNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: oNxt ? C.red : C.green }}>
+                    {oCur ? oNxt ? <>Unlocked <strong>{oCur.reward}</strong> — Book <strong>{fmtL(oNxt.min - octBooked)} more</strong> for {oNxt.reward}</> : <strong>Top slab — Thailand 1 Pax unlocked!</strong> : oNxt ? <>Book <strong>{fmtL(oNxt.min - octBooked)} more</strong> to unlock <strong>{oNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
+                  </div>
+                </div>
+              )
+            }, {
+              key: "vli-oct",
+              title: "Health Payout Incentive (VLI)",
+              period: "Oct 2026 · Upto 15% extra",
+              badge: vliPremOct > 0 ? (vCurOct ? vCurOct.pct + " extra" : fmtL(vliPremOct) + " premium") : "No premium yet",
+              badgeColor: vCurOct ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="VLI Premium" value={fmtL(vliPremOct)} valueColor={C.red} />
+                    <StatTile label="VLI %" value={vliPctDisplayOct} valueColor={C.green} />
+                    <StatTile label="VLI Amount" value={"Rs." + Math.round(vliAmtOct).toLocaleString("en-IN")} valueColor={C.red} />
+                  </div>
+                  <ProgressBar value={vliPremOct} total={VLI_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
+                    {VLI_SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
+                      const ach = vliPremOct >= s.min;
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.pct}</div>;
+                    })}
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: vNxtOct ? C.redLight : C.greenLight, border: `1px solid ${vNxtOct ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: vNxtOct ? C.red : C.green }}>
+                    {vNxtOct ? <>Book <strong>{fmtL(vNxtOct.min - vliPremOct)} more</strong> to unlock {vNxtOct.pct} extra payout</> : <strong>Top VLI slab — earning 15% extra payout!</strong>}
+                  </div>
+                </div>
+              )
+            }, {
+              key: "second-nop-oct",
+              title: "Second Policy Contest",
+              period: "Oct 2026 · Booking till 10 Oct",
+              badge: secondNopOct >= 2 ? "Rs.800 Earned ✓" : secondNopOct === 1 ? "1/2 Policies" : "0 Policies",
+              badgeColor: secondNopOct >= 2 ? C.green : secondNopOct === 1 ? "#F59E0B" : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "14px", marginBottom: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
+                      <div style={{ fontSize: "32px", fontWeight: 700, color: secondNopOct >= 2 ? C.green : C.red }}>{secondNopOct}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span></div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
+                      <div style={{ fontSize: "24px", fontWeight: 700, color: secondNopOct >= 2 ? C.green : C.muted }}>{secondNopOct >= 2 ? "Rs.800" : "Rs.0"}</div>
+                    </div>
+                  </div>
+                  <div style={{ position: "relative", marginBottom: "20px" }}>
+                    <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px", height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
+                      <div style={{ height: "100%", borderRadius: "99px", background: C.red, width: secondNopOct >= 2 ? "100%" : secondNopOct === 1 ? "50%" : "0%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
+                      {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.800"}].map((m, i) => {
+                        const achieved = secondNopOct >= m.count && m.count > 0;
+                        const isCurrent = secondNopOct === m.count;
+                        return (
+                          <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
+                            <div style={{ fontSize: "10px", fontWeight: 700, height: "16px", color: achieved ? C.green : C.hint }}>{m.reward || ""}</div>
+                            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border, border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
+                              {achieved ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg> : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
+                            </div>
+                            <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center", color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: secondNopOct >= 2 ? C.greenLight : C.redLight, border: `1px solid ${secondNopOct >= 2 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: secondNopOct >= 2 ? C.green : C.red }}>
+                    {secondNopOct >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong> : secondNopOct === 1 ? <>1 more New policy needed to unlock <strong>Rs.800</strong></> : <>Book <strong>2 New policies</strong> (min Rs.15,000) to earn Rs.800</>}
+                  </div>
+                </div>
+              )
+            }, {
               key: "gold",
               title: "Gold Jackpot",
               period: "Jul–Sep 2026 · Booking till 10 Oct",
