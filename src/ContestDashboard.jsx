@@ -17,7 +17,7 @@ const VLI_SLABS = [
 ];
 const VLI_TOTAL = 300000;
 
-/* ── SLABS — JEETO JULY ──────────────────────────────────────── */
+/* ── SLABS — JEETO JULY / SEP ────────────────────────────────── */
 const SLABS = [
   { min: 75000,   amt: "75K",  reward: "Rs.1K Cash"    },
   { min: 100000,  amt: "1L",   reward: "Rs.4K Cash"    },
@@ -26,6 +26,16 @@ const SLABS = [
   { min: 450000,  amt: "4.5L", reward: "Thailand 1 Pax"},
 ];
 const JEETO_TOTAL = 450000;
+
+/* ── SLABS — OCT MAHOTSAV ────────────────────────────────────── */
+const OCT_SLABS = [
+  { min: 75000,   amt: "75K",  reward: "Rs.1K Cash"    },
+  { min: 100000,  amt: "1L",   reward: "Rs.4K Cash"    },
+  { min: 200000,  amt: "2L",   reward: "Rs.15K Cash"   },
+  { min: 300000,  amt: "3L",   reward: "Goa 1 Pax"     },
+  { min: 450000,  amt: "4.5L", reward: "Malaysia 1 Pax"},
+];
+const OCT_TOTAL = 450000;
 
 
 
@@ -392,10 +402,10 @@ export default function ContestDashboard() {
   const vliPctDisplaySep = vliPctSep > 0 ? (vliPctSep * 100).toFixed(0) + "%" : "0%";
   const { cur: vCurSep, nxt: vNxtSep } = getSlabInfo(vliPremSep, VLI_SLABS);
 
-  // October — Jeeto October
+  // October — Oct Mahotsav
   const octSourced = data ? parseRaw(data["oct sourced"] || 0) : 0;
   const octBooked  = data ? parseRaw(data["oct booked"]  || 0) : 0;
-  const { cur: oCur, nxt: oNxt } = getSlabInfo(octBooked, SLABS);
+  const { cur: oCur, nxt: oNxt } = getSlabInfo(octBooked, OCT_SLABS);
 
   // October VLI
   const vliPremOct = data ? parseRaw(data["vli premium oct"] || 0) : 0;
@@ -672,8 +682,8 @@ export default function ContestDashboard() {
 
             {/* ── ACCORDION HELPER ── */}
             {data && [{
-              key: "jeeto-oct",
-              title: "Jeeto October",
+              key: "oct-mahotsav",
+              title: "October Mahotsav",
               period: "Oct 2026 · Booking till 10 Nov",
               badge: octBooked > 0 ? (oCur ? oCur.reward : fmtL(octBooked) + " booked") : "No bookings yet",
               badgeColor: oCur ? C.green : C.muted,
@@ -683,16 +693,16 @@ export default function ContestDashboard() {
                     <StatTile label="Net Booked Premium" value={fmtL(octBooked)} valueColor={C.red} />
                     <StatTile label="Net Sourced Premium" value={fmtL(octSourced)} valueColor={C.muted} />
                   </div>
-                  <ProgressBar value={octBooked} total={JEETO_TOTAL} />
+                  <ProgressBar value={octBooked} total={OCT_TOTAL} />
                   <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
-                    {SLABS.map((s, i) => {
-                      const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
+                    {OCT_SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / OCT_TOTAL) * 100);
                       const ach = octBooked >= s.min;
                       return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.amt}</div>;
                     })}
                   </div>
                   <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: oNxt ? C.redLight : C.greenLight, border: `1px solid ${oNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: oNxt ? C.red : C.green }}>
-                    {oCur ? oNxt ? <>Unlocked <strong>{oCur.reward}</strong> — Book <strong>{fmtL(oNxt.min - octBooked)} more</strong> for {oNxt.reward}</> : <strong>Top slab — Thailand 1 Pax unlocked!</strong> : oNxt ? <>Book <strong>{fmtL(oNxt.min - octBooked)} more</strong> to unlock <strong>{oNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
+                    {oCur ? oNxt ? <>Unlocked <strong>{oCur.reward}</strong> — Book <strong>{fmtL(oNxt.min - octBooked)} more</strong> for {oNxt.reward}</> : <strong>Top slab — Malaysia 1 Pax unlocked!</strong> : oNxt ? <>Book <strong>{fmtL(oNxt.min - octBooked)} more</strong> to unlock <strong>{oNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
                   </div>
                 </div>
               )
