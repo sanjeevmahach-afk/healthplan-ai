@@ -254,6 +254,7 @@ function getPartnerData(gid) {
     'vli % oct':         parseFloat(match[33]) || 0,  // AH
     'vli amount oct':    parseFloat(match[34]) || 0,  // AI
     'second nop oct':    parseFloat(match[35]) || 0,  // AJ
+    'online oct':        parseFloat(match[36]) || 0,  // AK
   };
 }
 

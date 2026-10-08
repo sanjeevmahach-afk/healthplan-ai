@@ -417,6 +417,9 @@ export default function ContestDashboard() {
   // October Second NoP
   const secondNopOct = data ? Math.round(parseRaw(data["second nop oct"] || 0)) : 0;
 
+  // October Online Health Booking Contest
+  const onlineOct = data ? Math.round(parseRaw(data["online oct"] || 0)) : 0;
+
   // Online Policy Contest
   const onlineReward    = data ? parseRaw(data["online reward"] || 0) : 0;
 
@@ -772,6 +775,29 @@ export default function ContestDashboard() {
                   </div>
                   <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: secondNopOct >= 2 ? C.greenLight : C.redLight, border: `1px solid ${secondNopOct >= 2 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: secondNopOct >= 2 ? C.green : C.red }}>
                     {secondNopOct >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong> : secondNopOct === 1 ? <>1 more New policy needed to unlock <strong>Rs.800</strong></> : <>Book <strong>2 New policies</strong> (min Rs.15,000) to earn Rs.800</>}
+                  </div>
+                </div>
+              )
+            }, {
+              key: "online-oct",
+              title: "Online Health Booking Contest",
+              period: "Oct 2026 · PoS/IDEdge only",
+              badge: onlineOct >= 1 ? "Rs.500 Earned ✓" : "0 Bookings",
+              badgeColor: onlineOct >= 1 ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "14px", marginBottom: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Eligible Bookings</div>
+                      <div style={{ fontSize: "32px", fontWeight: 700, color: onlineOct >= 1 ? C.green : C.red }}>{onlineOct}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 1</span></div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
+                      <div style={{ fontSize: "24px", fontWeight: 700, color: onlineOct >= 1 ? C.green : C.muted }}>{onlineOct >= 1 ? "Rs.500" : "Rs.0"}</div>
+                    </div>
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: onlineOct >= 1 ? C.greenLight : C.redLight, border: `1px solid ${onlineOct >= 1 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: onlineOct >= 1 ? C.green : C.red }}>
+                    {onlineOct >= 1 ? <strong>Reward unlocked — Rs.500 earned!</strong> : <>Book <strong>1 eligible policy</strong> via PoS/IDEdge (min Rs.20,000) to earn <strong>Rs.500</strong></>}
                   </div>
                 </div>
               )
