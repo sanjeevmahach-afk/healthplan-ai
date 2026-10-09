@@ -296,7 +296,7 @@ function FeedbackForm() {
 
 /* ── BANNER SLIDE — shows image if available, styled fallback otherwise ── */
 function BannerSlide({ banner, visible }) {
-  const [imgFailed, setImgFailed] = React.useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
   if (!visible) return null;
   if (!imgFailed) {
     return (
