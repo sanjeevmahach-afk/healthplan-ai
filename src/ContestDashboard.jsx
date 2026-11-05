@@ -17,6 +17,17 @@ const VLI_SLABS = [
 ];
 const VLI_TOTAL = 300000;
 
+/* ── VLI SLABS — NOV (updated banner: request date 1–30 Nov) ── */
+const NOV_VLI_SLABS = [
+  { min: 20000,  amt: "20K",  pct: "3%"  },
+  { min: 50000,  amt: "50K",  pct: "5%"  },
+  { min: 100000, amt: "1L",   pct: "7%"  },
+  { min: 150000, amt: "1.5L", pct: "8%"  },
+  { min: 200000, amt: "2L",   pct: "10%" },
+  { min: 250000, amt: "2.5L", pct: "12%" },
+  { min: 300000, amt: "3L",   pct: "15%" },
+];
+
 /* ── SLABS — JEETO JULY / SEP ────────────────────────────────── */
 const SLABS = [
   { min: 75000,   amt: "75K",  reward: "Rs.1K Cash"    },
@@ -36,6 +47,16 @@ const OCT_SLABS = [
   { min: 450000,  amt: "4.5L", reward: "Malaysia 1 Pax"},
 ];
 const OCT_TOTAL = 450000;
+
+/* ── SLABS — NOV MAHOTSAV (per Nov creative: request date 1–30 Nov) ── */
+const NOV_SLABS = [
+  { min: 75000,   amt: "75K",  reward: "Rs.1K Cash"    },
+  { min: 100000,  amt: "1L",   reward: "Rs.3K Cash"    },
+  { min: 200000,  amt: "2L",   reward: "Rs.10K Cash"   },
+  { min: 350000,  amt: "3.5L", reward: "Goa 1 Pax"     },
+  { min: 450000,  amt: "4.5L", reward: "Malaysia 1 Pax"},
+];
+const NOV_TOTAL = 450000;
 
 
 
@@ -277,6 +298,7 @@ export default function ContestDashboard() {
   const [showGoldLb,    setShowGoldLb]    = useState(false);
   const [showMultiyLb,  setShowMultiyLb]  = useState(false);
   const [expandedPast,   setExpandedPast]   = useState(null);
+  const [showPast,       setShowPast]       = useState(false);
   const [expandedContest, setExpandedContest] = useState(null);
   const [activeContests, setActiveContests] = useState([]);
   const [pastContests,   setPastContests]   = useState([]); // "vli" | "second" | null
@@ -373,20 +395,14 @@ export default function ContestDashboard() {
   const augustBooked  = data ? parseRaw(data["august booked"]  || 0) : 0;
   const { cur: aCur, nxt: aNxt } = getSlabInfo(augustBooked, SLABS);
 
-  // September — Jeeto September
-  const septSourced = data ? parseRaw(data["sept sourced"] || 0) : 0;
-  const septBooked  = data ? parseRaw(data["sept booked"]  || 0) : 0;
-  const { cur: sCur, nxt: sNxt } = getSlabInfo(septBooked, SLABS);
-
   // FLP Eligibility
   const flp6months      = data ? parseFloat(data["flp 6months"]      || 0) : null;
   const flpRenewal      = data ? parseFloat(data["flp renewal"]       || 0) : null;
   const flpCancellation = data ? parseFloat(data["flp cancellation"]  || 0) : null;
   const flpAllGood      = flp6months === 1 && flpRenewal === 1 && flpCancellation === 1;
 
-  // Second NoP
+  // Second NoP (Aug)
   const secondNop    = data ? Math.round(parseRaw(data["second nop"]     || 0)) : 0;
-  const secondNopSep = data ? Math.round(parseRaw(data["second nop sep"] || 0)) : 0;
 
   // July — VLI July (from Jeeto July Summary cols E, F, G)
   const vliPremJul = data ? parseRaw(data["vli premium jul"] || 0) : 0;
@@ -394,13 +410,6 @@ export default function ContestDashboard() {
   const vliAmtJul  = data ? parseRaw(data["vli amount jul"]  || 0) : 0;
   const vliPctDisplay = vliPctJul > 0 ? (vliPctJul * 100).toFixed(0) + "%" : "0%";
   const { cur: vCur, nxt: vNxt } = getSlabInfo(vliPremJul, VLI_SLABS);
-
-  // September VLI
-  const vliPremSep = data ? parseRaw(data["vli premium sep"] || 0) : 0;
-  const vliPctSep  = data ? parseRaw(data["vli % sep"]       || 0) : 0;
-  const vliAmtSep  = data ? parseRaw(data["vli amount sep"]  || 0) : 0;
-  const vliPctDisplaySep = vliPctSep > 0 ? (vliPctSep * 100).toFixed(0) + "%" : "0%";
-  const { cur: vCurSep, nxt: vNxtSep } = getSlabInfo(vliPremSep, VLI_SLABS);
 
   // October — Oct Mahotsav
   const octSourced = data ? parseRaw(data["oct sourced"] || 0) : 0;
@@ -418,7 +427,22 @@ export default function ContestDashboard() {
   const secondNopOct = data ? Math.round(parseRaw(data["second nop oct"] || 0)) : 0;
 
   // October Online Health Booking Contest
-  const onlineOct = data ? Math.round(parseRaw(data["online oct"] || 0)) : 0;
+  const onlineOct = data ? (parseRaw(data["online oct"] || 0) > 0 ? 1 : 0) : 0; // sheet holds reward (500), not a count
+
+  // November — Nov Mahotsav
+  const novSourced = data ? parseRaw(data["nov sourced"] || 0) : 0;
+  const novBooked  = data ? parseRaw(data["nov booked"]  || 0) : 0;
+  const { cur: nCur, nxt: nNxt } = getSlabInfo(novBooked, NOV_SLABS);
+
+  // November VLI
+  const vliPremNov = data ? parseRaw(data["vli premium nov"] || 0) : 0;
+  const vliPctNov  = data ? parseRaw(data["vli % nov"]       || 0) : 0;
+  const vliAmtNov  = data ? parseRaw(data["vli amount nov"]  || 0) : 0;
+  const vliPctDisplayNov = vliPctNov > 0 ? (vliPctNov * 100).toFixed(0) + "%" : "0%";
+  const { cur: vCurNov, nxt: vNxtNov } = getSlabInfo(vliPremNov, NOV_VLI_SLABS);
+
+  // November Online Health Booking Contest (sheet holds the reward, Rs.500 max, not a count)
+  const onlineNov = data ? (parseRaw(data["online nov"] || 0) > 0 ? 1 : 0) : 0;
 
   // Online Policy Contest
   const onlineReward    = data ? parseRaw(data["online reward"] || 0) : 0;
@@ -622,7 +646,7 @@ export default function ContestDashboard() {
               <div style={{ marginTop: "12px", marginBottom: "8px" }}>
                 <div style={{ fontSize: "11px", fontWeight: 700, color: C.muted,
                   textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>
-                  Final Eligibility — Sep'26
+                  Final Eligibility — Oct'26
                 </div>
                 {/* Final Eligibility — full width */}
                 <div style={{
@@ -662,7 +686,7 @@ export default function ContestDashboard() {
                   ? <div style={{ fontSize: "12px", fontWeight: 600, color: C.green,
                       background: C.greenLight, border: "1px solid #86EFAC",
                       borderRadius: C.radiusSm, padding: "10px 12px" }}>
-                      ✅ You are eligible for payout without waiting for Free Look Period for Sep'26
+                      ✅ You are eligible for payout without waiting for Free Look Period for Oct'26
                     </div>
                   : <div style={{ fontSize: "11px", color: "#92400E",
                       background: "#FFFBEB", border: "1px solid #FCD34D",
@@ -684,7 +708,87 @@ export default function ContestDashboard() {
             </div>
 
             {/* ── ACCORDION HELPER ── */}
-            {data && [{
+            {data && (() => {
+            const PAST_KEYS = ["gold", "jeeto-aug", "second-nop", "vli-aug", "multiyear", "online"];
+            const allContests = [{
+              key: "nov-mahotsav",
+              title: "November Mahotsav",
+              period: "Nov 2026 · Request 1–30 Nov · Booking till 10 Dec",
+              badge: novBooked > 0 ? (nCur ? nCur.reward : fmtL(novBooked) + " booked") : "No bookings yet",
+              badgeColor: nCur ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="Net Booked Premium" value={fmtL(novBooked)} valueColor={C.red} />
+                    <StatTile label="Net Sourced Premium" value={fmtL(novSourced)} valueColor={C.muted} />
+                  </div>
+                  <ProgressBar value={novBooked} total={NOV_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
+                    {NOV_SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / NOV_TOTAL) * 100);
+                      const ach = novBooked >= s.min;
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.amt}</div>;
+                    })}
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: nNxt ? C.redLight : C.greenLight, border: `1px solid ${nNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: nNxt ? C.red : C.green }}>
+                    {nCur ? nNxt ? <>Unlocked <strong>{nCur.reward}</strong> — Book <strong>{fmtL(nNxt.min - novBooked)} more</strong> for {nNxt.reward}</> : <strong>Top slab — Malaysia 1 Pax unlocked!</strong> : nNxt ? <>Book <strong>{fmtL(nNxt.min - novBooked)} more</strong> to unlock <strong>{nNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
+                  </div>
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Request date 1–30 Nov 2026, booked till 10 Dec. New premium 100% weightage, Port 50%. New SI ≥ Rs.10L, Port ≥ Rs.15L. Policies counted in October Mahotsav are excluded. Renewal, cancelled and 0% payout policies excluded.</div>
+                </div>
+              )
+            }, {
+              key: "vli-nov",
+              title: "Health Payout Incentive (VLI)",
+              period: "Nov 2026 · Request 1–30 Nov · Upto 15% extra",
+              badge: vliPremNov > 0 ? (vCurNov ? vCurNov.pct + " extra" : fmtL(vliPremNov) + " premium") : "No premium yet",
+              badgeColor: vCurNov ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
+                    <StatTile label="VLI Premium" value={fmtL(vliPremNov)} valueColor={C.red} />
+                    <StatTile label="VLI %" value={vliPctDisplayNov} valueColor={C.green} />
+                    <StatTile label="VLI Amount" value={"Rs." + Math.round(vliAmtNov).toLocaleString("en-IN")} valueColor={C.red} />
+                  </div>
+                  <ProgressBar value={vliPremNov} total={VLI_TOTAL} />
+                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
+                    {NOV_VLI_SLABS.map((s, i) => {
+                      const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
+                      const ach = vliPremNov >= s.min;
+                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.pct}</div>;
+                    })}
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: vNxtNov ? C.redLight : C.greenLight, border: `1px solid ${vNxtNov ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: vNxtNov ? C.red : C.green }}>
+                    {vNxtNov ? <>Book <strong>{fmtL(vNxtNov.min - vliPremNov)} more</strong> to unlock {vNxtNov.pct} extra payout</> : <strong>Top VLI slab — earning 15% extra payout!</strong>}
+                  </div>
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Request date 1–30 Nov 2026. Only New policies; PA, Port and Renewal excluded. Multi-tenure: first-year premium only. Payout released post FLP completion.</div>
+                </div>
+              )
+            }, {
+              key: "online-nov",
+              title: "Online Health Booking Contest",
+              period: "Nov 2026 · Request 1–30 Nov · PoS/IDEdge only",
+              badge: onlineNov >= 1 ? "Rs.500 Earned ✓" : "0 Bookings",
+              badgeColor: onlineNov >= 1 ? C.green : C.muted,
+              content: (
+                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "14px", marginBottom: "16px" }}>
+                    <div>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Eligible Bookings</div>
+                      <div style={{ fontSize: "32px", fontWeight: 700, color: onlineNov >= 1 ? C.green : C.red }}>{onlineNov}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 1</span></div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
+                      <div style={{ fontSize: "24px", fontWeight: 700, color: onlineNov >= 1 ? C.green : C.muted }}>{onlineNov >= 1 ? "Rs.500" : "Rs.0"}</div>
+                    </div>
+                  </div>
+                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: onlineNov >= 1 ? C.greenLight : C.redLight, border: `1px solid ${onlineNov >= 1 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: onlineNov >= 1 ? C.green : C.red }}>
+                    {onlineNov >= 1 ? <strong>Reward unlocked — Rs.500 earned!</strong> : <>Book <strong>1 eligible policy</strong> via PoS/IDEdge (min Rs.20,000) to earn <strong>Rs.500</strong></>}
+                  </div>
+                  <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Only New + Port via PoS/IDEdge. Request date 1–30 Nov, booked till 10 Dec. Min Rs.20,000 per policy. PA and 0% payout excluded. Max Rs.500.</div>
+                </div>
+              )
+
+            }, {
               key: "oct-mahotsav",
               title: "October Mahotsav",
               period: "Oct 2026 · Booking till 10 Nov",
@@ -738,7 +842,7 @@ export default function ContestDashboard() {
             }, {
               key: "second-nop-oct",
               title: "Second Policy Contest",
-              period: "Oct 2026 · Booking till 10 Oct",
+              period: "Oct 2026 · Booking till 10 Nov",
               badge: secondNopOct >= 2 ? "Rs.800 Earned ✓" : secondNopOct === 1 ? "1/2 Policies" : "0 Policies",
               badgeColor: secondNopOct >= 2 ? C.green : secondNopOct === 1 ? "#F59E0B" : C.muted,
               content: (
@@ -848,101 +952,6 @@ export default function ContestDashboard() {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                       <path d="M9 18L15 12L9 6" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
-                  </div>
-                </div>
-              )
-            }, {
-              key: "jeeto-sep",
-              title: "Jeeto September",
-              period: "Sep 2026 · Booking till 10 Oct",
-              badge: septBooked > 0 ? (sCur ? sCur.reward : fmtL(septBooked) + " booked") : "No bookings yet",
-              badgeColor: sCur ? C.green : C.muted,
-              content: (
-                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
-                    <StatTile label="Net Booked Premium" value={fmtL(septBooked)} valueColor={C.red} />
-                    <StatTile label="Net Sourced Premium" value={fmtL(septSourced)} valueColor={C.muted} />
-                  </div>
-                  <ProgressBar value={septBooked} total={JEETO_TOTAL} />
-                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
-                    {SLABS.map((s, i) => {
-                      const pct = Math.min(96, (s.min / JEETO_TOTAL) * 100);
-                      const ach = septBooked >= s.min;
-                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.amt}</div>;
-                    })}
-                  </div>
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: sNxt ? C.redLight : C.greenLight, border: `1px solid ${sNxt ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: sNxt ? C.red : C.green }}>
-                    {sCur ? sNxt ? <>Unlocked <strong>{sCur.reward}</strong> — Book <strong>{fmtL(sNxt.min - septBooked)} more</strong> for {sNxt.reward}</> : <strong>Top slab — Thailand 1 Pax unlocked!</strong> : sNxt ? <>Book <strong>{fmtL(sNxt.min - septBooked)} more</strong> to unlock <strong>{sNxt.reward}</strong></> : <strong>Start booking to win!</strong>}
-                  </div>
-                </div>
-              )
-            }, {
-              key: "vli-sep",
-              title: "Health Payout Incentive (VLI)",
-              period: "Sep 2026 · Upto 15% extra",
-              badge: vliPremSep > 0 ? (vCurSep ? vCurSep.pct + " extra" : fmtL(vliPremSep) + " premium") : "No premium yet",
-              badgeColor: vCurSep ? C.green : C.muted,
-              content: (
-                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "8px", marginTop: "14px", marginBottom: "16px" }}>
-                    <StatTile label="VLI Premium" value={fmtL(vliPremSep)} valueColor={C.red} />
-                    <StatTile label="VLI %" value={vliPctDisplaySep} valueColor={C.green} />
-                    <StatTile label="VLI Amount" value={"Rs." + Math.round(vliAmtSep).toLocaleString("en-IN")} valueColor={C.red} />
-                  </div>
-                  <ProgressBar value={vliPremSep} total={VLI_TOTAL} />
-                  <div style={{ position: "relative", height: "18px", marginTop: "4px", marginBottom: "12px" }}>
-                    {VLI_SLABS.map((s, i) => {
-                      const pct = Math.min(96, (s.min / VLI_TOTAL) * 100);
-                      const ach = vliPremSep >= s.min;
-                      return <div key={i} style={{ position: "absolute", left: pct + "%", transform: "translateX(-50%)", fontSize: "9px", fontWeight: 600, color: ach ? C.green : C.hint, whiteSpace: "nowrap" }}>{s.pct}</div>;
-                    })}
-                  </div>
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: vNxtSep ? C.redLight : C.greenLight, border: `1px solid ${vNxtSep ? "#FECACA" : "#86EFAC"}`, fontSize: "12px", color: vNxtSep ? C.red : C.green }}>
-                    {vNxtSep ? <>Book <strong>{fmtL(vNxtSep.min - vliPremSep)} more</strong> to unlock {vNxtSep.pct} extra payout</> : <strong>Top VLI slab — earning 15% extra payout!</strong>}
-                  </div>
-                </div>
-              )
-            }, {
-            
-              key: "second-nop-sep",
-              title: "Second Policy Contest",
-              period: "Sep 2026 · Booking till 10 Sep",
-              badge: secondNopSep >= 2 ? "Rs.800 Earned ✓" : secondNopSep === 1 ? "1/2 Policies" : "0 Policies",
-              badgeColor: secondNopSep >= 2 ? C.green : secondNopSep === 1 ? "#F59E0B" : C.muted,
-              content: (
-                <div style={{ padding: "0 16px 16px", borderTop: `1px solid ${C.border}` }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "14px", marginBottom: "16px" }}>
-                    <div>
-                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Policies Done</div>
-                      <div style={{ fontSize: "32px", fontWeight: 700, color: secondNopSep >= 2 ? C.green : C.red }}>{secondNopSep}<span style={{ fontSize: "14px", color: C.muted, fontWeight: 400, marginLeft: "4px" }}>/ 2</span></div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: "12px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "4px" }}>Reward</div>
-                      <div style={{ fontSize: "24px", fontWeight: 700, color: secondNopSep >= 2 ? C.green : C.muted }}>{secondNopSep >= 2 ? "Rs.800" : "Rs.0"}</div>
-                    </div>
-                  </div>
-                  <div style={{ position: "relative", marginBottom: "20px" }}>
-                    <div style={{ position: "absolute", top: "16px", left: "16px", right: "16px", height: "4px", background: C.border, borderRadius: "99px", zIndex: 0 }}>
-                      <div style={{ height: "100%", borderRadius: "99px", background: C.red, width: secondNopSep >= 2 ? "100%" : secondNopSep === 1 ? "50%" : "0%", transition: "width 0.8s cubic-bezier(0.4,0,0.2,1)" }} />
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", position: "relative", zIndex: 1 }}>
-                      {[{count:0,label:"Start",reward:null},{count:1,label:"1 Policy",reward:null},{count:2,label:"2 Policies",reward:"Rs.800"}].map((m, i) => {
-                        const achieved = secondNopSep >= m.count && m.count > 0;
-                        const isCurrent = secondNopSep === m.count;
-                        return (
-                          <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
-                            <div style={{ fontSize: "10px", fontWeight: 700, height: "16px", color: achieved ? C.green : C.hint }}>{m.reward || ""}</div>
-                            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: achieved ? C.green : isCurrent && m.count === 0 ? C.bg : C.border, border: `2.5px solid ${achieved ? C.green : isCurrent ? C.red : C.border}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.3s" }}>
-                              {achieved ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12L10 17L19 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg> : <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: isCurrent ? C.red : C.border }} />}
-                            </div>
-                            <div style={{ fontSize: "10px", fontWeight: 600, textAlign: "center", color: achieved ? C.green : isCurrent ? C.red : C.muted }}>{m.label}</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div style={{ padding: "10px 12px", borderRadius: C.radiusSm, background: secondNopSep >= 2 ? C.greenLight : C.redLight, border: `1px solid ${secondNopSep >= 2 ? "#86EFAC" : "#FECACA"}`, fontSize: "12px", color: secondNopSep >= 2 ? C.green : C.red }}>
-                    {secondNopSep >= 2 ? <strong>Reward unlocked — Rs.800 earned!</strong> : secondNopSep === 1 ? <>1 more New policy needed to unlock <strong>Rs.800</strong></> : <>Book <strong>2 New policies</strong> (min Rs.15,000) to earn Rs.800</>}
                   </div>
                 </div>
               )
@@ -1132,7 +1141,8 @@ export default function ContestDashboard() {
                   <div style={{ marginTop: "10px", fontSize: "10px", color: C.hint, lineHeight: 1.5 }}>Only New + Port via PoS/IDEdge. Min Rs.15,000. PA and 0% excluded. Max Rs.500.</div>
                 </div>
               )
-            }].map(contest => {
+            }];
+            const renderContest = contest => {
               const isExpanded = expandedContest === contest.key;
               return (
                 <div key={contest.key} style={{ background: C.card, borderRadius: C.radius, boxShadow: C.shadow, marginBottom: "8px", overflow: "hidden" }}>
@@ -1157,13 +1167,29 @@ export default function ContestDashboard() {
                   {isExpanded && contest.content}
                 </div>
               );
-            })}
+            };
+            const pastList = allContests.filter(c => PAST_KEYS.includes(c.key));
+            return (<>
+              {allContests.filter(c => !PAST_KEYS.includes(c.key)).map(renderContest)}
+              <div onClick={() => setShowPast(!showPast)}
+                style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+                  marginTop: "16px", marginBottom: "8px", cursor: "pointer", WebkitTapHighlightColor: "transparent" }}>
+                <div style={{ fontSize: "12px", fontWeight: 700, color: C.muted,
+                  textTransform: "uppercase", letterSpacing: "0.08em" }}>Past Contests ({pastList.length})</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  style={{ transform: showPast ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                  <path d="M6 9L12 15L18 9" stroke={C.muted} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              {showPast && pastList.map(renderContest)}
+            </>);
+            })()}
 
             {/* Dates */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginTop: "20px" }}>
               {[
-                { label: "Jeeto July Period", value: "1 Jul – 31 Jul 2026" },
-                { label: "Booking Allowed Till", value: "10 Aug 2026"    },
+                { label: "Nov Request Date", value: "1 Nov – 30 Nov 2026" },
+                { label: "Nov Booking Allowed Till", value: "10 Dec 2026" },
               ].map((d, i) => (
                 <div key={i} style={{ background: C.card, borderRadius: C.radiusSm, padding: "10px 12px", boxShadow: C.shadow }}>
                   <div style={{ fontSize: "10px", color: C.muted, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>{d.label}</div>
