@@ -381,7 +381,7 @@ function HomeScreen({ onNavigate }) {
     },
     {
       title: "Contest Achievement",
-      desc: "Track Jeeto July, VLI and Gold Jackpot progress",
+      desc: "Track Mahotsav, VLI and Online contest progress",
       tab: "contests",
       icon: (
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
