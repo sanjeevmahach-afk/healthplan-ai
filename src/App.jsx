@@ -333,7 +333,7 @@ function HomeScreen({ onNavigate }) {
   const totalDisplay = useCountUp(visits.total, 1400);
 
   const BANNERS = [
-    { src: "/Oct_Mahotsav_Banner.png",    alt: "October Mahotsav",              fallbackTitle: "🏆 October Mahotsav", fallbackSub: "Book Rs.75K → Earn up to Malaysia 1 Pax!", fallbackBg: "linear-gradient(135deg,#7c3aed,#4f46e5)" },
+    { src: "/Nov_Mahotsav_Banner.png",    alt: "November Mahotsav",             fallbackTitle: "🏆 November Mahotsav", fallbackSub: "Book Rs.75K → Earn up to Malaysia 1 Pax!", fallbackBg: "linear-gradient(135deg,#7c3aed,#4f46e5)" },
     { src: "/Online_Contest_Banner.png",  alt: "Online Health Booking Contest",  fallbackTitle: "📱 Online Health Booking", fallbackSub: "Book 1 policy via PoS/IDEdge → Earn Rs.500!", fallbackBg: "linear-gradient(135deg,#0891b2,#0369a1)" },
     { src: "/VLI_4__Banner.png",          alt: "VLI Health Payout",              fallbackTitle: "💰 VLI Health Payout", fallbackSub: "Earn up to 15% extra on health premium", fallbackBg: "linear-gradient(135deg,#dc2626,#b91c1c)" },
   ];
